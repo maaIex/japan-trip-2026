@@ -752,7 +752,10 @@ html, body { overflow-x: hidden; max-width: 100vw; }
         <InstallBanner />
         <EmergencyFAB />
         <header className="safe-top" style={{ background:"linear-gradient(135deg,#7B0000 0%,#B0000A 60%,#CC2020 100%)", padding:"1.75rem 1.25rem 1.5rem", position:"relative", overflow:"hidden" }}>
-          <div style={{ position:"absolute", right:"-40px", top:"-40px", width:"200px", height:"200px", borderRadius:"50%", background:"rgba(255,255,255,0.05)" }}/>
+          {/* Decorative circle — pointerEvents:none so it never intercepts
+              clicks on the dark mode toggle button that sits behind it in
+              the flex layout. */}
+          <div style={{ position:"absolute", right:"-40px", top:"-40px", width:"200px", height:"200px", borderRadius:"50%", background:"rgba(255,255,255,0.05)", pointerEvents:"none" }}/>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
             <div style={{ flex:1 }}>
               <p style={{ fontFamily:"'Cormorant Garamond',serif", color:"rgba(255,255,255,0.55)", fontSize:"0.78rem", letterSpacing:"0.22em", textTransform:"uppercase", marginBottom:"0.35rem" }}>Voyage Japon · 3 adultes · 27 avril – 11 mai 2026</p>
