@@ -1,50 +1,47 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta charset="UTF-8" />
+  <!-- Viewport: viewport-fit=cover required so content can extend under
+       the iPhone notch / Dynamic Island (combined with safe-area-inset
+       padding in the app CSS). -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
   <title>Voyage Japon 2026</title>
+  <meta name="description" content="Itinéraire détaillé du voyage au Japon — 27 avril au 11 mai 2026" />
 
-  <!-- Theme color: matches the dark red header -->
-  <meta name="theme-color" content="#7B0000">
-  <meta name="color-scheme" content="light dark">
+  <!-- Color scheme: theme_color matches the dark red header. -->
+  <meta name="theme-color" content="#7B0000" />
+  <meta name="color-scheme" content="light dark" />
 
-  <!-- iOS PWA support -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Japon 2026">
+  <!-- ─── iOS / Safari PWA ─── -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Japon 2026" />
+  <!-- iOS falls back to any icon it can find; we point to icon-192.png
+       until a dedicated 180x180 apple-touch-icon.png is added. -->
+  <link rel="apple-touch-icon" href="/icon-192.png" />
 
-  <!-- Android PWA -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="application-name" content="Voyage Japon 2026">
+  <!-- ─── Android / Chrome PWA ─── -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="application-name" content="Voyage Japon 2026" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
 
-  <!-- Manifest + icons -->
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-  <link rel="apple-touch-icon" href="icon-192.png">
-
-  <!-- Description -->
-  <meta name="description" content="Itinéraire détaillé du voyage au Japon — 27 avril au 11 mai 2026">
-
+  <!-- Initial paint: red gradient loader, avoids flash of white while Vite loads. -->
   <style>
-    /* Inline critical styles so something is shown even if app.js is slow to load */
     html, body {
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
       background: #F7F4EF;
-      color: #1F2937;
       -webkit-text-size-adjust: 100%;
       -webkit-tap-highlight-color: transparent;
     }
     @media (prefers-color-scheme: dark) {
-      html, body { background: #0D0D0D; color: #F1F0EE; }
+      html, body { background: #0D0D0D; }
     }
-    #root { min-height: 100vh; }
-
-    /* Loading screen shown until React mounts */
-    .initial-loader {
+    #initial-loader {
       position: fixed;
       inset: 0;
       display: flex;
@@ -56,56 +53,45 @@
       color: white;
       z-index: 9999;
       transition: opacity 0.3s;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
     }
-    .initial-loader.hidden { opacity: 0; pointer-events: none; }
-    .initial-loader-emoji { font-size: 3rem; }
-    .initial-loader-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-    }
-    .initial-loader-sub {
-      font-size: 0.8rem;
-      opacity: 0.7;
-    }
-    .initial-loader-spinner {
-      width: 28px;
-      height: 28px;
-      border: 3px solid rgba(255,255,255,0.2);
+    #initial-loader.hidden { opacity: 0; pointer-events: none; }
+    #initial-loader .emoji { font-size: 3rem; }
+    #initial-loader .title { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.05em; }
+    #initial-loader .sub { font-size: 0.78rem; opacity: 0.75; }
+    #initial-loader .spin {
+      width: 26px; height: 26px;
+      border: 3px solid rgba(255,255,255,0.22);
       border-top-color: white;
       border-radius: 50%;
       animation: spin 0.9s linear infinite;
-      margin-top: 0.5rem;
+      margin-top: 0.3rem;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
   <div id="root">
-    <div class="initial-loader" id="initial-loader">
-      <div class="initial-loader-emoji">🗾</div>
-      <div class="initial-loader-title">Voyage Japon 2026</div>
-      <div class="initial-loader-sub">Chargement de l'itinéraire…</div>
-      <div class="initial-loader-spinner"></div>
+    <div id="initial-loader">
+      <div class="emoji">🗾</div>
+      <div class="title">Voyage Japon 2026</div>
+      <div class="sub">Chargement de l'itinéraire…</div>
+      <div class="spin"></div>
     </div>
   </div>
 
-  <!-- React 18 from unpkg (cached by service worker after first load) -->
-  <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
-
-  <!-- App bundle -->
-  <script src="app.js"></script>
+  <script type="module" src="/src/main.jsx"></script>
 
   <script>
-    // Hide the initial loader once React has mounted (react replaces #root contents)
+    // Remove the loader shortly after mount so the user sees branding
+    // instead of a flash of nothing.
     setTimeout(() => {
       const loader = document.getElementById('initial-loader');
       if (loader) {
         loader.classList.add('hidden');
         setTimeout(() => loader.remove(), 400);
       }
-    }, 100);
+    }, 150);
   </script>
 </body>
 </html>

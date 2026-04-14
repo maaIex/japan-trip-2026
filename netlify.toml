@@ -1,12 +1,13 @@
 # ─── Netlify configuration — Voyage Japon 2026 ───────────────────────
-# Static site: pre-bundled app.js loads React via UMD from unpkg.
-# No build step required — Netlify just publishes the files as-is.
+# Vite project: React source in src/, built to dist/ by `npm run build`.
 
 [build]
-  # No compilation — "true" is a no-op shell command that always succeeds.
-  command = "true"
-  # Root of the repo is what gets published.
-  publish = "."
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Pin Node to an LTS version supported by Vite 5.
+  NODE_VERSION = "20"
 
 # ─── SPA fallback ────────────────────────────────────────────────────
 # Any unknown path serves index.html so the React app can handle routing
@@ -35,3 +36,9 @@
   for = "/icon-*.png"
   [headers.values]
     Cache-Control = "public, max-age=604800"
+
+# Hashed Vite bundles can be cached forever (filenames change on rebuild).
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
