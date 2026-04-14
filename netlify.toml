@@ -1,0 +1,37 @@
+# ─── Netlify configuration — Voyage Japon 2026 ───────────────────────
+# Static site: pre-bundled app.js loads React via UMD from unpkg.
+# No build step required — Netlify just publishes the files as-is.
+
+[build]
+  # No compilation — "true" is a no-op shell command that always succeeds.
+  command = "true"
+  # Root of the repo is what gets published.
+  publish = "."
+
+# ─── SPA fallback ────────────────────────────────────────────────────
+# Any unknown path serves index.html so the React app can handle routing
+# (safe even though the app currently uses in-memory navigation).
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# ─── Headers ─────────────────────────────────────────────────────────
+# The service worker MUST NOT be cached aggressively — browsers should
+# re-check it on every page load so new versions ship quickly.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+# The manifest should also stay fresh.
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+# Icons can be cached hard — they rarely change.
+[[headers]]
+  for = "/icon-*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
