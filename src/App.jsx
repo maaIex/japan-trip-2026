@@ -720,8 +720,12 @@ input, textarea, select { font-size: 16px !important; }
   border-radius: 4px;
 }
 
-/* Smooth momentum scrolling on iOS */
-html, body { -webkit-overflow-scrolling: touch; overscroll-behavior-y: none; }
+/* Smooth momentum scrolling on iOS. Note: only applied to body (not html)
+   so html remains the natural viewport scroll container on desktop —
+   setting overflow on html makes it a scroll context and can break
+   wheel-scroll. overscroll-behavior-y:none prevents pull-to-refresh
+   on mobile without affecting desktop wheel scroll. */
+body { -webkit-overflow-scrolling: touch; overscroll-behavior-y: none; }
 
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
@@ -788,8 +792,13 @@ button[data-tap="action"] {
    Removed — the perf gain on 16 cards did not justify the scroll bug. */
 
 /* Prevent horizontal scroll at page level (common mobile bug when a
-   child accidentally overflows the viewport). */
-html, body { overflow-x: hidden; max-width: 100vw; }
+   child accidentally overflows the viewport).
+   IMPORTANT: only applied to body, NOT html. Per CSS spec, if overflow-x
+   is set to hidden on the root element, overflow-y is forced to auto,
+   which turns html into a scroll container — on desktop this breaks
+   mouse-wheel scrolling on the natural document scroll. Keeping the rule
+   on body only preserves the normal viewport scroll behaviour. */
+body { overflow-x: hidden; max-width: 100vw; }
 
 @media print {
   header, nav, .no-print, [class*="urgent"], [class*="search"], [class*="toggle"],
