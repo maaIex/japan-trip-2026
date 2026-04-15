@@ -740,12 +740,11 @@ button[data-tap="action"] {
 .nav-scroll-wrap nav { scroll-snap-type: x proximity; }
 .nav-scroll-wrap nav > div > button { scroll-snap-align: start; }
 
-/* Defer rendering/layout of off-screen day cards. This keeps first
-   paint fast on older phones even with 16 data-heavy days. */
-article[id^="day-"] {
-  content-visibility: auto;
-  contain-intrinsic-size: 0 200px;
-}
+/* Note: we previously used `content-visibility: auto` + `contain-intrinsic-size`
+   on day cards to defer off-screen rendering. It broke desktop wheel-scroll
+   because the browser underestimated total document height (200px placeholder
+   vs. 1500-3000px actual per day card), which confused scroll anchoring.
+   Removed — the perf gain on 16 cards did not justify the scroll bug. */
 
 /* Prevent horizontal scroll at page level (common mobile bug when a
    child accidentally overflows the viewport). */
