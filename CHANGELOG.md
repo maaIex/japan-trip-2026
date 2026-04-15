@@ -38,6 +38,12 @@ Priorités réelles restantes : ErrorBoundary (🔥), iOS modal scroll-lock, fon
 
 Impact : en cas de crash inattendu pendant le voyage, plus d'écran blanc catastrophique. L'utilisateur voit une page lisible avec action de récupération claire, et les données localStorage (réservations, items cochés) sont préservées.
 
+### Lot 2 — Fixes techniques rapides
+
+- **iOS modal scroll-lock** corrigé ([App.jsx:3087](src/App.jsx)) : sur iOS Safari, `overflow:hidden` sur body ne bloque pas le scroll d'arrière-plan. Remplacé par le pattern `position:fixed` + mémorisation du scrollY + restauration à la fermeture.
+- **A11y** ajoutée : `aria-expanded` + `aria-controls` sur les boutons de cartes-journées, `aria-selected` + `aria-current="page"` sur les onglets de navigation. Permet aux lecteurs d'écran (VoiceOver iOS, TalkBack Android) d'annoncer l'état plié/déplié et l'onglet actif.
+- **Google Fonts preconnect** ajouté dans `index.html` : établit le handshake DNS/TLS vers fonts.googleapis.com et fonts.gstatic.com en parallèle du chargement principal au lieu de bloquer le premier rendu.
+
 ---
 
 ## Session 1 — Avant 2026-04-15 (historique git)

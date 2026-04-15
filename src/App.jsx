@@ -934,7 +934,7 @@ html, body { overflow-x: hidden; max-width: 100vw; }
               const cc = CITY[tb.city];
               const active = activeTab === tb.id;
               return (
-                <button key={tb.id} onClick={()=>setActiveTab(tb.id)} style={{ padding:"0.85rem 0.9rem", border:"none", background:"transparent", cursor:"pointer", borderBottom:active?`3px solid ${cc.color}`:"3px solid transparent", transition:"all 0.15s", outline:"none" }}>
+                <button key={tb.id} onClick={()=>setActiveTab(tb.id)} role="tab" aria-selected={active} aria-current={active ? "page" : undefined} style={{ padding:"0.85rem 0.9rem", border:"none", background:"transparent", cursor:"pointer", borderBottom:active?`3px solid ${cc.color}`:"3px solid transparent", transition:"all 0.15s", outline:"none" }}>
                   <div style={{ fontSize:"0.8rem", fontWeight:600, color:active?cc.color:v("textSec",dark), whiteSpace:"nowrap" }}>{tb.label}</div>
                   <div style={{ fontSize:"0.68rem", color:v("textMuted",dark), marginTop:"1px" }}>{tb.sub}</div>
                 </button>
@@ -1021,7 +1021,7 @@ const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query }, re
   const cityNames = { tokyo:"Tokyo", kyoto:"Kyoto", osaka:"Osaka", transit:"Transit", depart:"Départ" };
   return (
     <article ref={ref} id={"day-" + day.n} style={{ background:v("cardBg",dark), borderRadius:"12px", overflow:"hidden", boxShadow:dark?"0 1px 4px rgba(0,0,0,0.4)":"0 1px 4px rgba(0,0,0,0.07)", border:`1px solid ${v("border",dark)}`, transition:"background 0.3s, border 0.3s" }}>
-      <button onClick={onToggle} style={{ width:"100%", display:"flex", alignItems:"center", gap:"0.85rem", padding:"0.85rem 1rem", background:"transparent", border:"none", cursor:"pointer", textAlign:"left", outline:"none" }}>
+      <button onClick={onToggle} aria-expanded={isOpen} aria-controls={"day-" + day.n + "-content"} style={{ width:"100%", display:"flex", alignItems:"center", gap:"0.85rem", padding:"0.85rem 1rem", background:"transparent", border:"none", cursor:"pointer", textAlign:"left", outline:"none" }}>
         <div style={{ flexShrink:0, width:"2.5rem", height:"2.5rem", borderRadius:"50%", background:cc.light[dark?"dark":"light"], border:`2px solid ${cc.border[dark?"dark":"light"]}`, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
           <span style={{ fontSize:"0.68rem", color:cc.color, fontWeight:700, lineHeight:1 }}>J</span>
           <span style={{ fontSize:day.nLabel?"0.85rem":"0.95rem", color:cc.color, fontWeight:700, lineHeight:1 }}>{day.nLabel||day.n}</span>
@@ -1042,7 +1042,7 @@ const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query }, re
         </div>
       )}
       {isOpen && (
-        <div style={{ padding:"0 0.875rem 0.875rem" }}>
+        <div id={"day-" + day.n + "-content"} style={{ padding:"0 0.875rem 0.875rem" }}>
           <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:"0.5rem" }}>
             <button onClick={e=>{e.stopPropagation();toggleView();}} data-tap="action" style={{ fontSize:"0.75rem", borderRadius:"8px", border:`1px solid ${v("borderLight",dark)}`, background:viewMode==="timeline"?(dark?"#1A2340":"#EEF2FF"):"transparent", color:viewMode==="timeline"?"#3B7EFF":v("textMuted",dark), cursor:"pointer", fontFamily:"inherit" }}>
               {viewMode==="timeline"?"📋 Cartes":"⏱ Timeline"}
@@ -3083,13 +3083,31 @@ function EmergencyFAB() {
     }
   }, []);
 
-  // Lock body scroll when modal open
+  // Lock body scroll when modal open — iOS-safe.
+  // Just setting overflow:hidden does NOT prevent background scroll on
+  // iOS Safari. The fixed-position trick locks the body at the current
+  // scroll offset and we restore scroll on close.
   useEffect(() => {
-    if (open) {
-      const prev = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-      return () => { document.body.style.overflow = prev; };
-    }
+    if (!open) return;
+    const scrollY = window.scrollY;
+    const prev = {
+      overflow: document.body.style.overflow,
+      position: document.body.style.position,
+      top: document.body.style.top,
+      width: document.body.style.width,
+    };
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+    return () => {
+      document.body.style.overflow = prev.overflow;
+      document.body.style.position = prev.position;
+      document.body.style.top = prev.top;
+      document.body.style.width = prev.width;
+      // Restore scroll. requestAnimationFrame avoids a flash on some browsers.
+      window.scrollTo(0, scrollY);
+    };
   }, [open]);
 
   const copyText = (text, key) => {

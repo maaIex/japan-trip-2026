@@ -14,6 +14,13 @@
   <meta name="theme-color" content="#7B0000" />
   <meta name="color-scheme" content="light dark" />
 
+  <!-- Preconnect to Google Fonts so DNS/TLS happens in parallel with
+       the main app load rather than blocking first paint. The fonts
+       themselves are still @import-ed from App.jsx, but the handshake
+       is now free. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
   <!-- ─── iOS / Safari PWA ─── -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
