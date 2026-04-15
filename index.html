@@ -18,9 +18,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Japon 2026" />
-  <!-- iOS falls back to any icon it can find; we point to icon-192.png
-       until a dedicated 180x180 apple-touch-icon.png is added. -->
-  <link rel="apple-touch-icon" href="/icon-192.png" />
+  <!-- 180x180 is the size iOS actually uses for the home-screen icon.
+       Providing a dedicated asset avoids iOS downscaling the 192px one. -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
   <!-- ─── Android / Chrome PWA ─── -->
   <meta name="mobile-web-app-capable" content="yes" />
