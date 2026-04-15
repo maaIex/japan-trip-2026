@@ -20,9 +20,23 @@ Journal des modifications apportées par session Claude Code. À donner en débu
   - Fix : suppression de la règle CSS. Gain de perf marginal vs bug bloquant.
   - Impact mobile : aucun (le tactile n'était pas affecté).
 
-### Audit en cours
+### Audit revisé
 
-Audit complet sur 4 axes (technique/perf, UX desktop+mobile, contenu Japon, fonctionnalités manquantes) présenté à l'utilisateur — en attente de validation avant implémentation.
+Audit initial avait manqué plusieurs fonctionnalités déjà implémentées :
+- Service Worker + offline.html déjà présents et enregistrés (`public/sw.js`, App.jsx:601)
+- Auto-scroll vers jour actuel déjà présent (`voyageMode`, `currentDayN`, App.jsx:564-646)
+- Compte à rebours départ déjà présent
+- Liens Google Maps par activité déjà présents (`mapsLink()` App.jsx:1391)
+
+Priorités réelles restantes : ErrorBoundary (🔥), iOS modal scroll-lock, fonts, a11y, layout desktop, convertisseur JPY, météo, checklist départ, mode grand texte, contenu Golden Week.
+
+### Lot 1 — Filet de sécurité React
+
+- **`src/ErrorBoundary.jsx`** créé : composant classe React qui capture les erreurs du sous-arbre. Affiche un écran fallback rouge avec emoji, message rassurant, détails technique dépliables, bouton "Recharger", et bouton "Réinitialiser les données locales" (préserve le dark mode).
+- **`src/main.jsx`** : `<App />` wrappé dans `<ErrorBoundary>`.
+- **Fix build** : backticks dans le commentaire CSS du commit précédent cassaient le template literal JS. Remplacés par du texte brut.
+
+Impact : en cas de crash inattendu pendant le voyage, plus d'écran blanc catastrophique. L'utilisateur voit une page lisible avec action de récupération claire, et les données localStorage (réservations, items cochés) sont préservées.
 
 ---
 

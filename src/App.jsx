@@ -740,7 +740,7 @@ button[data-tap="action"] {
 .nav-scroll-wrap nav { scroll-snap-type: x proximity; }
 .nav-scroll-wrap nav > div > button { scroll-snap-align: start; }
 
-/* Note: we previously used `content-visibility: auto` + `contain-intrinsic-size`
+/* Note: we previously used content-visibility:auto + contain-intrinsic-size
    on day cards to defer off-screen rendering. It broke desktop wheel-scroll
    because the browser underestimated total document height (200px placeholder
    vs. 1500-3000px actual per day card), which confused scroll anchoring.
