@@ -44,6 +44,12 @@ Impact : en cas de crash inattendu pendant le voyage, plus d'écran blanc catast
 - **A11y** ajoutée : `aria-expanded` + `aria-controls` sur les boutons de cartes-journées, `aria-selected` + `aria-current="page"` sur les onglets de navigation. Permet aux lecteurs d'écran (VoiceOver iOS, TalkBack Android) d'annoncer l'état plié/déplié et l'onglet actif.
 - **Google Fonts preconnect** ajouté dans `index.html` : établit le handshake DNS/TLS vers fonts.googleapis.com et fonts.gstatic.com en parallèle du chargement principal au lieu de bloquer le premier rendu.
 
+### Lot 3 — Mode grand texte (parents)
+
+- **Toggle "A+/A−"** dans le header à côté du dark mode. Persistance localStorage (`large-text=1`).
+- Quand activé : `document.documentElement.style.fontSize = "19px"` (vs 16px par défaut) → toutes les tailles en rem grandissent de +18.75%. Les inputs restent à 16px forcés (protection anti-zoom iOS conservée).
+- Usage : utile sur le téléphone des parents en plein soleil ou à bout de bras, et au retour pour relire les notes.
+
 ---
 
 ## Session 1 — Avant 2026-04-15 (historique git)

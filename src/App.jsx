@@ -557,6 +557,20 @@ export default function App() {
   useEffect(() => {
     try { localStorage.setItem("dark-mode", dark ? "1" : "0"); } catch {}
   }, [dark]);
+
+  // Large-text mode — pour les parents (ou lecture a bout de bras).
+  // Scale le root font-size: toutes les tailles en rem grandissent
+  // proportionnellement. Les inputs restent a 16px (regle !important au
+  // dessus) pour conserver la protection anti-zoom iOS.
+  const [largeText, setLargeText] = useState(() => {
+    try { return localStorage.getItem("large-text") === "1"; }
+    catch { return false; }
+  });
+  useEffect(() => {
+    document.documentElement.style.fontSize = largeText ? "19px" : "";
+    try { localStorage.setItem("large-text", largeText ? "1" : "0"); } catch {}
+  }, [largeText]);
+
   const [query, setQuery] = useState("");
   const searchRef = useRef(null);
 
@@ -772,22 +786,41 @@ html, body { overflow-x: hidden; max-width: 100vw; }
               <p style={{ fontFamily:"'Cormorant Garamond',serif", color:"rgba(255,255,255,0.55)", fontSize:"0.78rem", letterSpacing:"0.22em", textTransform:"uppercase", marginBottom:"0.35rem" }}>Voyage Japon · 3 adultes · 27 avril – 11 mai 2026</p>
               <h1 style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1.85rem", fontWeight:600, lineHeight:1.2, marginBottom:"1rem" }}>Itinéraire Complet</h1>
             </div>
-            <button
-              onClick={()=>setDark(d=>!d)}
-              title={dark?"Mode clair":"Mode sombre"}
-              aria-label={dark?"Passer en mode clair":"Passer en mode sombre"}
-              style={{
-                flexShrink:0, marginLeft:"0.75rem",
-                width:"44px", height:"44px",
-                borderRadius:"12px", border:"none", cursor:"pointer",
-                background: dark ? "rgba(250,204,21,0.25)" : "rgba(255,255,255,0.18)",
-                display:"flex", alignItems:"center", justifyContent:"center",
-                fontSize:"1.1rem",
-                transition:"background 0.2s",
-              }}
-            >
-              {dark ? "🌙" : "☀️"}
-            </button>
+            <div style={{ display:"flex", gap:"0.4rem", flexShrink:0, marginLeft:"0.75rem" }}>
+              <button
+                onClick={()=>setLargeText(t=>!t)}
+                title={largeText?"Texte normal":"Grand texte"}
+                aria-label={largeText?"Passer en texte normal":"Passer en grand texte"}
+                aria-pressed={largeText}
+                style={{
+                  width:"44px", height:"44px",
+                  borderRadius:"12px", border:"none", cursor:"pointer",
+                  background: largeText ? "rgba(96,165,250,0.35)" : "rgba(255,255,255,0.18)",
+                  display:"flex", alignItems:"center", justifyContent:"center",
+                  fontSize:"0.95rem", fontFamily:"inherit", fontWeight:700,
+                  color:"white", letterSpacing:"0.02em",
+                  transition:"background 0.2s",
+                }}
+              >
+                {largeText ? "A−" : "A+"}
+              </button>
+              <button
+                onClick={()=>setDark(d=>!d)}
+                title={dark?"Mode clair":"Mode sombre"}
+                aria-label={dark?"Passer en mode clair":"Passer en mode sombre"}
+                aria-pressed={dark}
+                style={{
+                  width:"44px", height:"44px",
+                  borderRadius:"12px", border:"none", cursor:"pointer",
+                  background: dark ? "rgba(250,204,21,0.25)" : "rgba(255,255,255,0.18)",
+                  display:"flex", alignItems:"center", justifyContent:"center",
+                  fontSize:"1.1rem",
+                  transition:"background 0.2s",
+                }}
+              >
+                {dark ? "🌙" : "☀️"}
+              </button>
+            </div>
           </div>
           <div style={{ display:"flex", flexWrap:"wrap", gap:"0.45rem" }}>
             {["🏨 4 séjours réservés","🎫 JR Pass ✅","✈️ Haneda (HND)","🎌 Golden Week","👥 3 adultes","☕ Petit-déj inclus"].map((b,i)=>(
