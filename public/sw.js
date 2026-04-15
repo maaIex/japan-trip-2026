@@ -7,7 +7,7 @@
 // 🧷 localStorage data (notes, reservations, done-items) is NEVER touched
 //    by the SW — only static assets are cached here.
 
-const CACHE_VERSION = 'japon-2026-v2';
+const CACHE_VERSION = 'japon-2026-v3';
 const CACHE_NAME = `japon-voyage-${CACHE_VERSION}`;
 
 // Files to cache on first visit. Paths are relative to the site root.

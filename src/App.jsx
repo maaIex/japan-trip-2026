@@ -143,7 +143,7 @@ const DAYS = [
   // J4 — 30 AVRIL — HARAJUKU + TEAMLAB + SHIBUYA
   // ═══════════════════════════════════════════════════════
   {
-    n:4, date:"30 avr", day:"Jeu", city:"tokyo", title:"Harajuku + TeamLab ✅ 15h + Shibuya Sky 🌇", alert:null,
+    n:4, date:"30 avr", day:"Jeu", city:"tokyo", title:"Harajuku + TeamLab ✅ 15h + Shibuya Sky ✅ 19h", alert:null,
     sections:[
       { id:"matin", items:[
         {s:"free", t:"🕗 8h00 — Meiji Jingu (明治神宮) — Protocole et itinéraire", sub:"🚇 Depuis Asakusa : Ginza Line (G-19) → Omotesando (G-02, 6 arrêts, 12 min) → marcher 10 min vers le nord jusqu'à l'entrée sud du sanctuaire. OU Yamanote Line → Harajuku (2 arrêts depuis Shibuya). Entrée : GRATUITE. Ouvert à l'aube, ferme à la tombée de la nuit.\n\nGRANDE TORII (大鳥居) : En cyprès hinoki, 12m de haut, reconstruit en 1975. S'incliner légèrement en passant sous la porte — protocole shinto.\n\nCHEMIN GRAVIER (参道) : 1,7 km à travers une forêt de 70 000 arbres de 365 espèces, tous plantés manuellement par 100 000 volontaires en 1920. Silence quasi-total à 8h.\n\nTONNEAUX DE SAKÉ (菰樽) : À mi-chemin côté droit. 245 tonneaux de Bourgogne offerts par la Bourgogne (côté opposé gauche). Offrandes symboliques au sanctuaire.\n\nSANCTUAIRE PRINCIPAL (本殿) : Prière shinto — 2 inclinaisons profondes, 2 claquements de mains, 1 inclinaison finale. Goshuin disponible (tampon officiel ~500¥) au bureau à droite.\n\nIRIS GARDEN (花菖蒲田) : Accessible par chemin secondaire. En floraison mi-juin mais le jardin intérieur est beau en avril. Entrée ~500¥."},
@@ -160,13 +160,13 @@ const DAYS = [
         {s:"opt", t:"✨ Teamlab Borderless (si réouvert en 2026)", sub:"Différent de Planets — installations numériques sans murs ni limites (concept 'borderless'). Vérifier teamlab.art pour la réouverture. Anciennement à Odaiba, déplacé à Azabudai Hills — vérifier la nouvelle adresse."},
       ]},
       { id:"soir", items:[
-        {s:"book", t:"🌇 18h30 — Shibuya Sky (渋谷スカイ) — Coucher de soleil ⚠️ Réserver", sub:"⚠️ RÉSERVATION OBLIGATOIRE sur shibuya-scramble-square.com — section 'SKY'. 2000¥/adulte.\n\n🚇 Depuis Odaiba : Yurikamome → Shimbashi + Ginza Line → Shibuya (~35 min). Arriver à 18h15 au comptoir (Scramble Square Tower, niveau 2F → ascenseur dédié jusqu'au 46F).\n\nVUE DEPUIS LE TOIT (229m) : Toit entièrement ouvert avec garde-corps en verre transparent. Le Scramble Crossing est directement en contrebas. En mai à 18h30 : soleil se couchant derrière Shinjuku à l'ouest, dégradé rose-orange-violet exceptionnel.\n\nEDGE of SKY : Zone en porte-à-faux avec hamacs suspendus dans les airs — vertige garanti. File 5-15 min.\n\nOn distingue Tokyo Tower (sud), Tokyo Skytree (nord-est), Shinjuku (ouest). Durée recommandée : 1h."},
-        {s:"free", t:"🕗 19h45 — Shibuya Crossing + Dîner", sub:"🚶 2 min depuis le Scramble Square en descendant. Traverser le carrefour (jusqu'à 3000 personnes simultanément). Vue depuis le Starbucks Shibuya Tsutaya (2F, côté fenêtre).\n\n🍣 KATSU MIDORI SUSHI : Sushi qualité marché-poisson. Shibuya Mark City 1F. File ~20-30 min. Assiettes 130-350¥.\n\n🍜 AFURI HARAJUKU : Ramen au bouillon yuzu (~1200¥) — léger et aromatique. File ~20 min."},
+        {s:"ok", t:"✅ 🌇 19h00 — Shibuya Sky (渋谷スカイ) — Réservation confirmée", sub:"✅ RÉSERVATION CONFIRMÉE pour le 30 avril à 19h00. 2000¥/adulte × 3.\n\n🚇 Depuis Odaiba : Yurikamome → Shimbashi + Ginza Line → Shibuya (~35 min). Quitter Odaiba vers 18h15 pour arriver à 18h45. Accès : Scramble Square Tower, niveau 2F → ascenseur dédié jusqu'au 46F. QR code au portique.\n\nVUE DEPUIS LE TOIT (229m) : Toit entièrement ouvert avec garde-corps en verre transparent. Le Scramble Crossing est directement en contrebas. Soleil couchant vers 18h35 en mai, ciel rose-orange qui s'estompe jusqu'à 19h20 → on arrive pile pour la bascule jour/nuit (« blue hour »). Tokyo commence à s'illuminer.\n\nEDGE of SKY : Zone en porte-à-faux avec hamacs suspendus dans les airs — vertige garanti. File 5-15 min.\n\nOn distingue Tokyo Tower (sud), Tokyo Skytree (nord-est), Shinjuku (ouest). Durée recommandée : 1h — sortie ~20h.\n\n⚠️ SACS : obligatoirement en casier en bas avant de monter (gratuit). Pas de trépied sur le toit. Vêtement chaud léger : il peut faire 4-5°C de moins qu'en bas et très venté."},
+        {s:"free", t:"🕗 20h15 — Shibuya Crossing + Dîner", sub:"🚶 2 min depuis le Scramble Square en descendant. Traverser le carrefour (jusqu'à 3000 personnes simultanément). Vue depuis le Starbucks Shibuya Tsutaya (2F, côté fenêtre).\n\n🍣 KATSU MIDORI SUSHI : Sushi qualité marché-poisson. Shibuya Mark City 1F. File ~20-30 min. Assiettes 130-350¥.\n\n🍜 AFURI HARAJUKU : Ramen au bouillon yuzu (~1200¥) — léger et aromatique. File ~20 min."},
       ]},
     ],
     tips:[
-      "⏰ TIMING J4 : TeamLab → Odaiba (~17h) → Shibuya Sky 18h30 (transit ~35 min). Quitter Odaiba à 17h45 au plus tard.",
-      "🌇 SHIBUYA SKY : Réserver dès maintenant sur shibuya-scramble-square.com — sold out en Golden Week.",
+      "⏰ TIMING J4 : TeamLab → Odaiba (~17h) → Shibuya Sky 19h (transit ~35 min). Quitter Odaiba à 18h15 au plus tard.",
+      "🌇 SHIBUYA SKY : ✅ Réservé pour le 30 avril à 19h00 — bascule jour/nuit parfaite à cette heure (coucher de soleil ~18h35, blue hour jusqu'à 19h20).",
       "🌉 ODAIBA : Vue nocturne sur Rainbow Bridge depuis la plage = une des plus belles de Tokyo.",
     ],
   },
@@ -456,7 +456,7 @@ const CHECKLIST = [
     { name:"Universal Studios Japan", date:"8 mai — journée", platform:"usj.co.jp", status:"ok", note:"" },
   ]},
   { cat:"🔴 Urgence absolue — Réserver maintenant", color:"#F87171", items:[
-    { name:"Shibuya Sky (Scramble Square)", date:"30 avril soir — 18h30", platform:"shibuya-scramble-square.com", status:"book", note:"Sold out rapidement en Golden Week" },
+    { name:"Shibuya Sky (Scramble Square)", date:"30 avril — 19h00", platform:"shibuya-scramble-square.com", status:"ok", note:"✅ Réservation confirmée (3 adultes)" },
     { name:"Kittan Hibiki — Wagyu Yakiniku Osaka", date:"Soir du 9 mai (J13)", platform:"Tablecheck.com ou Tableall.com — chercher Kittan Hibiki Osaka", status:"book", note:"Réserver plusieurs semaines à l'avance" },
     { name:"Gion Tanto — Cuisine kyotoïte machiya", date:"Soir du 4 ou 6 mai", platform:"Tablecheck ou contact direct", status:"book", note:"Délai minimum 2-3 semaines — urgent" },
     { name:"Kichi Kichi Omurice — Chef Yukimura", date:"Soir du 5 mai", platform:"kichikichi.co.jp ou DM Instagram @kichikichi_yukimura", status:"book", note:"6 places seulement — tenter tous les canaux" },
@@ -544,7 +544,19 @@ function countMatches(days, query) {
 export default function App() {
   const [activeTab, setActiveTab] = useState("tokyo");
   const [openDays, setOpenDays] = useState(new Set([1]));
-  const [dark, setDark] = useState(false);
+  // Dark mode: read saved preference, fall back to system preference.
+  // Using a lazy initializer so this only runs once on mount.
+  const [dark, setDark] = useState(() => {
+    try {
+      const saved = localStorage.getItem("dark-mode");
+      if (saved === "1") return true;
+      if (saved === "0") return false;
+      return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    } catch { return false; }
+  });
+  useEffect(() => {
+    try { localStorage.setItem("dark-mode", dark ? "1" : "0"); } catch {}
+  }, [dark]);
   const [query, setQuery] = useState("");
   const searchRef = useRef(null);
 
@@ -822,6 +834,30 @@ html, body { overflow-x: hidden; max-width: 100vw; }
               <>
                 <span style={{ fontSize:"1rem" }}>🗾</span>
                 <span style={{ fontSize:"0.75rem", fontWeight:600, color:dark?"#4ADE80":"#166534", flex:1 }}>Jour {currentDayN} de votre voyage — {currentDayObj.title}</span>
+                <button
+                  onClick={() => {
+                    const tabForDay = TABS.find(t => t.range.length && currentDayN >= t.range[0] && currentDayN <= t.range[1]);
+                    if (tabForDay) {
+                      setActiveTab(tabForDay.id);
+                      setOpenDays(prev => new Set(prev).add(currentDayN));
+                      setTimeout(() => {
+                        const el = document.getElementById("day-" + currentDayN);
+                        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                      }, 120);
+                    }
+                    if (navigator.vibrate) navigator.vibrate(8);
+                  }}
+                  data-tap="action"
+                  style={{
+                    fontSize:"0.7rem", fontWeight:700,
+                    background: dark ? "#14301E" : "#166534",
+                    color: "white",
+                    border:"none", borderRadius:"8px",
+                    padding:"0.35rem 0.7rem",
+                    cursor:"pointer", fontFamily:"inherit", flexShrink:0,
+                  }}
+                  aria-label="Aller à ma journée actuelle"
+                >📍 Maintenant</button>
                 <span style={{ fontSize:"0.7rem", color:dark?"#4ADE80":"#166534" }}>🕐 Tokyo {timeStr}</span>
               </>
             )}
@@ -1782,7 +1818,7 @@ const GASTRO = [
         prix:"Otoro : ¥500-2000 la pièce en omakase", ou:"Toutes disponibles à Tsukiji le matin ou en kaiten-zushi.",
         adresse:"Pour l'otoro frais : arriver à Tsukiji avant 8h",
         spots:[
-          { nom:"Katsu Midori Sushi かつみどり 渋谷", quartier:"Shibuya Mark City 1F, Tokyo", note:"⭐ 4.4/5 Tabelog — rapport qualité/prix exceptionnel", prix:"~2500¥ repas complet", resa:"File ~30 min en soirée — sans réservation", diff:"🟢", url:"", tabId:"tokyo", dayN:4, dayLabel:"J4 — Dîner Shibuya (après Shibuya Sky)" },
+          { nom:"Katsu Midori Sushi かつみどり 渋谷", quartier:"Shibuya Mark City 1F, Tokyo", note:"⭐ 4.4/5 Tabelog — rapport qualité/prix exceptionnel", prix:"~2500¥ repas complet", resa:"File ~30 min en soirée — sans réservation", diff:"🟢", url:"", tabId:"tokyo", dayN:4, dayLabel:"J4 — Dîner Shibuya (après Shibuya Sky 19h ✅)" },
         ]
       },
     ]
@@ -2442,7 +2478,43 @@ function GastroSection() {
 // ═══════════════════════════════════════════════════════════════════
 function ConverterCard() {
   const dark = useDark();
-  const [rate, setRate] = useState(163);
+  // Persist the rate across reloads; start from cached value, or 163 as a sane fallback.
+  const [rate, setRate] = useState(() => {
+    try {
+      const cached = parseFloat(localStorage.getItem("jpy-rate"));
+      return Number.isFinite(cached) && cached > 0 ? cached : 163;
+    } catch { return 163; }
+  });
+  const [rateMeta, setRateMeta] = useState(() => {
+    try {
+      const ts = parseInt(localStorage.getItem("jpy-rate-ts") || "0", 10);
+      return ts ? { ts, source: "cache" } : null;
+    } catch { return null; }
+  });
+  // Refresh rate from frankfurter.app (ECB data, free, no key) at most once per 24h.
+  // If offline or the API is down, we silently keep the cached value.
+  useEffect(() => {
+    try {
+      const last = parseInt(localStorage.getItem("jpy-rate-ts") || "0", 10);
+      if (last && Date.now() - last < 24 * 60 * 60 * 1000) return;
+    } catch {}
+    if (!navigator.onLine) return;
+    fetch("https://api.frankfurter.app/latest?from=EUR&to=JPY")
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(data => {
+        const jpy = data && data.rates && data.rates.JPY;
+        if (!jpy) return;
+        const r = Math.round(jpy * 100) / 100;
+        setRate(r);
+        const ts = Date.now();
+        setRateMeta({ ts, source: "live" });
+        try {
+          localStorage.setItem("jpy-rate", String(r));
+          localStorage.setItem("jpy-rate-ts", String(ts));
+        } catch {}
+      })
+      .catch(() => {});
+  }, []);
   const [yen, setYen] = useState("");
   const [eur, setEur] = useState("");
   const refs = [
@@ -2475,12 +2547,19 @@ function ConverterCard() {
           <input type="number" placeholder="0.00" value={eur} onChange={e=>handleEur(e.target.value)} style={inp} />
         </div>
       </div>
-      <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", marginBottom:"0.75rem" }}>
+      <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", marginBottom:"0.4rem" }}>
         <span style={{ fontSize:"0.72rem", color:v("textSec",dark), whiteSpace:"nowrap" }}>Taux : 1€ =</span>
         <input type="number" value={rate} onChange={e=>handleRate(e.target.value)} style={{ ...inp, fontSize:"0.85rem", width:"80px", fontWeight:700, color:"#F59E0B" }} />
         <span style={{ fontSize:"0.72rem", color:v("textSec",dark) }}>¥</span>
         <button onClick={reset} style={{ marginLeft:"auto", fontSize:"0.7rem", color:v("textMuted",dark), background:"transparent", border:`1px solid ${v("borderLight",dark)}`, borderRadius:"6px", padding:"0.25rem 0.6rem", cursor:"pointer", fontFamily:"inherit" }}>Réinitialiser</button>
       </div>
+      {rateMeta && (
+        <p style={{ fontSize:"0.66rem", color:v("textMuted",dark), margin:"0 0 0.75rem", lineHeight:1.3 }}>
+          {rateMeta.source === "live" ? "🟢 Taux mis à jour" : "📦 Taux en cache"} —{" "}
+          {new Date(rateMeta.ts).toLocaleDateString("fr-FR", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" })}
+          {" · source BCE via frankfurter.app"}
+        </p>
+      )}
       <div style={{ borderTop:`1px solid ${v("borderLight",dark)}`, paddingTop:"0.6rem" }}>
         <p style={{ fontSize:"0.7rem", color:v("textMuted",dark), marginBottom:"0.4rem", fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase" }}>Références rapides</p>
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"0.3rem" }}>
@@ -2617,21 +2696,27 @@ function MeteoSection() {
       "🩴 Sandales ou slip-ons faciles à enlever (temples multiples/jour)",
     ]},
     { cat:"🎒 Accessoires voyage", color:"#10B981", items:[
-      "🔌 Adaptateur prise japonaise Type A (comme USA — 2 fiches plates)",
-      "🔋 Batterie externe 20 000 mAh (journées de 12h sans recharge)",
-      "☂️ Parapluie compact pliant (indispensable, vente partout à 600¥ si oublié)",
+      "🔌 Adaptateur prise japonaise Type A (2 fiches plates, comme USA — 100V. iPhone/MacBook compatibles, sèche-cheveux français = non)",
+      "🔋 Batterie externe 20 000 mAh (journées de 12h sans recharge, GPS drain la batterie)",
+      "☂️ Parapluie compact pliant (indispensable, vente partout à 600¥ si oublié — distributeurs dans les konbinis)",
       "🎒 Sac à dos léger 15-20L pour les excursions (pas la valise)",
-      "💳 Deux cartes bancaires (Visa + Mastercard) — certains ATM n'acceptent qu'une",
+      "💳 Deux cartes bancaires différentes (Visa + Mastercard) — certains ATM n'acceptent qu'une des deux",
       "📱 Câble de charge universel + chargeur rapide",
+      "🧻 Petite serviette / tenugui — les toilettes publiques japonaises n'ont ni sèche-main ni essuie-tout",
+      "🧦 Chaussettes sans trous — inspectées visuellement dans temples et ryokan",
     ]},
     { cat:"💊 Santé & Pharmacie", color:"#F59E0B", items:[
-      "🌞 Crème solaire SPF 50+ — UV forts en mai au Japon (indice UV 8-9)",
+      "🌞 Crème solaire SPF 50+ — UV forts en mai au Japon (indice UV 8-9, + fort qu'en France)",
       "💊 Anti-diarrhéiques (changement alimentaire radical)",
       "🤢 Médicaments mal des transports si shinkansen à haute vitesse",
       "🩹 Pansements anti-ampoules (15-20k pas/jour = ampoules garanties J2)",
-      "😷 Masques chirurgicaux (encore très courants — poli de s'adapter)",
-      "💊 Antihistaminiques (cryptomères japonais = allergies printanières)",
+      "😷 Masques chirurgicaux (encore très courants — poli de s'adapter ; vendus partout ~100¥ sinon)",
+      "💊 Antihistaminiques (cryptomères japonais sugi花粉 = pic pollens avril-mai)",
+      "💨 Spray nasal anti-pollen si allergique (moins efficace sur variétés japonaises, doubler avec masque)",
       "🔁 Ordonnances en double + médicaments habituels (pharmacies peu accessibles)",
+      "⚠️ Médicaments interdits au Japon : codéine, pseudoéphédrine (nombreux sirops contre rhume). Vérifier Yakkan Shoumei si ordonnance — une saisie en douane est possible",
+      "🧴 Déodorant : très peu vendu au Japon et formulations douces — apporter de France si sensible",
+      "🪥 Brosse à dents + dentifrice : l'hôtel en fournit systématiquement (kit à côté de l'évier), à utiliser",
     ]},
     { cat:"📄 Documents essentiels", color:"#DC2626", items:[
       "🛂 Passeports valables 6 mois minimum après la date de retour",
@@ -2642,12 +2727,17 @@ function MeteoSection() {
       "📞 Numéro ambassade de France Tokyo : +81-3-5798-6000",
     ]},
     { cat:"📱 Applications à installer avant le départ", color:"#7C3AED", items:[
-      "Google Maps — télécharger cartes offline Tokyo, Kyoto, Osaka, Nara",
-      "Google Translate — télécharger pack japonais pour utilisation offline",
-      "Navitime Japan — meilleur pour les transports (métro + JR + bus)",
-      "Hyperdia — horaires Shinkansen précis avec options JR Pass",
-      "IC Card app — gestion Suica à distance",
-      "Tabelog — avis restaurants japonais (avec traduction auto)",
+      "Google Maps — télécharger cartes offline Tokyo, Kyoto, Osaka, Nara (Menu → Cartes hors connexion)",
+      "Google Translate — télécharger pack japonais pour utilisation offline (Paramètres → Traduction hors connexion)",
+      "Navitime Japan Travel — le meilleur pour les transports voyageurs (métro + JR + bus), interface FR, comparaison JR Pass",
+      "Hyperdia — horaires Shinkansen précis avec options JR Pass (filtre Nozomi/Hikari)",
+      "IC Card app — gestion Suica à distance (rechargement carte bancaire en roaming)",
+      "Tabelog — avis restaurants japonais (note 3.5+ = très bon, 3.8+ = excellent ; traduction auto)",
+      "🚨 Safety Tips (JNTO officielle) — alertes séisme, tsunami, météo extrême en français — indispensable",
+      "🌋 Yurekuru Call — alertes séisme précoces, plus rapides et détaillées que l'OS (avec niveau sur échelle japonaise)",
+      "💬 LINE — équivalent WhatsApp au Japon. Utile pour réservations restos, contacts d'hôtels, chauffeurs de taxi privés",
+      "📶 Japan Connected-free Wi-Fi — agrégateur des points wifi gratuits publics (gares, parcs, cafés) avec login unique",
+      "🗾 Japan Official Travel App (JNTO) — urgences, plans offline, annuaire médical FR",
     ]},
   ];
   const URGENCES = [
@@ -2672,11 +2762,26 @@ function MeteoSection() {
       { label:"Étape 2", val:"Présenter votre Exchange Order original (le document reçu à l'achat)", note:"Garder une copie photo sur téléphone" },
       { label:"Étape 3", val:"Un JR Pass perdu ne peut généralement pas être remplacé — prévoir un budget de remplacement (env. 50 000¥)", note:"" },
     ]},
-    { emoji:"🌋", titre:"Tremblement de terre — Procédure officielle", items:[
-      { label:"Pendant la secousse", val:"Se protéger sous une table solide ou contre un mur intérieur. NE PAS courir dehors.", note:"" },
-      { label:"Si dans un bâtiment moderne", val:"Rester à l'intérieur — les bâtiments japonais sont construits aux normes antisismiques", note:"" },
-      { label:"Après la secousse", val:"Couper le gaz si possible. Éloignez-vous des fenêtres. Suivre les instructions des autorités locales.", note:"" },
-      { label:"Application d'alerte", val:"Installer 'Safety tips Japan' (JNT officielle) — alertes séisme en français", note:"" },
+    { emoji:"🌋", titre:"Tremblement de terre — Procédure complète", items:[
+      { label:"Fréquence normale", val:"Des M3-M4 ressentis plusieurs fois par semaine — parfaitement banals. Regarder les Japonais autour : s'ils continuent leur repas, c'est sans danger.", note:"La plupart des secousses passent inaperçues en marchant" },
+      { label:"Alerte Earthquake Early Warning", val:"Un son strident caractéristique (jingle officiel 緊急地震速報) sort de TOUS les téléphones 5 à 30 secondes avant la secousse.", note:"Le son n'est pas un bug — c'est l'alerte nationale. Activer les notifications d'urgence dans les paramètres système iOS/Android dès l'arrivée" },
+      { label:"Pendant la secousse — à l'intérieur", val:"Se protéger sous une table solide ou dans un encadrement de porte. S'éloigner des fenêtres et des étagères. NE PAS courir dehors — la plupart des blessés sont tués par la chute d'objets dans la rue.", note:"" },
+      { label:"Pendant la secousse — dehors", val:"S'éloigner des bâtiments, lampadaires, distributeurs, lignes électriques. Se protéger la tête avec un sac ou les bras. Chercher un parc ouvert.", note:"" },
+      { label:"Dans un bâtiment moderne", val:"Rester à l'intérieur — les bâtiments japonais sont conçus pour absorber les secousses (structure sur amortisseurs). La sensation est impressionnante mais la structure est plus sûre que la rue.", note:"" },
+      { label:"Après la secousse", val:"Couper le gaz si accessible. Éviter les ascenseurs pendant 2h (risque de blocage aux répliques). Ne pas téléphoner en appel vocal (réseau saturé) — utiliser LINE, WhatsApp ou SMS en priorité.", note:"" },
+      { label:"Sirènes tsunami (régions côtières)", val:"Si les sirènes retentissent près de la côte (Hakone côte, Odaiba), évacuer IMMÉDIATEMENT vers les hauteurs — suivre les panneaux bleus '津波避難場所' (tsunami evacuation area).", note:"Pour notre itinéraire, concerne surtout Odaiba et les excursions côtières" },
+      { label:"Applications indispensables", val:"« Safety Tips » (JNTO officielle, FR/EN — alertes séisme, tsunami, météo extrême) + « NHK World » (actualités en anglais pendant une crise) + « Yurekuru Call » (alertes séisme précoces, plus rapides que l'OS).", note:"Installer AVANT le départ, sans wifi l'app ne peut pas s'installer" },
+    ]},
+    { emoji:"🎌", titre:"Golden Week — Impact concret jour par jour", items:[
+      { label:"27 avril (Lun)", val:"Notre arrivée Haneda. Aéroport OK. Pré-Golden Week — Tokyo encore respirable.", note:"Excellente fenêtre pour Meiji Jingu au lever du jour" },
+      { label:"29 avril (Mer) — Shōwa Day 昭和の日", val:"Premier jour férié. Parcs et sanctuaires remplis de locaux. Shibuya Sky, Skytree : afflux notable.", note:"Nikkō peut être très chargé — partir avant 7h" },
+      { label:"3 mai (Sam) — Kenpō Kinenbi 憲法記念日", val:"Shinkansen Tokyo→Kyoto : TOUTES les places réservées. Wagons non-réservés = debout 3h. Gares Tokyo/Shin-Osaka chaos total.", note:"Sièges réservés au guichet JR depuis J1 — obligatoire" },
+      { label:"4 mai (Dim) — Midori no Hi みどりの日", val:"Pic absolu de la Golden Week. Arashiyama à éviter (bambouseraie bondée dès 7h30). Fushimi Inari idem. Kyoto suffoque.", note:"Jour idéal pour musées intérieurs et shopping fermé par climatisation" },
+      { label:"5 mai (Lun) — Kodomo no Hi 子供の日", val:"Carpes koinobori partout — fête des enfants. Parcs familiaux bondés. Universal Studios Osaka : capacité max.", note:"" },
+      { label:"6 mai (Mer)", val:"Dernier jour férié. Trains de retour vers Tokyo saturés. Osaka/Kyoto commencent à respirer en soirée.", note:"" },
+      { label:"7-11 mai", val:"Reprise normale. C'est la semaine parfaite pour tout ce qu'on a pu reporter : temples calmes à Kyoto, Arashiyama au calme dès 8h, Osaka quartier Shinsekai tranquille.", note:"" },
+      { label:"Astuce horaires", val:"Sites populaires en Golden Week : arriver avant 7h30 OU après 17h. Entre les deux = foule. Fushimi Inari au lever du soleil (~5h en mai) = expérience transformative.", note:"" },
+      { label:"Ce qui reste calme", val:"Musées (Mori Tower, teamLab, Ghibli), quartiers Daikanyama/Nakameguro, onsens hors Hakone (ex: Kinosaki), Yanaka à Tokyo, Arashiyama en toute fin de journée 17h30+.", note:"" },
     ]},
   ];
   return (
@@ -3390,7 +3495,7 @@ function CalendrierSection() {
       type: "foule", impact: "fort", emoji: "🌊",
       titre: "Pic de déplacement inter-cités",
       desc: "Journée de déplacement massif — des millions de Japonais quittent Tokyo vers les régions. Gares bondées en après-midi. Harajuku et Shibuya sont les zones les plus chargées de la journée.",
-      tips: ["TeamLab à 15h : prévoir 20 min supplémentaires pour les transports", "Shibuya Sky 18h30 : arriver 15 min en avance pour les files de sécurité", "Akihabara est paradoxalement plus calme que les jours précédents"],
+      tips: ["TeamLab à 15h : prévoir 20 min supplémentaires pour les transports", "Shibuya Sky 19h ✅ : arriver 15 min en avance pour les files de sécurité — blue hour garantie", "Akihabara est paradoxalement plus calme que les jours précédents"],
       dayN: 4, tabId: "tokyo",
     },
     {
@@ -3643,6 +3748,12 @@ function PhrasebookSection() {
       { fr:"Je suis allergique à [ingrédient]", jp:"[食材]アレルギーがあります", rom:"[shokuzai] arerugi ga arimasu", diff:"🔴" },
       { fr:"Sans viande / végétarien", jp:"肉なしでお願いします", rom:"Niku nashi de onegaishimasu", diff:"🟡" },
       { fr:"Pas de bière s'il vous plaît", jp:"ビールなしでお願いします", rom:"Biiru nashi de onegaishimasu", diff:"🟡" },
+      { fr:"Sans wasabi s'il vous plaît", jp:"サビ抜きでお願いします", rom:"Sabi nuki de onegaishimasu", diff:"🟡" },
+      { fr:"Sans poisson cru", jp:"生魚なしでお願いします", rom:"Namazakana nashi de onegaishimasu", diff:"🔴" },
+      { fr:"Puis-je payer par carte ?", jp:"カードで払えますか？", rom:"Kaado de haraemasu ka?", diff:"🟡" },
+      { fr:"C'était excellent, merci", jp:"ごちそうさまでした", rom:"Gochisousama deshita", diff:"🔴" },
+      { fr:"Encore de l'eau, s'il vous plaît", jp:"お水をお願いします", rom:"Omizu wo onegaishimasu", diff:"🟢" },
+      { fr:"Pouvez-vous recommander ?", jp:"おすすめは何ですか？", rom:"Osusume wa nan desu ka?", diff:"🟡" },
     ]},
     { id:"transport", emoji:"🚇", titre:"Dans les transports", color:"#0369A1", phrases:[
       { fr:"Où est le quai pour [ville] ?", jp:"[都市]行きのホームはどこですか？", rom:"[toshi]-yuki no hoomu wa doko desu ka?", diff:"🔴" },
@@ -3675,6 +3786,11 @@ function PhrasebookSection() {
       { fr:"Je suis perdu(e)", jp:"迷子になりました", rom:"Maigo ni narimashita", diff:"🟡" },
       { fr:"Je me sens mal", jp:"気分が悪いです", rom:"Kibun ga warui desu", diff:"🟢" },
       { fr:"Mon passeport a été volé", jp:"パスポートが盗まれました", rom:"Pasupooto ga nusumaremashita", diff:"🔴" },
+      { fr:"J'ai perdu mon passeport", jp:"パスポートをなくしました", rom:"Pasupooto wo nakushimashita", diff:"🟡" },
+      { fr:"Pouvez-vous appeler une ambulance ?", jp:"救急車を呼んでください", rom:"Kyuukyuusha wo yonde kudasai", diff:"🔴" },
+      { fr:"Où sont les toilettes ?", jp:"トイレはどこですか？", rom:"Toire wa doko desu ka?", diff:"🟢" },
+      { fr:"Je ne parle pas japonais", jp:"日本語が話せません", rom:"Nihongo ga hanasemasen", diff:"🟡" },
+      { fr:"Où est l'hôpital le plus proche ?", jp:"一番近い病院はどこですか？", rom:"Ichiban chikai byouin wa doko desu ka?", diff:"🔴" },
     ]},
     { id:"politesse", emoji:"🙏", titre:"Politesse & Formules", color:"#B45309", phrases:[
       { fr:"Merci beaucoup", jp:"ありがとうございます", rom:"Arigatou gozaimasu", diff:"🟢" },
@@ -4063,6 +4179,220 @@ function NotificationsSection() {
 }
 
 
+// ─── Translate shortcuts ────────────────────────────────────────────
+// One-tap launchers for the tools actually useful on the ground in Japan:
+// Google Translate (camera OCR for menus/signs) and Google Lens.
+// We target the translate.google.com URL rather than app-specific URL
+// schemes so it works identically on iPhone and Android without needing
+// the native app installed.
+function TranslateShortcuts() {
+  const dark = useDark();
+  const links = [
+    {
+      label: "📷 Traduire un menu / un panneau",
+      desc: "Ouvre Google Traduction en mode image — vise le japonais, choisis 'Caméra' dans l'app.",
+      href: "https://translate.google.com/?sl=ja&tl=fr&op=images",
+      color: "#3B82F6",
+    },
+    {
+      label: "🔤 Traduire un mot saisi",
+      desc: "Taper / coller du texte japonais → français. Fonctionne hors-ligne si le pack JP est téléchargé dans l'app.",
+      href: "https://translate.google.com/?sl=ja&tl=fr&op=translate",
+      color: "#10B981",
+    },
+    {
+      label: "🎙 Traduire une conversation",
+      desc: "Mode dialogue bilingue — un bouton par langue. Idéal pour demander une direction ou commander.",
+      href: "https://translate.google.com/?sl=ja&tl=fr&op=conversation",
+      color: "#F59E0B",
+    },
+    {
+      label: "🔍 Google Lens — identifier un plat",
+      desc: "Prends un plat en photo si le menu n'a pas d'image. Ouvre lens.google.com.",
+      href: "https://lens.google.com/",
+      color: "#A855F7",
+    },
+  ];
+  return (
+    <InfoCard title="🔤 Traduire sur place" color="#3B82F6" headerBg={t("#EFF6FF","#0A1628")}>
+      <p style={{ fontSize:"0.72rem", color:v("textMuted",dark), margin:"0 0 0.6rem", lineHeight:1.45 }}>
+        💡 <strong style={{ color:v("textSec",dark) }}>Avant de partir</strong> : dans l'app Google Traduction, télécharger le pack <em>japonais</em> pour usage hors-ligne (Paramètres → Traduction hors connexion).
+      </p>
+      <div style={{ display:"flex", flexDirection:"column", gap:"0.4rem" }}>
+        {links.map((l, i) => (
+          <a
+            key={i}
+            href={l.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-tap="action"
+            style={{
+              display:"block", textDecoration:"none", padding:"0.55rem 0.7rem",
+              borderRadius:"8px", border:`1px solid ${v("borderLight",dark)}`,
+              background:v("cardBg2",dark),
+            }}
+          >
+            <p style={{ fontSize:"0.78rem", fontWeight:700, color:l.color, margin:0 }}>{l.label}</p>
+            <p style={{ fontSize:"0.7rem", color:v("textSec",dark), margin:"0.2rem 0 0", lineHeight:1.4 }}>{l.desc}</p>
+          </a>
+        ))}
+      </div>
+    </InfoCard>
+  );
+}
+
+// ─── Konbini hub ────────────────────────────────────────────────────
+// Konbinis are the single most useful "infrastructure" for tourists in
+// Japan — far beyond being food shops. This card surfaces all the
+// non-obvious services French travelers systematically miss their
+// first week.
+function KonbiniHub() {
+  const dark = useDark();
+  const items = [
+    { emoji:"💴", title:"ATM 24h acceptant Visa/Mastercard étrangères",
+      desc:"Seules 3 enseignes sont fiables : 7-Eleven (rouge/blanc), Lawson (bleu), Japan Post (vert — à la Poste). Les ATM des banques japonaises refusent souvent les cartes étrangères. Retirer en journée — quelques konbinis coupent leur ATM la nuit." },
+    { emoji:"📶", title:"Wifi gratuit sans inscription",
+      desc:"7-Eleven (7SPOT) et FamilyMart (Famima Wi-Fi) : se connecter depuis les paramètres wifi, accepter les CGU, 60 min gratuites renouvelables. Lawson aussi mais via une inscription rapide par mail." },
+    { emoji:"🚻", title:"Toilettes gratuites et propres",
+      desc:"Dans 90% des konbinis, toilettes publiques accessibles sans consommer — nettoyées plusieurs fois par jour. Souvent la meilleure option en ville pour les parents. Frapper à la porte, ne pas forcer si c'est fermé : c'est qu'elles sont en cours de nettoyage." },
+    { emoji:"🗑", title:"Poubelles = seules de la rue",
+      desc:"Il n'y a PAS de poubelles publiques au Japon. Celles des konbinis (dehors ou dedans) sont la seule solution — par politesse, uniquement si vous y avez consommé quelque chose. Tri obligatoire : canettes/PET/papier/combustibles." },
+    { emoji:"🎫", title:"Retrait billets concerts, parcs, bus",
+      desc:"Borne Loppi (Lawson) ou Famiport (FamilyMart) : si vous avez réservé en ligne un spectacle, un billet USJ, un bus longue distance, vous pouvez imprimer le ticket sur place. Écran en anglais disponible." },
+    { emoji:"🖨", title:"Impression / photocopie / scan",
+      desc:"Imprimer une réservation d'hôtel, scanner un passeport pour l'envoyer par mail — toutes ces bornes existent en konbini. ~20-60¥ par impression. Utile si pépin technique." },
+    { emoji:"📦", title:"Expédition de bagages (takkyubin)",
+      desc:"Envoyer une valise directement Tokyo → Kyoto pour ~2000¥ pour voyager léger en Shinkansen. Comptoir Yamato Transport dans 7-Eleven et FamilyMart. Délai 24-48h, livraison à l'hôtel." },
+    { emoji:"❄️", title:"Climatisation / chauffage refuge",
+      desc:"Mai peut monter à 28°C. En cas de coup de chaud ou d'averse, entrer dans un konbini = pause fraîche gratuite et légitime. Personne ne vous regardera de travers si vous y restez 5 min à regarder les magazines." },
+    { emoji:"🍙", title:"Cuisine de survie 24h/24",
+      desc:"Onigiri (7-Eleven = référence absolue — le thon mayo est le best-seller), tamago sando (FamilyMart), oden en hiver, karaage poulet, bento complet ~500¥, café machine ~150¥. Parfait pour petit-déj à 6h avant Fushimi Inari, ou dîner tardif après une longue journée." },
+  ];
+  return (
+    <InfoCard title="🏪 Konbini — votre hub de survie" color="#059669" headerBg={t("#ECFDF5","#0A1E12")}>
+      <p style={{ fontSize:"0.72rem", color:v("textMuted",dark), margin:"0 0 0.65rem", lineHeight:1.45 }}>
+        Les <strong style={{ color:v("textSec",dark) }}>7-Eleven, FamilyMart et Lawson</strong> ne sont pas de simples supérettes : ce sont des mini-centres de services qui font gagner un temps fou aux voyageurs.
+      </p>
+      {items.map((it, i) => (
+        <div key={i} style={{ marginBottom: i < items.length-1 ? "0.55rem" : 0, paddingBottom: i < items.length-1 ? "0.55rem" : 0, borderBottom: i < items.length-1 ? `1px solid ${v("borderLight",dark)}` : "none" }}>
+          <p style={{ fontSize:"0.78rem", fontWeight:700, color:"#059669", margin:0 }}>{it.emoji} {it.title}</p>
+          <p style={{ fontSize:"0.72rem", color:v("textSec",dark), margin:"0.15rem 0 0", lineHeight:1.45 }}>{it.desc}</p>
+        </div>
+      ))}
+    </InfoCard>
+  );
+}
+
+// ─── Do's & Don'ts culturels ────────────────────────────────────────
+// Grouped by scenario so a traveler can scan quickly before the
+// situation arises (entering a temple, paying at a restaurant, etc.).
+function DoAndDont() {
+  const dark = useDark();
+  const groups = [
+    { emoji:"💰", titre:"Argent & paiement",
+      dos:[
+        "Poser argent/carte dans le plateau (otsuri-zara), jamais directement en main",
+        "Payer à la caisse en sortant, pas à table (dans 80% des restaurants)",
+        "Garder 15 000-20 000¥ cash sur soi par personne — certains restos, temples, Hakone rural sont cash only",
+      ],
+      donts:[
+        "JAMAIS de pourboire — c'est considéré comme une offense",
+        "Ne pas compter l'argent dans la rue devant un commerçant, c'est impoli",
+        "Ne pas essayer Apple Pay dans un petit resto — insister sur la carte ou passer au cash",
+      ] },
+    { emoji:"🥢", titre:"À table",
+      dos:[
+        "Dire « Itadakimasu » avant de manger, « Gochisousama deshita » après",
+        "Boire les nouilles en faisant du bruit (slurping) : c'est un compliment au chef",
+        "Reposer les baguettes sur le hashioki (repose-baguettes), pas en travers du bol",
+      ],
+      donts:[
+        "JAMAIS planter les baguettes verticalement dans le riz — ça rappelle les offrandes funéraires",
+        "Ne pas passer de nourriture de baguettes à baguettes (idem)",
+        "Ne pas verser sa propre bière : on sert son voisin, et vice-versa",
+        "Ne pas pourboire, ne pas partir sans passer à la caisse",
+      ] },
+    { emoji:"🚇", titre:"Transports",
+      dos:[
+        "Téléphone en mode silencieux total dans tous les trains et métros",
+        "Ranger la file sur le quai — lignes peintes au sol à respecter scrupuleusement",
+        "Escalator Tokyo/Kyoto/Nikkō : on se tient à gauche, on marche à droite",
+        "Escalator Osaka : on se tient à DROITE, on marche à gauche (inversé !)",
+        "Céder les sièges prioritaires (bleus) aux personnes âgées, femmes enceintes, handicapés",
+      ],
+      donts:[
+        "Ne pas téléphoner dans le train, même à voix basse",
+        "Ne pas manger dans le métro urbain (Shinkansen OK, métro non)",
+        "Ne pas monter avant que tous soient descendus — attendre sur les côtés des portes",
+        "Ne pas doubler dans une file, même si elle paraît longue",
+      ] },
+    { emoji:"⛩", titre:"Temples & sanctuaires",
+      dos:[
+        "Au chōzuya (bassin) : laver main gauche, main droite, rincer la bouche (eau dans la paume), laver le manche",
+        "Sanctuaire shinto : 2 inclinaisons, 2 claps, 1 inclinaison (二礼二拍手一礼)",
+        "Temple bouddhiste : inclinaison silencieuse, PAS de claps",
+        "Prendre le goshuin (御朱印) pour 300-500¥ : tampon calligraphié, superbe souvenir personnalisé",
+      ],
+      donts:[
+        "Ne pas marcher au centre du chemin sous un torii — c'est la voie des kami",
+        "Ne pas photographier à l'intérieur des bâtiments principaux sans vérifier (« 撮影禁止 » = interdit)",
+        "Ne pas toucher les statues, objets sacrés, ema suspendus",
+      ] },
+    { emoji:"♨️", titre:"Onsen",
+      dos:[
+        "Nu intégral obligatoire dans les bains publics, aucun maillot",
+        "Douche assise COMPLÈTE avec savon+shampoing au poste individuel AVANT d'entrer dans le bassin",
+        "Petite serviette : pour la pudeur hors du bassin, jamais dans l'eau — la poser pliée sur la tête",
+        "Cheveux longs attachés hors de l'eau",
+      ],
+      donts:[
+        "Tatouages : refusés dans ~70% des onsens publics. Chercher « tattoo-friendly » ou masquer avec patchs pharmacie (Daiso)",
+        "Pas d'alcool avant l'onsen — chaleur + alcool = risque hypotension et évanouissement",
+        "Ne pas plonger, éclabousser, nager : c'est un bain de détente, pas une piscine",
+      ] },
+    { emoji:"📸", titre:"Photos & comportement public",
+      dos:[
+        "Toujours demander (« Shashin ii desu ka? ») avant de photographier une personne",
+        "Se moucher aux toilettes uniquement — renifler discrètement en public est accepté",
+        "Porter un masque si on tousse/éternue — très apprécié par les locaux",
+      ],
+      donts:[
+        "Ne pas bloquer ni toucher une geiko/maiko à Gion — amendes possibles dans certaines ruelles privées",
+        "Ne pas manger en marchant (sauf zone dédiée type Nishiki Market)",
+        "Ne pas parler fort, rire bruyamment dans un espace fermé — volume ambiant japonais bien en-dessous du nôtre",
+        "Pointer du doigt : mal vu, préférer la main ouverte pour montrer",
+      ] },
+  ];
+  return (
+    <InfoCard title="🚫 Faux-pas à éviter (erreurs classiques françaises)" color="#DC2626" headerBg={t("#FEF2F2","#2D0A0A")}>
+      <p style={{ fontSize:"0.72rem", color:v("textMuted",dark), margin:"0 0 0.65rem", lineHeight:1.45 }}>
+        Les Japonais sont extrêmement tolérants avec les touristes, mais éviter ces pièges classiques montrera votre respect et sera très apprécié.
+      </p>
+      {groups.map((g, gi) => (
+        <div key={gi} style={{ marginBottom: gi < groups.length-1 ? "0.9rem" : 0, paddingBottom: gi < groups.length-1 ? "0.9rem" : 0, borderBottom: gi < groups.length-1 ? `1px solid ${v("borderLight",dark)}` : "none" }}>
+          <p style={{ fontSize:"0.82rem", fontWeight:700, color:v("textPrimary",dark), margin:"0 0 0.4rem" }}>{g.emoji} {g.titre}</p>
+          {g.dos.length > 0 && (
+            <div style={{ marginBottom:"0.35rem" }}>
+              <p style={{ fontSize:"0.7rem", fontWeight:700, color:"#059669", margin:"0 0 0.2rem", letterSpacing:"0.05em", textTransform:"uppercase" }}>✓ À faire</p>
+              {g.dos.map((d, i) => (
+                <p key={i} style={{ fontSize:"0.72rem", color:v("textSec",dark), margin:"0 0 0.2rem", lineHeight:1.45, paddingLeft:"0.6rem" }}>• {d}</p>
+              ))}
+            </div>
+          )}
+          {g.donts.length > 0 && (
+            <div>
+              <p style={{ fontSize:"0.7rem", fontWeight:700, color:"#DC2626", margin:"0 0 0.2rem", letterSpacing:"0.05em", textTransform:"uppercase" }}>✗ À ne PAS faire</p>
+              {g.donts.map((d, i) => (
+                <p key={i} style={{ fontSize:"0.72rem", color:v("textSec",dark), margin:"0 0 0.2rem", lineHeight:1.45, paddingLeft:"0.6rem" }}>• {d}</p>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </InfoCard>
+  );
+}
+
 function InfoCard({ title, color, headerBg, children }) {
   const dark = useDark();
   return (
@@ -4080,6 +4410,9 @@ function InfoSection() {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:"0.875rem" }}>
       <ConverterCard />
+      <TranslateShortcuts />
+      <KonbiniHub />
+      <DoAndDont />
       <DepartureChecklist />
       <ShareSection />
       <NotificationsSection />
