@@ -50,6 +50,20 @@ Impact : en cas de crash inattendu pendant le voyage, plus d'écran blanc catast
 - Quand activé : `document.documentElement.style.fontSize = "19px"` (vs 16px par défaut) → toutes les tailles en rem grandissent de +18.75%. Les inputs restent à 16px forcés (protection anti-zoom iOS conservée).
 - Usage : utile sur le téléphone des parents en plein soleil ou à bout de bras, et au retour pour relire les notes.
 
+### Lot 4 — Convertisseur JPY↔EUR
+
+- **Déjà implémenté** — composant `ConverterCard` [App.jsx:2511](src/App.jsx) avec taux live depuis frankfurter.app (ECB), fallback cache 163¥/€, refresh max 1×/24h, input bidirectionnel, 6 prix de référence. Rien à faire.
+
+### Lot 5 — Checklist avant départ J-7 / J-1 / Jour J
+
+Ajout de 3 nouvelles catégories dans `CHECKLIST` (section 📋 Checklist), toutes avec items cochables et persistance :
+
+1. **⏰ Cette semaine (J-7 → J-3)** — 9 items : vérif passeport 6 mois validité, prévenir banque, assurance voyage, commande yens cash, screenshots réservations, impressions papier, packs offline Maps/Translate, numéros d'urgence (AMDA, ambassade FR, SOS Help), Suica sur iPhone Wallet.
+2. **⏰ La veille (J-1 = 26 avril)** — 6 items : check-in en ligne, recharge batteries, sac cabine, adaptateurs électriques, trajet aéroport, absence logement.
+3. **🎌 Jour J (27 avril)** — 4 items critiques : passeports, adresse hôtel en japonais, yens cash, mode voyage cartes bancaires.
+
+Chaque item a une note explicite avec contexte japonais spécifique (ex : adresse 〒111-0032 Asakusa Tobu, téléphone AMDA, tension 100V Type A).
+
 ---
 
 ## Session 1 — Avant 2026-04-15 (historique git)
