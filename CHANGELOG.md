@@ -64,6 +64,24 @@ Ajout de 3 nouvelles catégories dans `CHECKLIST` (section 📋 Checklist), tout
 
 Chaque item a une note explicite avec contexte japonais spécifique (ex : adresse 〒111-0032 Asakusa Tobu, téléphone AMDA, tension 100V Type A).
 
+### Lot 6 — Contenu Golden Week (audit + ajouts ciblés)
+
+Après audit approfondi du contenu existant, beaucoup de points de mon audit initial étaient en réalité déjà couverts :
+
+- ✅ Faux-pas à éviter (pourboire, baguettes, tatouages, mouchoirs, escalators Tokyo/Osaka inversés, geiko) — DoAndDont très complet
+- ✅ Golden Week jour par jour avec pics de foule — section Météo/Préparation
+- ✅ Apps : Safety Tips, Yurekuru Call, NHK World, Navitime — mentionnées
+- ✅ Tsunami procédure — présente
+- ✅ JR Pass couverture détaillée (Hikari/Kodama, PAS Nozomi/Mizuho)
+
+**Ajout d'une nouvelle InfoCard "🇯🇵 Astuces Japon pratiques"** ([App.jsx InfoSection](src/App.jsx)) avec 5 points qui manquaient :
+
+1. **🛍 Tax-free (détaxe immédiate)** — règle des 5 000¥ HT, passeport obligatoire, sac scellé à ne pas ouvrir avant sortie du Japon, liste des magasins (Don Quijote, BicCamera, Isetan, etc.).
+2. **📅 Fermetures hebdo** — musées fermés lundi, Ghibli fermé mardi, temples ouverts 7j/7, règle "vérifier avant de s'y rendre" (d'autant plus pendant GW où les fériés décalent).
+3. **🌊 Procédure séisme précise** — pendant / après / cas tsunami, en 3 sections pas-à-pas.
+4. **🏥 Hôpitaux internationaux** — AMDA +81-3-6233-9266, noms d'hôpitaux anglophones Tokyo/Kyoto/Osaka, conseil de noter médicaments en DCI internationale.
+5. **🚄 Shinkansen Golden Week** — urgence réservation sièges J1, EKINET/SmartEX, phrase en japonais pour le guichet, rappel JR Pass ne couvre pas Nozomi/Mizuho.
+
 ---
 
 ## Session 1 — Avant 2026-04-15 (historique git)
