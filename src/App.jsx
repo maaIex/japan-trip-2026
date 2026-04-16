@@ -656,6 +656,68 @@ export default function App() {
   const days = query ? allDays.filter(d => matchesQuery(d, query)) : allDays;
   const totalMatches = query ? countMatches(allDays, query) : 0;
 
+  // ── Keyboard navigation (desktop) ─────────────────────────────
+  // ←/→ naviguent entre jours du tab courant ; Alt+←/→ changent d'onglet.
+  // Ignore quand l'utilisateur tape dans un input/textarea, ou que des
+  // modificateurs "sérieux" (Ctrl/Cmd) sont enfoncés — on évite de casser
+  // les raccourcis navigateur standard (back/forward, sélection texte).
+  useEffect(() => {
+    // Skip on touch-only devices where there's no keyboard anyway.
+    // (matchMedia hover:none is a good heuristic for phones/tablets.)
+    if (typeof window !== "undefined" && window.matchMedia &&
+        window.matchMedia("(hover: none)").matches) return;
+
+    const handler = (e) => {
+      if (e.ctrlKey || e.metaKey) return;
+      const el = document.activeElement;
+      if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+
+      // Alt+Arrow → change tab
+      if (e.altKey) {
+        const idx = TABS.findIndex(t => t.id === activeTab);
+        if (idx === -1) return;
+        const next = e.key === "ArrowRight"
+          ? (idx + 1) % TABS.length
+          : (idx - 1 + TABS.length) % TABS.length;
+        e.preventDefault();
+        setActiveTab(TABS[next].id);
+        // Scroll top so the new tab's content is visible from the top.
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      // Plain Arrow → navigate between days of current tab
+      if (!days.length) return;
+      // Find the "current" day: the one whose card top is closest to the
+      // viewport top (just scrolled past or about to be). Fallback: first.
+      let currentIdx = 0;
+      let bestDist = Infinity;
+      for (let i = 0; i < days.length; i++) {
+        const node = document.getElementById("day-" + days[i].n);
+        if (!node) continue;
+        const top = node.getBoundingClientRect().top;
+        // Prefer cards whose top is >= -40 (in-view or just below nav)
+        const dist = Math.abs(top - 80);
+        if (dist < bestDist) { bestDist = dist; currentIdx = i; }
+      }
+      const nextIdx = e.key === "ArrowRight"
+        ? Math.min(currentIdx + 1, days.length - 1)
+        : Math.max(currentIdx - 1, 0);
+      if (nextIdx === currentIdx) return;
+      const target = days[nextIdx];
+      e.preventDefault();
+      setOpenDays(p => { const s = new Set(p); s.add(target.n); return s; });
+      setTimeout(() => {
+        const node = document.getElementById("day-" + target.n);
+        if (node) node.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 40);
+    };
+
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [activeTab, days]);
+
   useEffect(() => {
     if (!query) return;
     // Use a small delay so React has flushed the new DOM, then querySelector the
@@ -799,6 +861,48 @@ button[data-tap="action"] {
    mouse-wheel scrolling on the natural document scroll. Keeping the rule
    on body only preserves the normal viewport scroll behaviour. */
 body { overflow-x: hidden; max-width: 100vw; }
+
+/* ─── Desktop layout (Lot 7) ────────────────────────────────────
+   Table des matières flottante sur l'écran droit en desktop large.
+   En dessous de 1180px on la masque — le contenu principal reste
+   centré à 760px comme sur mobile (lisibilité optimale). */
+.desk-toc { display: none; }
+@media (min-width: 1180px) {
+  .desk-toc {
+    display: block;
+    position: fixed;
+    top: 120px;
+    right: max(1rem, calc((100vw - 760px) / 2 - 270px));
+    width: 250px;
+    max-height: calc(100vh - 160px);
+    overflow-y: auto;
+    font-size: 0.82rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 12px;
+    z-index: 5;
+  }
+  .desk-toc::-webkit-scrollbar { width: 6px; }
+  .desk-toc::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.35); border-radius: 3px; }
+}
+.desk-toc-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+  line-height: 1.3;
+  transition: background 0.12s, color 0.12s;
+}
+.desk-toc-btn:hover { background: rgba(176, 0, 10, 0.08); }
+.desk-toc-btn[data-active="true"] {
+  background: rgba(176, 0, 10, 0.14);
+  font-weight: 600;
+}
 
 @media print {
   header, nav, .no-print, [class*="urgent"], [class*="search"], [class*="toggle"],
@@ -1012,6 +1116,15 @@ body { overflow-x: hidden; max-width: 100vw; }
           </div>
         </nav>
         </div>
+        {/* Lot 7 — Desktop table of contents (hidden < 1180px via CSS) */}
+        {tab && tab.range.length > 0 && days.length > 1 && (
+          <DesktopTOC
+            days={days}
+            openDays={openDays}
+            setOpenDays={setOpenDays}
+            tabColor={CITY[tab.city]?.color || "#B0000A"}
+          />
+        )}
         <main style={{ padding:"0.875rem 0.875rem calc(6rem + env(safe-area-inset-bottom, 0px))", maxWidth:"760px", margin:"0 auto" }}>
           {activeTab==="infos"     && <InfoSection />}
           {activeTab==="checklist" && <ChecklistSection />}
@@ -1073,6 +1186,95 @@ body { overflow-x: hidden; max-width: 100vw; }
       </div>
     </DarkCtx.Provider>
     </NavCtx.Provider>
+  );
+}
+
+// ─── DesktopTOC (Lot 7) ───────────────────────────────────────────
+// Table des matières flottante à droite sur écrans >= 1180px.
+// Liste les jours du tab actif, scroll-to + highlight le jour visible.
+// Sur mobile / tablette : masquée entièrement via CSS (display:none).
+function DesktopTOC({ days, openDays, setOpenDays, tabColor }) {
+  const dark = useDark();
+  const [activeN, setActiveN] = useState(null);
+
+  // Observe quel jour est visible dans la moitié haute du viewport.
+  useEffect(() => {
+    if (typeof window === "undefined" || !("IntersectionObserver" in window)) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        // Prefer the topmost card currently intersecting with the upper half.
+        const visibles = entries
+          .filter(e => e.isIntersecting)
+          .map(e => ({ n: Number(e.target.id.replace("day-", "")), top: e.boundingClientRect.top }))
+          .sort((a, b) => a.top - b.top);
+        if (visibles.length) setActiveN(visibles[0].n);
+      },
+      { rootMargin: "-80px 0px -60% 0px", threshold: 0 }
+    );
+    days.forEach(d => {
+      const el = document.getElementById("day-" + d.n);
+      if (el) obs.observe(el);
+    });
+    return () => obs.disconnect();
+  }, [days]);
+
+  const jump = (n) => {
+    setOpenDays(p => { const s = new Set(p); s.add(n); return s; });
+    setTimeout(() => {
+      const el = document.getElementById("day-" + n);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 40);
+  };
+
+  return (
+    <aside
+      className="desk-toc"
+      aria-label="Table des matières — jours"
+      style={{
+        background: v("cardBg", dark),
+        border: `1px solid ${v("border", dark)}`,
+        color: v("textPrimary", dark),
+        boxShadow: dark ? "0 2px 8px rgba(0,0,0,0.5)" : "0 2px 8px rgba(0,0,0,0.08)",
+      }}
+    >
+      <div style={{
+        fontSize: "0.68rem",
+        textTransform: "uppercase",
+        letterSpacing: "0.08em",
+        fontWeight: 600,
+        color: v("textMuted", dark),
+        padding: "0.25rem 0.5rem 0.5rem",
+      }}>
+        Jours ({days.length})
+      </div>
+      {days.map(d => {
+        const isActive = d.n === activeN;
+        const isOpen = openDays.has(d.n);
+        return (
+          <button
+            key={d.n}
+            className="desk-toc-btn"
+            data-active={isActive ? "true" : "false"}
+            onClick={() => jump(d.n)}
+            style={{
+              color: isActive ? tabColor : v("textPrimary", dark),
+              borderLeft: isActive ? `3px solid ${tabColor}` : "3px solid transparent",
+              paddingLeft: "0.6rem",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "baseline", gap: "0.4rem" }}>
+              <span style={{ fontWeight: 700, fontSize: "0.75rem", opacity: 0.7, minWidth: "22px" }}>J{d.n}</span>
+              <span style={{ fontSize: "0.78rem", lineHeight: 1.25 }}>{d.title}</span>
+            </div>
+            {isOpen && (
+              <span style={{ fontSize: "0.62rem", color: v("textMuted", dark), marginLeft: "28px" }}>
+                ▼ déplié
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </aside>
   );
 }
 
@@ -2732,6 +2934,160 @@ function DepartureChecklist() {
 // ═══════════════════════════════════════════════════════════════════
 // A. ONGLET MÉTÉO & PRÉPARATION
 // ═══════════════════════════════════════════════════════════════════
+// ─── LiveWeatherCard (Lot 8) ──────────────────────────────────────
+// 7-day live forecast via Open-Meteo (no API key required).
+// Fetches Tokyo / Kyoto / Osaka in parallel, caches 3h in localStorage.
+// Offline fallback: last cached response (âge affiché).
+// Si hors plage (trop loin du voyage) affiche qd même les 7 prochains jours
+// — ça permet de comparer aux moyennes saisonnières à tout moment.
+const WEATHER_CITIES = [
+  { id: "tokyo", name: "Tokyo 🗼", color: "#3B7EFF", lat: 35.6762, lon: 139.6503 },
+  { id: "kyoto", name: "Kyoto ⛩",  color: "#A855F7", lat: 35.0116, lon: 135.7681 },
+  { id: "osaka", name: "Osaka 🎡", color: "#F97316", lat: 34.6937, lon: 135.5023 },
+];
+
+// WMO weather code → emoji + label simplifié (FR).
+// https://open-meteo.com/en/docs (section "Weather variable documentation")
+function wmoToIcon(code) {
+  if (code == null) return { ico: "❓", lbl: "—" };
+  if (code === 0) return { ico: "☀️", lbl: "Ensoleillé" };
+  if (code <= 2)  return { ico: "🌤", lbl: "Partiellement nuageux" };
+  if (code === 3) return { ico: "☁️", lbl: "Couvert" };
+  if (code <= 48) return { ico: "🌫", lbl: "Brouillard" };
+  if (code <= 57) return { ico: "🌦", lbl: "Bruine" };
+  if (code <= 67) return { ico: "🌧", lbl: "Pluie" };
+  if (code <= 77) return { ico: "🌨", lbl: "Neige" };
+  if (code <= 82) return { ico: "🌧", lbl: "Averses" };
+  if (code <= 86) return { ico: "🌨", lbl: "Averses de neige" };
+  if (code <= 99) return { ico: "⛈", lbl: "Orage" };
+  return { ico: "❓", lbl: "—" };
+}
+
+function LiveWeatherCard() {
+  const dark = useDark();
+  const [data, setData] = useState(null);   // { city: {...}, fetchedAt }
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const CACHE_KEY = "weather-cache-v1";
+    const MAX_AGE = 3 * 60 * 60 * 1000; // 3h
+    let cancelled = false;
+
+    // Try cache first (instant render).
+    try {
+      const raw = localStorage.getItem(CACHE_KEY);
+      if (raw) {
+        const cached = JSON.parse(raw);
+        if (cached && cached.fetchedAt) {
+          setData(cached);
+          // If fresh enough, skip network entirely.
+          if (Date.now() - cached.fetchedAt < MAX_AGE) {
+            setLoading(false);
+            return;
+          }
+        }
+      }
+    } catch {}
+
+    // Refresh from Open-Meteo.
+    const fetchAll = async () => {
+      try {
+        const results = await Promise.all(WEATHER_CITIES.map(async c => {
+          const url = `https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&timezone=Asia%2FTokyo&forecast_days=7`;
+          const res = await fetch(url);
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          const json = await res.json();
+          return { id: c.id, daily: json.daily };
+        }));
+        if (cancelled) return;
+        const payload = { fetchedAt: Date.now(), cities: Object.fromEntries(results.map(r => [r.id, r.daily])) };
+        setData(payload);
+        setError(null);
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(payload)); } catch {}
+      } catch (err) {
+        if (cancelled) return;
+        // Don't wipe the previous cached data if present — we still show it.
+        setError(err.message || "Erreur réseau");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    fetchAll();
+    return () => { cancelled = true; };
+  }, []);
+
+  const ageText = (() => {
+    if (!data?.fetchedAt) return null;
+    const mins = Math.round((Date.now() - data.fetchedAt) / 60000);
+    if (mins < 1) return "à l'instant";
+    if (mins < 60) return `il y a ${mins} min`;
+    const h = Math.floor(mins / 60);
+    return `il y a ${h}h`;
+  })();
+
+  return (
+    <InfoCard title="🌐 Météo live (7 prochains jours)" color="#0EA5E9" headerBg={t("#F0F9FF","#0C1F35")}>
+      <p style={{ fontSize:"0.7rem", color:v("textMuted",dark), margin:"0 0 0.6rem" }}>
+        Source : Open-Meteo (gratuit, sans clé) • {loading && !data ? "chargement…" : ageText ? `MAJ ${ageText}` : ""}
+        {error && data ? " • hors-ligne (cache)" : ""}
+      </p>
+
+      {!data && loading && (
+        <p style={{ fontSize:"0.75rem", color:v("textSec",dark) }}>Chargement des prévisions…</p>
+      )}
+      {!data && !loading && error && (
+        <p style={{ fontSize:"0.75rem", color:"#DC2626" }}>
+          Impossible de charger la météo ({error}). Vérifiez la connexion — les prévisions seront affichées ici.
+        </p>
+      )}
+
+      {data && WEATHER_CITIES.map(city => {
+        const d = data.cities?.[city.id];
+        if (!d || !d.time) return null;
+        return (
+          <div key={city.id} style={{ marginBottom:"0.85rem" }}>
+            <p style={{ fontSize:"0.78rem", fontWeight:700, color:city.color, margin:"0 0 0.4rem" }}>{city.name}</p>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(7, 1fr)", gap:"0.25rem" }}>
+              {d.time.map((isoDate, i) => {
+                const date = new Date(isoDate + "T00:00:00");
+                const dayLabel = date.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric" });
+                const wmo = wmoToIcon(d.weathercode?.[i]);
+                const tmax = Math.round(d.temperature_2m_max?.[i]);
+                const tmin = Math.round(d.temperature_2m_min?.[i]);
+                const rain = d.precipitation_probability_max?.[i] ?? 0;
+                return (
+                  <div
+                    key={i}
+                    title={wmo.lbl}
+                    style={{
+                      textAlign:"center",
+                      background: dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)",
+                      borderRadius:"6px",
+                      padding:"0.35rem 0.15rem",
+                    }}
+                  >
+                    <div style={{ fontSize:"0.6rem", color:v("textMuted",dark), textTransform:"capitalize" }}>
+                      {dayLabel.replace(".", "")}
+                    </div>
+                    <div style={{ fontSize:"1.05rem", lineHeight:1.1, margin:"0.15rem 0" }}>{wmo.ico}</div>
+                    <div style={{ fontSize:"0.66rem", fontWeight:700, color:v("textPrimary",dark) }}>
+                      {tmax}°<span style={{ color:v("textMuted",dark), fontWeight:500 }}>/{tmin}°</span>
+                    </div>
+                    <div style={{ fontSize:"0.58rem", color: rain >= 50 ? "#3B7EFF" : v("textMuted",dark) }}>
+                      💧{rain}%
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </InfoCard>
+  );
+}
+
 function MeteoSection() {
   const dark = useDark();
   const METEO = [
@@ -2861,6 +3217,8 @@ function MeteoSection() {
           La plus grande semaine de vacances du Japon. Transports et sites touristiques à capacité maximale. Les Shinkansen sont complets des semaines à l'avance — réserver les sièges dès J1 au guichet JR. Les restaurants populaires affichent complet — toutes vos réservations doivent être faites avant le départ.
         </p>
       </div>
+      {/* MÉTÉO LIVE 7 JOURS (Lot 8) */}
+      <LiveWeatherCard />
       {/* MÉTÉO CARTES */}
       <InfoCard title="🌡 Météo semaine par semaine" color="#0EA5E9" headerBg={t("#F0F9FF","#0C1F35")}>
         {METEO.map((city, ci) => (

@@ -64,6 +64,48 @@ Ajout de 3 nouvelles catégories dans `CHECKLIST` (section 📋 Checklist), tout
 
 Chaque item a une note explicite avec contexte japonais spécifique (ex : adresse 〒111-0032 Asakusa Tobu, téléphone AMDA, tension 100V Type A).
 
+### Fix scroll molette desktop — 2e tentative (vraie cause)
+
+Le fix précédent (suppression de `content-visibility:auto`) n'a **pas** résolu le bug — l'utilisateur reportait toujours le scroll bloqué.
+
+Vraie cause identifiée : `html, body { overflow-x: hidden; max-width: 100vw; }` à la racine du style global.
+
+Per spec CSS ([§ overflow interaction](https://drafts.csswg.org/css-overflow/)), lorsque `overflow-x` est mis sur l'élément racine (`html`), le navigateur **force `overflow-y` à `auto`**, ce qui transforme `html` en conteneur de défilement. Résultat : la molette agit sur un élément qui n'attrape pas le focus scroll par défaut → blocage.
+
+Fix : retirer `html` de la règle, ne garder que `body { overflow-x: hidden; max-width: 100vw; }`. Le scroll revient au viewport normal (document), où la molette fonctionne.
+
+Même fix appliqué à la règle `html, body { -webkit-overflow-scrolling: touch; overscroll-behavior-y: none; }` → désormais seulement sur `body`.
+
+### Lot 7 — Layout desktop (sidebar "Table des matières")
+
+- **Nouveau composant `DesktopTOC`** ([App.jsx:1192](src/App.jsx)) — aside flottant fixe à droite du viewport, visible uniquement à partir de 1180px de largeur (masqué via CSS `display:none` en dessous).
+- Liste les jours du tab courant (Tokyo / Kyoto / Osaka / Départ), numéro + titre.
+- Clic → ouvre la carte-journée et scroll-to.
+- IntersectionObserver surveille quel jour est visible dans la moitié haute du viewport et highlight l'entrée correspondante (bordure gauche colorée + fond léger).
+- Indication "▼ déplié" sous les jours actuellement ouverts pour aider à la vue d'ensemble.
+- Positionnée en `right: max(1rem, calc((100vw - 760px) / 2 - 270px))` → colle au bord quand l'écran est très large, se rapproche du contenu quand l'écran l'est moins.
+- Effet : sur grand écran (PC de prépa), l'espace à droite du contenu principal sert enfin à quelque chose — navigation éclair entre les 15 jours.
+
+### Lot 8 — Météo live 7 jours (Open-Meteo)
+
+- **Nouveau composant `LiveWeatherCard`** ([App.jsx MeteoSection](src/App.jsx)) — placé en tête de l'onglet 🌤 Météo, avant les cartes statiques.
+- **API Open-Meteo** ([open-meteo.com](https://open-meteo.com)) — gratuit, sans clé, timezone `Asia/Tokyo`, 3 requêtes en parallèle pour Tokyo (35.6762/139.6503), Kyoto (35.0116/135.7681), Osaka (34.6937/135.5023).
+- **Cache localStorage** `weather-cache-v1` : affichage instantané au rechargement, refresh réseau si > 3h. Hors-ligne : on affiche le dernier cache avec mention "hors-ligne (cache)".
+- **Données par ville, 7 jours** : date (jour de la semaine raccourci), emoji météo (WMO code → icône via `wmoToIcon`), T° max/min en °C, probabilité de précipitation (bleue si ≥ 50%).
+- **Couverture de voyage** : le voyage est du 27/04 au 11/05, soit dans la fenêtre de 7 jours à partir de ~20/04. Pendant le voyage, on voit le réel jour par jour. Avant le voyage, on voit les tendances J-X.
+- **Cohabitation avec les cartes statiques** : les cartes "Météo semaine par semaine" restent — elles décrivent la saison complète (climat normal, advice de saison) là où l'API donne le temps prévu.
+
+### Lot 9 — Navigation clavier (desktop)
+
+- **`useEffect` keyboard handler** sur `window` ([App.jsx:659](src/App.jsx)) — actif seulement si `(hover: none)` est faux (= vrai clavier physique, pas tactile pur).
+- **←/→** (sans modifier) : navigue entre les jours du tab courant. Le "jour courant" est déterminé dynamiquement en cherchant la carte dont le `top` est le plus proche de 80px (juste sous le nav). Le jour cible est automatiquement ouvert et scroll-into-view.
+- **Alt+←/→** : change d'onglet (Tokyo → Kyoto → Osaka → Départ → Infos → Checklist → Gastro → Météo → Phrasebook → Calendrier, circulaire).
+- **Ignore quand l'utilisateur tape** : test sur `document.activeElement` → INPUT/TEXTAREA/contenteditable = skip. Et Ctrl/Cmd + flèche : skip (préserve les raccourcis navigateur).
+
+### Lot 10 — Non réalisé
+
+Le budget tracker (catégorie Lot 10 de l'audit) n'est volontairement pas implémenté — demande explicite de l'utilisateur.
+
 ### Lot 6 — Contenu Golden Week (audit + ajouts ciblés)
 
 Après audit approfondi du contenu existant, beaucoup de points de mon audit initial étaient en réalité déjà couverts :
