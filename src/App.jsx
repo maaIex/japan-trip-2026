@@ -517,18 +517,30 @@ const CHECKLIST = [
 ];
 
 const TABS = [
-  { id:"tokyo",     label:"🗼 Tokyo",     sub:"J1→J7 • Nikko • Hakone",        range:[1,7],   city:"tokyo"  },
-  { id:"kyoto",     label:"⛩ Kyoto",     sub:"J8→J11",       range:[8,11],  city:"kyoto"  },
-  { id:"osaka",     label:"🎡 Osaka",     sub:"J12→J14",      range:[12,14], city:"osaka"  },
-  { id:"depart",    label:"✈️ Départ",    sub:"J15",           range:[15,15], city:"depart" },
-  { id:"infos",     label:"💡 Infos",     sub:"Pratiques",     range:[],      city:"transit"},
-  { id:"checklist", label:"📋 Checklist", sub:"Réservations",  range:[],      city:"transit"},
-  { id:"gastro",    label:"🍜 Gastronomie", sub:"Guide complet", range:[],      city:"transit"},
-  { id:"meteo",     label:"🌤 Météo",       sub:"& Préparation", range:[],      city:"transit"},
-  { id:"phrasebook",label:"🗣 Phrasebook",  sub:"Guide japonais", range:[],      city:"transit"},
-  { id:"calendrier", label:"🎌 Calendrier",  sub:"Événements",     range:[],      city:"transit"},
+  // ── Groupe A — Destinations (planning voyage) ─────────────
+  { id:"tokyo",      group:"A", label:"🗼 Tokyo",      sub:"J1–J5 · J7",      range:[1,7],   dayNs:[1,2,4,5,7], city:"tokyo"   },
+  { id:"kyoto",      group:"A", label:"⛩ Kyoto",      sub:"J8–J11",          range:[8,11],                     city:"kyoto"   },
+  { id:"osaka",      group:"A", label:"🎡 Osaka",      sub:"J12–J14",         range:[12,14],                    city:"osaka"   },
+  { id:"excursions", group:"A", label:"🏔 Excursions", sub:"Nikkō · Hakone",  range:[3,6],   dayNs:[3,6],       city:"transit" },
+  { id:"depart",     group:"A", label:"✈️ Départ",     sub:"J15",             range:[15,15],                    city:"depart"  },
+  // ── Groupe B — Ressources pratiques ─────────────────────
+  { id:"infos",      group:"B", label:"💡 Infos",      sub:"Pratiques",       range:[],                         city:"transit" },
+  { id:"checklist",  group:"B", label:"📋 Checklist",  sub:"Réservations",    range:[],                         city:"transit" },
+  { id:"gastro",     group:"B", label:"🍜 Gastro",     sub:"Guide",           range:[],                         city:"transit" },
+  { id:"meteo",      group:"B", label:"🌤 Météo",      sub:"& Prépa",         range:[],                         city:"transit" },
+  { id:"phrasebook", group:"B", label:"🗣 Phrases",    sub:"Japonais",        range:[],                         city:"transit" },
+  { id:"calendrier", group:"B", label:"🎌 Calendrier", sub:"Événements",      range:[],                         city:"transit" },
 ];
 
+
+// Find which tab owns a given day number.
+// Tabs with explicit dayNs take precedence; others use the range.
+function findTabForDay(dayN) {
+  return TABS.find(t => {
+    if (t.dayNs) return t.dayNs.includes(dayN);
+    return t.range && t.range.length && dayN >= t.range[0] && dayN <= t.range[1];
+  });
+}
 
 // ─── SEARCH UTILITIES ─────────────────────────────────────────────
 function highlight(text, query, dark) {
@@ -600,6 +612,8 @@ export default function App() {
 
   const [query, setQuery] = useState("");
   const searchRef = useRef(null);
+  // Panneau Groupe B (ressources pratiques) — dépliable via bouton "Plus"
+  const [showMore, setShowMore] = useState(false);
 
   // ── Mode Voyage en cours ──────────────────────────────────────
   const [voyageMode, setVoyageMode] = useState(true);
@@ -652,7 +666,11 @@ export default function App() {
 
   const toggleDay = n => setOpenDays(p => { const s=new Set(p); s.has(n)?s.delete(n):s.add(n); return s; });
   const tab = TABS.find(t => t.id === activeTab);
-  const allDays = DAYS.filter(d => tab.range.length && d.n >= tab.range[0] && d.n <= tab.range[1]).sort((a,b) => a.n - b.n);
+  const allDays = tab
+    ? (tab.dayNs
+        ? DAYS.filter(d => tab.dayNs.includes(d.n)).sort((a,b) => a.n - b.n)
+        : DAYS.filter(d => tab.range.length && d.n >= tab.range[0] && d.n <= tab.range[1]).sort((a,b) => a.n - b.n))
+    : [];
   const days = query ? allDays.filter(d => matchesQuery(d, query)) : allDays;
   const totalMatches = query ? countMatches(allDays, query) : 0;
 
@@ -736,7 +754,7 @@ export default function App() {
   // Auto-navigate to current day
   useEffect(() => {
     if (voyageMode && inTrip && currentDayN != null) {
-      const tabForDay = TABS.find(t => t.range.length && currentDayN >= t.range[0] && currentDayN <= t.range[1]);
+      const tabForDay = findTabForDay(currentDayN);
       if (tabForDay) {
         setActiveTab(tabForDay.id);
         setTimeout(() => {
@@ -840,12 +858,12 @@ button[data-tap="action"] {
 .nav-scroll-wrap[data-dark="true"]::after { --nav-fade-color: #141414; }
 
 /* Hide scrollbar on the horizontal tabs nav (Chrome Android shows it by default) */
-.nav-scroll-wrap nav { scrollbar-width: none; -ms-overflow-style: none; }
-.nav-scroll-wrap nav::-webkit-scrollbar { display: none; }
+.nav-scroll-wrap > div { scrollbar-width: none; -ms-overflow-style: none; }
+.nav-scroll-wrap > div::-webkit-scrollbar { display: none; }
 
 /* Scroll-snap for the tabs nav so swipes feel natural on mobile */
-.nav-scroll-wrap nav { scroll-snap-type: x proximity; }
-.nav-scroll-wrap nav > div > button { scroll-snap-align: start; }
+.nav-scroll-wrap > div { scroll-snap-type: x proximity; }
+.nav-scroll-wrap > div > button { scroll-snap-align: start; }
 
 /* Note: we previously used content-visibility:auto + contain-intrinsic-size
    on day cards to defer off-screen rendering. It broke desktop wheel-scroll
@@ -916,7 +934,7 @@ body { overflow-x: hidden; max-width: 100vw; }
         <OfflineBanner />
         <InstallBanner />
         <EmergencyFAB />
-        <header className="safe-top" style={{ background:"linear-gradient(135deg,#7B0000 0%,#B0000A 60%,#CC2020 100%)", padding:"1.75rem 1.25rem 1.5rem", position:"relative", overflow:"hidden" }}>
+        <header className="safe-top" style={{ background:"linear-gradient(135deg,#7B0000 0%,#B0000A 60%,#CC2020 100%)", padding:"0.9rem 1.25rem 0.75rem", position:"relative", overflow:"hidden" }}>
           {/* Decorative circle — pointerEvents:none so it never intercepts
               clicks on the dark mode toggle button that sits behind it in
               the flex layout. */}
@@ -924,7 +942,7 @@ body { overflow-x: hidden; max-width: 100vw; }
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
             <div style={{ flex:1 }}>
               <p style={{ fontFamily:"'Cormorant Garamond',serif", color:"rgba(255,255,255,0.55)", fontSize:"0.78rem", letterSpacing:"0.22em", textTransform:"uppercase", marginBottom:"0.35rem" }}>Voyage Japon · 3 adultes · 27 avril – 11 mai 2026</p>
-              <h1 style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1.85rem", fontWeight:600, lineHeight:1.2, marginBottom:"1rem" }}>Itinéraire Complet</h1>
+              <h1 style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1.85rem", fontWeight:600, lineHeight:1.2, marginBottom:"0.4rem" }}>Itinéraire Complet</h1>
             </div>
             <div style={{ display:"flex", gap:"0.4rem", flexShrink:0, marginLeft:"0.75rem" }}>
               <button
@@ -962,18 +980,13 @@ body { overflow-x: hidden; max-width: 100vw; }
               </button>
             </div>
           </div>
-          <div style={{ display:"flex", flexWrap:"wrap", gap:"0.45rem" }}>
-            {["🏨 4 séjours réservés","🎫 JR Pass ✅","✈️ Haneda (HND)","🎌 Golden Week","👥 3 adultes","☕ Petit-déj inclus"].map((b,i)=>(
-              <span key={i} style={{ background:"rgba(255,255,255,0.12)", borderRadius:"20px", padding:"0.18rem 0.6rem", color:"rgba(255,255,255,0.92)", fontSize:"0.7rem" }}>{b}</span>
-            ))}
-          </div>
           {/* U1 — Trip progress bar */}
           <TripProgressBar
             currentDayN={currentDayN}
             inTrip={inTrip}
             afterTrip={afterTrip}
             onJump={(dayN) => {
-              const tabForDay = TABS.find(t => t.range.length && dayN >= t.range[0] && dayN <= t.range[1]);
+              const tabForDay = findTabForDay(dayN);
               if (tabForDay) {
                 setActiveTab(tabForDay.id);
                 setOpenDays(prev => new Set(prev).add(dayN));
@@ -1008,7 +1021,7 @@ body { overflow-x: hidden; max-width: 100vw; }
                 <span style={{ fontSize:"0.75rem", fontWeight:600, color:dark?"#4ADE80":"#166534", flex:1 }}>Jour {currentDayN} de votre voyage — {currentDayObj.title}</span>
                 <button
                   onClick={() => {
-                    const tabForDay = TABS.find(t => t.range.length && currentDayN >= t.range[0] && currentDayN <= t.range[1]);
+                    const tabForDay = findTabForDay(currentDayN);
                     if (tabForDay) {
                       setActiveTab(tabForDay.id);
                       setOpenDays(prev => new Set(prev).add(currentDayN));
@@ -1100,22 +1113,63 @@ body { overflow-x: hidden; max-width: 100vw; }
             </>
           )}
         </div>
-        <div className="nav-scroll-wrap" data-dark={dark ? "true" : "false"}>
-        <nav style={{ background:v("navBg",dark), borderBottom:`1px solid ${v("navBorder",dark)}`, overflowX:"auto", WebkitOverflowScrolling:"touch", transition:"background 0.3s" }}>
-          <div style={{ display:"flex", minWidth:"max-content" }}>
-            {TABS.map(tb => {
-              const cc = CITY[tb.city];
-              const active = activeTab === tb.id;
-              return (
-                <button key={tb.id} onClick={()=>setActiveTab(tb.id)} role="tab" aria-selected={active} aria-current={active ? "page" : undefined} style={{ padding:"0.85rem 0.9rem", border:"none", background:"transparent", cursor:"pointer", borderBottom:active?`3px solid ${cc.color}`:"3px solid transparent", transition:"all 0.15s", outline:"none" }}>
-                  <div style={{ fontSize:"0.8rem", fontWeight:600, color:active?cc.color:v("textSec",dark), whiteSpace:"nowrap" }}>{tb.label}</div>
-                  <div style={{ fontSize:"0.68rem", color:v("textMuted",dark), marginTop:"1px" }}>{tb.sub}</div>
-                </button>
-              );
-            })}
+        {/* ── NAVIGATION 2 NIVEAUX ── */}
+        <nav aria-label="Navigation principale" style={{ background:v("navBg",dark), borderBottom:`1px solid ${v("navBorder",dark)}`, transition:"background 0.3s" }}>
+          {/* Groupe A — Destinations (toujours visible) */}
+          <div className="nav-scroll-wrap" data-dark={dark ? "true" : "false"}>
+            <div style={{ display:"flex", overflowX:"auto", WebkitOverflowScrolling:"touch" }}>
+              {TABS.filter(t => t.group === "A").map(tb => {
+                const cc = CITY[tb.city];
+                const active = activeTab === tb.id;
+                return (
+                  <button key={tb.id}
+                    onClick={() => { setActiveTab(tb.id); setShowMore(false); }}
+                    role="tab" aria-selected={active} aria-current={active ? "page" : undefined}
+                    style={{ padding:"0.85rem 0.9rem", border:"none", background:"transparent", cursor:"pointer", flexShrink:0, borderBottom:active?`3px solid ${cc.color}`:"3px solid transparent", transition:"all 0.15s", outline:"none" }}>
+                    <div style={{ fontSize:"0.8rem", fontWeight:600, color:active?cc.color:v("textSec",dark), whiteSpace:"nowrap" }}>{tb.label}</div>
+                    <div style={{ fontSize:"0.68rem", color:v("textMuted",dark), marginTop:"1px" }}>{tb.sub}</div>
+                  </button>
+                );
+              })}
+              {/* Bouton d'accès au Groupe B */}
+              {(() => {
+                const activeBTab = TABS.find(t => t.group === "B" && t.id === activeTab);
+                const bHighlit = !!activeBTab || showMore;
+                return (
+                  <button
+                    onClick={() => setShowMore(s => !s)}
+                    aria-expanded={showMore}
+                    aria-label={showMore ? "Fermer les ressources pratiques" : "Ouvrir les ressources pratiques"}
+                    style={{ padding:"0.85rem 0.9rem", border:"none", background:"transparent", cursor:"pointer", flexShrink:0, borderBottom:bHighlit?`3px solid ${v("textSec",dark)}`:"3px solid transparent", transition:"all 0.15s", outline:"none" }}>
+                    <div style={{ fontSize:"0.8rem", fontWeight:600, color:bHighlit?v("textPrimary",dark):v("textSec",dark), whiteSpace:"nowrap" }}>
+                      {activeBTab ? activeBTab.label : "●●● Plus"}
+                    </div>
+                    <div style={{ fontSize:"0.68rem", color:v("textMuted",dark), marginTop:"1px" }}>
+                      {activeBTab ? activeBTab.sub : "Ressources"}
+                    </div>
+                  </button>
+                );
+              })()}
+            </div>
           </div>
+          {/* Groupe B — Ressources pratiques (panneau dépliable) */}
+          {showMore && (
+            <div style={{ borderTop:`1px solid ${v("borderLight",dark)}`, padding:"0.5rem 0.65rem 0.6rem", display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"0.4rem" }}>
+              {TABS.filter(t => t.group === "B").map(tb => {
+                const active = activeTab === tb.id;
+                return (
+                  <button key={tb.id}
+                    onClick={() => { setActiveTab(tb.id); setShowMore(false); }}
+                    role="tab" aria-selected={active}
+                    style={{ padding:"0.5rem 0.35rem", border:`1px solid ${active ? "#B0000A" : v("borderLight",dark)}`, background: active ? (dark ? "rgba(176,0,10,0.18)" : "rgba(176,0,10,0.07)") : v("cardBg2",dark), cursor:"pointer", borderRadius:"8px", transition:"all 0.15s", outline:"none", textAlign:"center" }}>
+                    <div style={{ fontSize:"0.75rem", fontWeight:600, color:active ? "#B0000A" : v("textPrimary",dark) }}>{tb.label}</div>
+                    <div style={{ fontSize:"0.63rem", color:v("textMuted",dark), marginTop:"2px" }}>{tb.sub}</div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </nav>
-        </div>
         {/* Lot 7 — Desktop table of contents (hidden < 1180px via CSS) */}
         {tab && tab.range.length > 0 && days.length > 1 && (
           <DesktopTOC
@@ -1413,7 +1467,7 @@ function DayNav({ dayN }) {
   const prev = idx > 0 ? sortedDays[idx - 1] : null;
   const next = idx < sortedDays.length - 1 ? sortedDays[idx + 1] : null;
   const tabForDay = (d) => {
-    const tb = TABS.find(t => t.range.length && d.n >= t.range[0] && d.n <= t.range[1]);
+    const tb = findTabForDay(d.n);
     return tb ? tb.id : "tokyo";
   };
   const btnStyle = (disabled) => ({

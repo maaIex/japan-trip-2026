@@ -4,6 +4,27 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ---
 
+## Session 3 — 2026-04-16
+
+**Contexte :** Refonte de la navigation et nettoyage du header.
+
+### Navigation 2 niveaux
+
+- **Groupe A — Destinations** (toujours visible dans la nav bar) : Tokyo, Kyoto, Osaka, Excursions, Départ.
+- **Groupe B — Ressources** (panneau dépliable via "●●● Plus") : Infos, Checklist, Gastro, Météo, Phrases, Calendrier.
+- Bouton "●●● Plus" en fin de barre Groupe A : affiche le label de l'onglet B actif si applicable, sinon "●●● Plus / Ressources". Panneau B = grille 3×2 de boutons cards.
+- **Onglet Excursions** créé : regroupe J3 (Nikkō) et J6 (Hakone/Mont Fuji) retirés du tab Tokyo. Tokyo passe à J1, J2, J4, J5, J7.
+- `findTabForDay(dayN)` — nouveau helper global pour résoudre le tab d'un jour (gère `dayNs` explicite ET `range`). Remplace les 4 occurrences inline de `TABS.find(t => t.range...)`.
+- `allDays` supporte maintenant les tabs à liste explicite (`dayNs`) en plus des tabs à plage (`range`).
+
+### Nettoyage header
+
+- Suppression des 6 badges statiques ("🏨 4 séjours réservés", "🎫 JR Pass ✅", "✈️ Haneda (HND)", etc.) — inutiles en situation de voyage.
+- Padding header réduit : `1.75rem 1.25rem 1.5rem` → `0.9rem 1.25rem 0.75rem`.
+- Conservés : titre "Itinéraire Complet", sous-titre, toggles A+/dark, barre de progression voyage (TripProgressBar).
+
+---
+
 ## Session 2 — 2026-04-15
 
 **Contexte :** App utilisée sur desktop pour préparer le voyage (27 avril → 11 mai, Golden Week). Scroll molette non fonctionnel sur desktop. Mise en place d'une stratégie de sauvegarde pour pérenniser le travail entre sessions.
