@@ -518,11 +518,10 @@ const CHECKLIST = [
 
 const TABS = [
   // ── Groupe A — Destinations (planning voyage) ─────────────
-  { id:"tokyo",      group:"A", label:"🗼 Tokyo",      sub:"J1–J5 · J7",      range:[1,7],   dayNs:[1,2,4,5,7], city:"tokyo"   },
-  { id:"kyoto",      group:"A", label:"⛩ Kyoto",      sub:"J8–J11",          range:[8,11],                     city:"kyoto"   },
-  { id:"osaka",      group:"A", label:"🎡 Osaka",      sub:"J12–J14",         range:[12,14],                    city:"osaka"   },
-  { id:"excursions", group:"A", label:"🏔 Excursions", sub:"Nikkō · Hakone",  range:[3,6],   dayNs:[3,6],       city:"transit" },
-  { id:"depart",     group:"A", label:"✈️ Départ",     sub:"J15",             range:[15,15],                    city:"depart"  },
+  { id:"tokyo",      group:"A", label:"🗼 Tokyo",      sub:"J1–J7 · Nikkō · Hakone", range:[1,7],   city:"tokyo"   },
+  { id:"kyoto",      group:"A", label:"⛩ Kyoto",      sub:"J8–J11",                 range:[8,11],  city:"kyoto"   },
+  { id:"osaka",      group:"A", label:"🎡 Osaka",      sub:"J12–J14",                range:[12,14], city:"osaka"   },
+  { id:"depart",     group:"A", label:"✈️ Départ",     sub:"J15",                    range:[15,15], city:"depart"  },
   // ── Groupe B — Ressources pratiques ─────────────────────
   { id:"infos",      group:"B", label:"💡 Infos",      sub:"Pratiques",       range:[],                         city:"transit" },
   { id:"checklist",  group:"B", label:"📋 Checklist",  sub:"Réservations",    range:[],                         city:"transit" },
