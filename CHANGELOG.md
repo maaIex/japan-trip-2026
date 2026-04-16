@@ -10,12 +10,13 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ### Navigation 2 niveaux
 
-- **Groupe A — Destinations** (toujours visible dans la nav bar) : Tokyo, Kyoto, Osaka, Excursions, Départ.
+- **Groupe A — Destinations** (toujours visible dans la nav bar) : Tokyo, Kyoto, Osaka, Départ.
 - **Groupe B — Ressources** (panneau dépliable via "●●● Plus") : Infos, Checklist, Gastro, Météo, Phrases, Calendrier.
 - Bouton "●●● Plus" en fin de barre Groupe A : affiche le label de l'onglet B actif si applicable, sinon "●●● Plus / Ressources". Panneau B = grille 3×2 de boutons cards.
-- **Onglet Excursions** créé : regroupe J3 (Nikkō) et J6 (Hakone/Mont Fuji) retirés du tab Tokyo. Tokyo passe à J1, J2, J4, J5, J7.
 - `findTabForDay(dayN)` — nouveau helper global pour résoudre le tab d'un jour (gère `dayNs` explicite ET `range`). Remplace les 4 occurrences inline de `TABS.find(t => t.range...)`.
-- `allDays` supporte maintenant les tabs à liste explicite (`dayNs`) en plus des tabs à plage (`range`).
+- `allDays` supporte maintenant les tabs à liste explicite (`dayNs`) en plus des tabs à plage (`range`) — capacité conservée pour usage futur.
+
+**Revert tenté :** un onglet "Excursions" avait été créé pour regrouper J3 (Nikkō) et J6 (Hakone/Mont Fuji) hors du tab Tokyo. Revert — ces jours restent dans Tokyo (range J1–J7) car ils sont géographiquement rattachés au séjour tokyoïte (hôtel Asakusa conservé, sac léger).
 
 ### Nettoyage header
 
