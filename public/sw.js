@@ -2,12 +2,16 @@
 // Strategy: cache-first for app shell, network-first for HTML navigations
 // so new deploys go live quickly without the user having to uninstall.
 //
-// 🔁 On every new deploy, bump CACHE_VERSION to force old caches to be
-//    deleted on the next visit.
+// 🔁 CACHE_VERSION is now stamped at BUILD TIME by the `sw-version-stamp`
+//    Vite plugin (see vite.config.js). Each `npm run build` replaces the
+//    __BUILD_VERSION__ placeholder with a UTC timestamp (YYYYMMDDHHmm), so
+//    every deploy ships with a fresh cache name — no more manual bumping.
+//    In dev (vite dev), the placeholder stays literal; SW caching is not
+//    a concern in dev anyway.
 // 🧷 localStorage data (notes, reservations, done-items) is NEVER touched
 //    by the SW — only static assets are cached here.
 
-const CACHE_VERSION = 'japon-2026-v3';
+const CACHE_VERSION = 'japon-2026-__BUILD_VERSION__';
 const CACHE_NAME = `japon-voyage-${CACHE_VERSION}`;
 
 // Files to cache on first visit. Paths are relative to the site root.

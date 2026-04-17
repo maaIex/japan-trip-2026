@@ -1,4 +1,7 @@
-import { useState, useEffect, useRef, forwardRef, createContext, useContext } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback, forwardRef, createContext, useContext } from "react";
+import { matchesQuery, countMatches, countItemMatches } from "./utils/search.js";
+import { highlight } from "./utils/highlight.jsx";
+import { wmoToIcon, formatAge } from "./utils/weather.js";
 
 const DarkCtx = createContext(false);
 const useDark = () => useContext(DarkCtx);
@@ -542,42 +545,8 @@ function findTabForDay(dayN) {
 }
 
 // ─── SEARCH UTILITIES ─────────────────────────────────────────────
-function highlight(text, query, dark) {
-  if (!query || !text) return text;
-  const idx = text.toLowerCase().indexOf(query.toLowerCase());
-  if (idx === -1) return text;
-  return (
-    <>
-      {text.slice(0, idx)}
-      <mark style={{
-        background: dark ? "#854D0E" : "#FEF08A",
-        color: dark ? "#FEF9C3" : "#78350F",
-        borderRadius: "2px",
-        padding: "0 1px",
-      }}>{text.slice(idx, idx + query.length)}</mark>
-      {text.slice(idx + query.length)}
-    </>
-  );
-}
-
-function matchesQuery(day, query) {
-  if (!query) return true;
-  const q = query.toLowerCase();
-  if (day.title.toLowerCase().includes(q)) return true;
-  if (day.alert && day.alert.toLowerCase().includes(q)) return true;
-  if (day.tips && day.tips.some(tip => tip.toLowerCase().includes(q))) return true;
-  return day.sections.some(sec =>
-    sec.items.some(item =>
-      (item.t && item.t.toLowerCase().includes(q)) ||
-      (item.sub && item.sub.toLowerCase().includes(q))
-    )
-  );
-}
-
-function countMatches(days, query) {
-  if (!query) return 0;
-  return days.filter(d => matchesQuery(d, query)).length;
-}
+// Moved to ./utils/search.js and ./utils/highlight.jsx so they can be
+// unit-tested without mounting React. Imported at the top of this file.
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("tokyo");
@@ -663,15 +632,25 @@ export default function App() {
     else window.addEventListener("load", reg, { once: true });
   }, []);
 
-  const toggleDay = n => setOpenDays(p => { const s=new Set(p); s.has(n)?s.delete(n):s.add(n); return s; });
-  const tab = TABS.find(t => t.id === activeTab);
-  const allDays = tab
+  const toggleDay = useCallback(n => setOpenDays(p => { const s=new Set(p); s.has(n)?s.delete(n):s.add(n); return s; }), []);
+  const tab = useMemo(() => TABS.find(t => t.id === activeTab), [activeTab]);
+  // `allDays` depends only on the active tab — recompute when it changes.
+  const allDays = useMemo(() => tab
     ? (tab.dayNs
         ? DAYS.filter(d => tab.dayNs.includes(d.n)).sort((a,b) => a.n - b.n)
         : DAYS.filter(d => tab.range.length && d.n >= tab.range[0] && d.n <= tab.range[1]).sort((a,b) => a.n - b.n))
-    : [];
-  const days = query ? allDays.filter(d => matchesQuery(d, query)) : allDays;
-  const totalMatches = query ? countMatches(allDays, query) : 0;
+    : [],
+    [tab]);
+  // Filtering + counting are O(items) — memoize so typing one character
+  // doesn't re-scan the itinerary 16 times per keystroke.
+  const days = useMemo(() => query ? allDays.filter(d => matchesQuery(d, query)) : allDays, [allDays, query]);
+  const totalMatches = useMemo(() => query ? countMatches(allDays, query) : 0, [allDays, query]);
+  const itemMatchesByDay = useMemo(() => {
+    if (!query) return null;
+    const m = {};
+    for (const d of allDays) m[d.n] = countItemMatches(d, query);
+    return m;
+  }, [allDays, query]);
 
   // ── Keyboard navigation (desktop) ─────────────────────────────
   // ←/→ naviguent entre jours du tab courant ; Alt+←/→ changent d'onglet.
@@ -1230,6 +1209,7 @@ body { overflow-x: hidden; max-width: 100vw; }
                     isOpen={query ? true : openDays.has(d.n)}
                     onToggle={() => toggleDay(d.n)}
                     query={query}
+                    matchCount={itemMatchesByDay ? itemMatchesByDay[d.n] : 0}
                   />
                 ))
               )}
@@ -1331,7 +1311,7 @@ function DesktopTOC({ days, openDays, setOpenDays, tabColor }) {
   );
 }
 
-const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query }, ref) {
+const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query, matchCount = 0 }, ref) {
   const dark = useDark();
   const [viewMode, setViewMode] = useState(() => {
     try { return localStorage.getItem("viewMode") || "cards"; } catch { return "cards"; }
@@ -1355,6 +1335,14 @@ const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query }, re
             <span style={{ fontSize:"0.72rem", fontWeight:600, color:cc.color, background:cc.light[dark?"dark":"light"], padding:"0.1rem 0.45rem", borderRadius:"10px", flexShrink:0 }}>{cityNames[day.city]||day.city}</span>
             <span style={{ fontSize:"0.68rem", color:v("textMuted",dark), flexShrink:0 }}>{day.day} {day.date}</span>
             {day.alert && <span style={{ fontSize:"0.7rem", background:dark?"#2A1800":"#FEF3C7", color:dark?"#FCD34D":"#92400E", padding:"0.1rem 0.4rem", borderRadius:"8px" }}>🎌 Jour férié</span>}
+            {query && matchCount > 0 && (
+              <span
+                title={`${matchCount} activité${matchCount>1?"s":""} correspond${matchCount>1?"ent":""} à « ${query} »`}
+                style={{ fontSize:"0.68rem", fontWeight:700, color:dark?"#FEF08A":"#78350F", background:dark?"#854D0E":"#FEF08A", padding:"0.1rem 0.4rem", borderRadius:"8px", flexShrink:0 }}
+              >
+                🔍 {matchCount}
+              </span>
+            )}
           </div>
           <div style={{ fontSize:"0.9rem", fontWeight:600, color:v("textPrimary",dark), lineHeight:1.3, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden", wordBreak:"break-word" }}>{day.title}</div>
         </div>
@@ -2999,22 +2987,7 @@ const WEATHER_CITIES = [
   { id: "osaka", name: "Osaka 🎡", color: "#F97316", lat: 34.6937, lon: 135.5023 },
 ];
 
-// WMO weather code → emoji + label simplifié (FR).
-// https://open-meteo.com/en/docs (section "Weather variable documentation")
-function wmoToIcon(code) {
-  if (code == null) return { ico: "❓", lbl: "—" };
-  if (code === 0) return { ico: "☀️", lbl: "Ensoleillé" };
-  if (code <= 2)  return { ico: "🌤", lbl: "Partiellement nuageux" };
-  if (code === 3) return { ico: "☁️", lbl: "Couvert" };
-  if (code <= 48) return { ico: "🌫", lbl: "Brouillard" };
-  if (code <= 57) return { ico: "🌦", lbl: "Bruine" };
-  if (code <= 67) return { ico: "🌧", lbl: "Pluie" };
-  if (code <= 77) return { ico: "🌨", lbl: "Neige" };
-  if (code <= 82) return { ico: "🌧", lbl: "Averses" };
-  if (code <= 86) return { ico: "🌨", lbl: "Averses de neige" };
-  if (code <= 99) return { ico: "⛈", lbl: "Orage" };
-  return { ico: "❓", lbl: "—" };
-}
+// wmoToIcon moved to ./utils/weather.js (unit-tested).
 
 function LiveWeatherCard() {
   const dark = useDark();
@@ -3070,14 +3043,10 @@ function LiveWeatherCard() {
     return () => { cancelled = true; };
   }, []);
 
-  const ageText = (() => {
-    if (!data?.fetchedAt) return null;
-    const mins = Math.round((Date.now() - data.fetchedAt) / 60000);
-    if (mins < 1) return "à l'instant";
-    if (mins < 60) return `il y a ${mins} min`;
-    const h = Math.floor(mins / 60);
-    return `il y a ${h}h`;
-  })();
+  const ageText = formatAge(data?.fetchedAt);
+  // Cache older than 24h is stale enough to flag — the user may have been
+  // offline for a while and the numbers are effectively reference-only.
+  const staleCache = error && data?.fetchedAt && (Date.now() - data.fetchedAt) > 24 * 3600 * 1000;
 
   return (
     <InfoCard title="🌐 Météo live (7 prochains jours)" color="#0EA5E9" headerBg={t("#F0F9FF","#0C1F35")}>
@@ -3085,6 +3054,20 @@ function LiveWeatherCard() {
         Source : Open-Meteo (gratuit, sans clé) • {loading && !data ? "chargement…" : ageText ? `MAJ ${ageText}` : ""}
         {error && data ? " • hors-ligne (cache)" : ""}
       </p>
+
+      {staleCache && (
+        <p style={{
+          fontSize:"0.72rem",
+          color: dark ? "#FCD34D" : "#92400E",
+          background: dark ? "#1C1400" : "#FFFBEB",
+          border: `1px solid ${dark ? "#78350F" : "#FDE68A"}`,
+          borderRadius: "6px",
+          padding: "0.4rem 0.55rem",
+          margin: "0 0 0.6rem",
+        }}>
+          ⚠️ Cache ancien ({ageText}) — reconnectez-vous pour rafraîchir.
+        </p>
+      )}
 
       {!data && loading && (
         <p style={{ fontSize:"0.75rem", color:v("textSec",dark) }}>Chargement des prévisions…</p>

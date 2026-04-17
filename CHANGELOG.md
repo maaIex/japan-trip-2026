@@ -4,6 +4,69 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ---
 
+## Session 4 — 2026-04-17
+
+**Contexte :** Audit qualité / perf / fiabilité avant voyage. Extraction d'utilitaires testables, optimisation des chemins chauds, versioning SW automatique, et amélioration UX de la recherche. Budget tracker et galerie photo explicitement écartés (inutiles pour l'usage voyage).
+
+### Extraction d'utilitaires testables
+
+- **`src/utils/search.js`** créé — `matchesQuery()`, `countMatches()`, `countItemMatches()` déplacées hors de `App.jsx`. JSDoc complète sur chaque fonction.
+- **`src/utils/highlight.jsx`** créé — le wrapper `<mark>` de mise en valeur de la recherche, avec JSDoc.
+- **`src/utils/weather.js`** créé — `wmoToIcon()` (code météo WMO → emoji/label) + nouvelle `formatAge()` pour formater "il y a Xmin/Xh/Xj". JSDoc.
+- **`App.jsx`** : imports depuis `./utils/*`, duplicata supprimés. Gain : ~40 lignes de logique pure hors du monolithe, testable sans monter React.
+
+### Tests — Vitest
+
+- **`vitest` + `@testing-library/react` + `jsdom`** ajoutés en `devDependencies`.
+- **`src/utils/__tests__/search.test.js`** — 15 tests couvrant : empty query, title match, case-insensitive, subtitle match (régression possible si on recasse search), city name, date, day-of-week, tips, null day.
+- **`src/utils/__tests__/weather.test.js`** — 11 tests : `wmoToIcon` (sunny/cloudy/rain/storm/fallback) + `formatAge` (now-ref fixe pour déterminisme).
+- **`src/utils/__tests__/highlight.test.jsx`** — 5 tests : empty, no-match, wrap, preserve case, dark-mode color.
+- **Scripts npm** : `npm test` (single run), `npm run test:watch` (dev).
+- Résultat : **36 tests ✓ / 3 fichiers**.
+
+### Recherche améliorée
+
+- **Nouveaux champs matchables** dans `matchesQuery` :
+  - Nom de ville (`tokyo`, `kyoto`, `osaka`, `transit`, `depart`) — taper "kyoto" ouvre automatiquement les jours du tab Kyoto.
+  - Date humaine (`27 avr`, `28 avr`…) — pour rejoindre un jour précis.
+  - Jour de la semaine (`Lun`, `Mar`…).
+- **Compteur par jour** : lorsque la recherche est active, chaque carte-journée affiche un badge 🔍 N indiquant le nombre d'activités correspondantes (hover : tooltip détaillée). Permet de voir en un coup d'œil *où* se concentrent les résultats plutôt que de devoir déplier chaque jour.
+
+### Performance — mémoïsation
+
+- **`useMemo`** sur `tab`, `allDays`, `days`, `totalMatches`, `itemMatchesByDay` ([App.jsx:666](src/App.jsx)) — évite de recalculer le filtrage/comptage à chaque render déclenché par un état non lié (ex: toggle d'un note d'un autre jour).
+- **`useCallback`** sur `toggleDay` — handler stable, évite des re-renders en cascade dans `DayCard`.
+- Impact mesurable : taper dans la recherche ne re-scanne plus les 16 jours × N items à chaque frappe.
+
+### Météo — indicateur de cache obsolète
+
+- [LiveWeatherCard](src/App.jsx) : nouveau bandeau d'avertissement jaune "⚠️ Cache ancien (il y a Xj) — reconnectez-vous pour rafraîchir" quand la dernière mise à jour est > 24h ET que le dernier fetch a échoué.
+- Utilise la nouvelle utilitaire `formatAge()` (remplace la fonction closure locale).
+- Comportement existant préservé : on continue d'afficher le cache tant qu'il existe, jamais d'écran blanc même hors-ligne prolongé.
+
+### Service Worker — versioning automatique
+
+- **Fini le bump manuel de `CACHE_VERSION`** à chaque déploiement.
+- **`vite.config.js`** : nouveau plugin `sw-version-stamp` + `define` injectent un timestamp UTC (format `YYYYMMDDHHmm`) à chaque build.
+- **`public/sw.js`** : `CACHE_VERSION` vaut `japon-2026-__BUILD_VERSION__`. Vite remplace le placeholder lors de `closeBundle` dans `dist/sw.js`.
+- En dev (Vite dev server), le placeholder reste littéral — non bloquant, le SW n'est pas actif en dev.
+- Vérifié après build : `dist/sw.js` contient bien `const CACHE_VERSION = 'japon-2026-202604170213';`.
+
+### Écartés explicitement
+
+- **Budget tracker** — demande utilisateur : inutile pour le voyage.
+- **Galerie photo locale** — demande utilisateur : inutile.
+- **Extraction complète du monolithe `App.jsx` (4972 lignes)** en composants séparés — risque élevé de régression vs gain modéré (sections déjà conditionnellement rendues via `activeTab==="xxx" && <Section />`). Reporté.
+- **Code splitting via `React.lazy`** — même raison : exigerait d'extraire toutes les sections en fichiers séparés pour générer des chunks distincts. Le SW cache aggressivement, le bundle est déjà ~157 kB gzip.
+
+### Build & vérifications
+
+- `npm run build` : 35 modules, 442 kB (157 kB gzip). Même ordre de grandeur qu'avant.
+- `npm test` : 36 ✓.
+- Aucune dépendance runtime ajoutée (React reste seule).
+
+---
+
 ## Session 3 — 2026-04-16
 
 **Contexte :** Refonte de la navigation et nettoyage du header.
