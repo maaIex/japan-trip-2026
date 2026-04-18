@@ -4,6 +4,51 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ---
 
+## Session 5 — 2026-04-18
+
+**Contexte :** Application complète et uniforme du design **Indigo Ukiyo-e** (handoff Claude Design `voyage-japon`). L'objectif : typographie éditoriale (Fraunces + Inter Tight + Shippori Mincho) partout, plus aucune couleur codée en dur, light + dark tuned automatiquement via les variables CSS, sans régression fonctionnelle.
+
+### Système de tokens — CSS variables d'abord
+
+- **`:root` (light)** et **`:root[data-theme="dark"]`** sont maintenant le *seul* endroit où une couleur Ukiyo-e est déclarée littéralement. Papiers kozo, ink prussien, vermillon hanko, or, cinq teintes de ville (Tokyo bleu, Kyoto prune, Osaka kaki, transit pierre, départ rouge foncé), quatre périodes (matin doré, après-midi indigo, soir prune, nuit encre), cinq statuses (OK / book / free / note / opt), cinq semantic levels (success/warning/danger/info/accent) — chacun avec variantes `-soft`, `-bdr`, `-wash`.
+- **Nouveaux tokens ajoutés** cette session pour étendre la palette sans casser les appels existants : `--accent-wash`, `--accent-bdr`, `--gold-bdr`.
+- **Accessoires JS** (`cssv(name)`, `t(name)`, `v(key)`) conservent leurs signatures historiques mais renvoient désormais *tous* un `var(--…)`. La bascule light/dark se fait 100 % en CSS, zéro branch JS à l'exécution — un atout perf et une suppression brutale de logique dupliquée.
+
+### Typographie éditoriale partout
+
+- **Fraunces (serif)** appliqué aux titres de cartes, bannières et sections : `InfoCard`, `EmergencyFAB` (Mode urgence, Phrases vitales, Consulats, Hôpitaux, Mes infos), `CalendrierSection` (intro + titre d'événement), Checklist, Gastro Top-10 hero. Weight 600, letter-spacing -0.01em pour le rendu affiche-voyage.
+- **Inter Tight (sans)** pour le corps, les micro-labels et les boutons.
+- **Shippori Mincho** pour les glyphes kanji (numéro de jour, bandeau Vol. 01).
+
+### Migration section par section
+
+Chaque commit couvre un groupe cohérent (cf. `git log`) :
+
+- **[f57ff43]** Checklist + UrgentReservationsBanner : catégories re-mappées sur `--city-*` / `--accent` ; badges de priorité sur `--gold-*` / `--accent-*` ; statuts « Réservé / À faire / Optionnel » via les tokens `st-*`.
+- **[d8ffe33]** Gastro + Top-10 éditorial : difficulté, priorité, TOP10 hero, filtres rapides, ville active, spot épinglé — tout en tokens. `SpotCard` simplifié, `DIFF_BADGE` extrait en constante globale.
+- **[71d2b8d]** Converter (or), Checklist de départ (success), LiveWeatherCard (info/warning/danger), MeteoSection (wash de ville pour les cartes semaine, catégories valise).
+- **[55b5449]** PhrasebookSection + InfoSection : badges difficulté DIFF, confirmations « Copié », KonbiniHub, DoAndDont, Transports & JR Pass, Boissons, Astuces Japon, Codes Culturels — plus un seul hex.
+- **[a248371]** OfflineBanner, InstallBanner (iOS tutoriel + Android prompt), EmergencyFAB (bulle flottante + modal plein écran, numéros, consulats, hôpitaux, phrases vitales). Le bouton 🚨 porte désormais le vermillon hanko officiel (`--accent` → `--accent-deep`).
+- **[dd5180f]** CalendrierSection : `IMPACT` et `TYPE_COLOR` convertis en vars sémantiques, timeline rail réécrit en gradient de 5 tokens, titre événement en Fraunces.
+
+### Corrections techniques liées
+
+- **Signature `t()` modernisée** — renvoie toujours `{light: cssv, dark: cssv}` (même var). Les ~10 derniers appels au pattern *legacy* `t("#HEX","#HEX")` produisaient des `var(--#HEX)` invalides ; tous corrigés.
+- **Accès `obj[dark?"dark":"light"]`** éliminés / simplifiés (ex. `ST[...].bg.light` ou accès direct au var string).
+- **`InfoCard`** accepte désormais `headerBg` comme string CSS-var. Fallback legacy `{light,dark}` conservé pour compat.
+- **`SpotCard`** : `DIFF_BADGE` extrait en const module-level, plus de re-création par render.
+
+### Build & vérifications
+
+- `npm run build` : 35 modules, ~455 kB (~160 kB gzip) — inchangé vs Session 4.
+- Ramassage des hex résiduels : les seuls hex restants dans `App.jsx` sont intentionnels — déclaration des vars (`:root`), la meta `theme-color` device-chrome, et les couleurs du QR code (noir/blanc obligatoires pour la lisibilité scanner).
+
+### Intention design
+
+> Un voyageur ouvre l'app dans un café parisien avant le vol : papier kozo crème, ink prussien, tampons vermillon. Dans le Shinkansen de nuit vers Kyoto (dark mode), même hiérarchie visuelle, les accents passent en teintes néon atténuées sur fond d'encre. **Aucune section ne doit trahir sa filiation avec l'estampe.**
+
+---
+
 ## Session 4 — 2026-04-17
 
 **Contexte :** Audit qualité / perf / fiabilité avant voyage. Extraction d'utilitaires testables, optimisation des chemins chauds, versioning SW automatique, et amélioration UX de la recherche. Budget tracker et galerie photo explicitement écartés (inutiles pour l'usage voyage).

@@ -2469,7 +2469,9 @@ function ChecklistSection() {
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:"0.5rem", flexWrap:"wrap" }}>
                       <p style={{ fontSize:"0.84rem", fontWeight:600, color:v("textPrimary",dark), margin:0, textDecoration: isDone ? "line-through" : "none", opacity: isDone ? 0.65 : 1 }}>{item.name}</p>
-                      <span style={{ fontSize:"0.7rem", fontWeight:600, padding:"0.15rem 0.5rem", borderRadius:"10px", background:ST[item.status==="ok"?"ok":item.status==="book"?"book":"free"].bg[dark?"dark":"light"], color:ST[item.status==="ok"?"ok":item.status==="book"?"book":"free"].color[dark?"dark":"light"], border:`1px solid ${ST[item.status==="ok"?"ok":item.status==="book"?"book":"free"].bdr[dark?"dark":"light"]}`, whiteSpace:"nowrap", flexShrink:0 }}>{isDone ? "✅ Fait" : item.status==="ok"?"✅ Réservé":item.status==="book"?"⚠️ À faire":"🔓 Optionnel"}</span>
+                      {(() => { const s = ST[item.status==="ok"?"ok":item.status==="book"?"book":"free"]; return (
+                      <span style={{ fontSize:"0.7rem", fontWeight:600, padding:"0.15rem 0.5rem", borderRadius:"10px", background:s.bg.light, color:s.color.light, border:`1px solid ${s.bdr.light}`, whiteSpace:"nowrap", flexShrink:0 }}>{isDone ? "✅ Fait" : item.status==="ok"?"✅ Réservé":item.status==="book"?"⚠️ À faire":"🔓 Optionnel"}</span>
+                      ); })()}
                     </div>
                     <p style={{ fontSize:"0.73rem", color:v("textPrimary",dark), margin:"0.15rem 0 0", opacity: isDone ? 0.6 : 1 }}>📅 {item.date}</p>
                     <p style={{ fontSize:"0.73rem", color:v("textSec",dark), margin:"0.05rem 0 0", opacity: isDone ? 0.6 : 1 }}>🔗 {item.platform}</p>
