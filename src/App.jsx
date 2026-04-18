@@ -4408,20 +4408,20 @@ function CalendrierSection() {
   const { goTo } = useNav();
   const [filter, setFilter] = useState("all"); // all | ferie | festival | pratique | foule
 
-  // Impact colors
+  // Impact colors — all resolve to CSS vars so light/dark swap via :root.
   const IMPACT = {
-    critique: { label:"🔴 Impact critique",  bg:t("#FEE2E2","#2D0A0A"), color:t("#991B1B","#F87171"), dot:"#EF4444" },
-    fort:     { label:"🟠 Impact fort",      bg:t("#FFF7ED","#1C1000"), color:t("#C2410C","#FB923C"), dot:"#F97316" },
-    modere:   { label:"🟡 Impact modéré",    bg:t("#FEF9C3","#1C1400"), color:t("#854D0E","#FCD34D"), dot:"#EAB308" },
-    faible:   { label:"🟢 Faible impact",    bg:t("#DCFCE7","#14301E"), color:t("#166534","#4ADE80"), dot:"#22C55E" },
-    positif:  { label:"✨ Opportunité",      bg:t("#F5F3FF","#1C0F2E"), color:t("#6D28D9","#C4B5FD"), dot:"#8B5CF6" },
+    critique: { label:"🔴 Impact critique", bg:"var(--danger-soft)",      color:"var(--danger)",     dot:"var(--danger)"      },
+    fort:     { label:"🟠 Impact fort",     bg:"var(--city-osaka-wash)",  color:"var(--city-osaka)", dot:"var(--city-osaka)"  },
+    modere:   { label:"🟡 Impact modéré",   bg:"var(--warning-soft)",     color:"var(--warning)",    dot:"var(--gold)"        },
+    faible:   { label:"🟢 Faible impact",   bg:"var(--success-soft)",     color:"var(--success)",    dot:"var(--success)"     },
+    positif:  { label:"✨ Opportunité",     bg:"var(--city-kyoto-wash)",  color:"var(--city-kyoto)", dot:"var(--city-kyoto)"  },
   };
 
   const TYPE_COLOR = {
-    ferie:    "#DC2626",
-    festival: "#7C3AED",
-    pratique: "#0369A1",
-    foule:    "#B45309",
+    ferie:    "var(--accent)",
+    festival: "var(--city-kyoto)",
+    pratique: "var(--info)",
+    foule:    "var(--warning)",
   };
 
   // Timeline events — each with date, title, type, impact, description, tips[], dayN, tabId
@@ -4572,13 +4572,13 @@ function CalendrierSection() {
 
       {/* INTRO */}
       <div style={{ background:v("cardBg",dark), border:`1px solid ${v("border",dark)}`, borderRadius:"12px", padding:"0.875rem 1rem" }}>
-        <h2 style={{ fontSize:"1rem", fontWeight:700, color:v("textPrimary",dark), margin:"0 0 0.4rem" }}>🎌 Calendrier culturel — 27 avril → 11 mai</h2>
+        <h2 style={{ fontFamily:"var(--font-serif)", fontSize:"1.1rem", fontWeight:600, color:v("textPrimary",dark), margin:"0 0 0.4rem", letterSpacing:"-0.01em" }}>🎌 Calendrier culturel — 27 avril → 11 mai</h2>
         <p style={{ fontSize:"0.75rem", color:v("textSec",dark), margin:"0 0 0.5rem", lineHeight:1.55 }}>
-          Votre séjour chevauche la <strong style={{ color:"#DC2626" }}>Golden Week</strong> (27 avril → 6 mai), la plus grande semaine de vacances du Japon. Chaque jour a un impact différent sur la foule, les transports et les prix. Utilisez ce calendrier pour anticiper et adapter votre rythme.
+          Votre séjour chevauche la <strong style={{ color:"var(--accent)" }}>Golden Week</strong> (27 avril → 6 mai), la plus grande semaine de vacances du Japon. Chaque jour a un impact différent sur la foule, les transports et les prix. Utilisez ce calendrier pour anticiper et adapter votre rythme.
         </p>
         <div style={{ display:"flex", flexWrap:"wrap", gap:"0.4rem" }}>
           {Object.entries(IMPACT).map(([k,v2]) => (
-            <span key={k} style={{ fontSize:"0.7rem", fontWeight:600, padding:"0.15rem 0.5rem", borderRadius:"8px", background:v2.bg[dark?"dark":"light"], color:v2.color[dark?"dark":"light"] }}>{v2.label}</span>
+            <span key={k} style={{ fontSize:"0.7rem", fontWeight:600, padding:"0.15rem 0.5rem", borderRadius:"8px", background:v2.bg, color:v2.color }}>{v2.label}</span>
           ))}
         </div>
       </div>
@@ -4588,9 +4588,9 @@ function CalendrierSection() {
         {FILTERS.map(f => (
           <button key={f.val} onClick={() => setFilter(f.val)} style={{
             padding:"0.3rem 0.65rem", borderRadius:"20px", fontSize:"0.72rem", fontFamily:"inherit", cursor:"pointer",
-            border:`1.5px solid ${filter===f.val?(dark?"#FBBF24":"#D97706"):(dark?"#3A3A3A":"#E5E7EB")}`,
-            background: filter===f.val ? (dark?"#2D1800":"#FEF3C7") : "transparent",
-            color: filter===f.val ? (dark?"#FBBF24":"#92400E") : v("textSec",dark),
+            border:`1.5px solid ${filter===f.val?"var(--gold-bdr)":"var(--border-light)"}`,
+            background: filter===f.val ? "var(--gold-soft)" : "transparent",
+            color: filter===f.val ? "var(--warning)" : v("textSec",dark),
             fontWeight: filter===f.val ? 700 : 400, transition:"all 0.15s",
           }}>{f.label}</button>
         ))}
@@ -4599,11 +4599,11 @@ function CalendrierSection() {
       {/* TIMELINE */}
       <div style={{ position:"relative", paddingLeft:"2.5rem" }}>
         {/* Vertical line */}
-        <div style={{ position:"absolute", left:"0.9rem", top:0, bottom:0, width:"2px", background:`linear-gradient(to bottom, #DC2626, #F97316, #EAB308, #22C55E, #3B7EFF)`, borderRadius:"1px", opacity:0.4 }} />
+        <div style={{ position:"absolute", left:"0.9rem", top:0, bottom:0, width:"2px", background:`linear-gradient(to bottom, var(--danger), var(--city-osaka), var(--gold), var(--success), var(--info))`, borderRadius:"1px", opacity:0.4 }} />
 
         {filteredEvents.map((ev, i) => {
           const imp = IMPACT[ev.impact];
-          const typeCol = TYPE_COLOR[ev.type] || "#374151";
+          const typeCol = TYPE_COLOR[ev.type] || "var(--text-sec)";
           // Find matching festivals for this date
           const fests = FESTIVALS.filter(f => f.date === ev.date || (ev.date >= f.date.split("-")[0] && f.date.includes("-") && ev.date <= f.date.split("-")[1]));
           return (
@@ -4612,21 +4612,21 @@ function CalendrierSection() {
               <div style={{
                 position:"absolute", left:"-2rem", top:"0.9rem",
                 width:"0.7rem", height:"0.7rem", borderRadius:"50%",
-                background: imp.dot, border:`2px solid ${dark?"#1A1A1A":"white"}`,
-                boxShadow:`0 0 0 2px ${imp.dot}40`,
+                background: imp.dot, border:`2px solid var(--bg-page)`,
+                boxShadow:`0 0 0 2px ${imp.bg}`,
                 zIndex:1,
               }} />
               {/* Card */}
-              <div style={{ background:v("cardBg",dark), borderRadius:"10px", border:`1px solid ${v("border",dark)}`, overflow:"hidden", boxShadow:dark?"0 1px 4px rgba(0,0,0,0.3)":"0 1px 4px rgba(0,0,0,0.07)" }}>
+              <div style={{ background:v("cardBg",dark), borderRadius:"10px", border:`1px solid ${v("border",dark)}`, overflow:"hidden", boxShadow:"var(--shadow-card)" }}>
                 {/* Header */}
-                <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", padding:"0.6rem 0.875rem", background:imp.bg[dark?"dark":"light"], borderBottom:`1px solid ${v("borderLight",dark)}` }}>
+                <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", padding:"0.6rem 0.875rem", background:imp.bg, borderBottom:`1px solid ${v("borderLight",dark)}` }}>
                   <span style={{ fontSize:"1.1rem", flexShrink:0 }}>{ev.emoji}</span>
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ display:"flex", alignItems:"center", gap:"0.4rem", flexWrap:"wrap" }}>
                       <span style={{ fontSize:"0.72rem", fontWeight:700, color:typeCol, whiteSpace:"nowrap" }}>{ev.date} — {ev.jour}</span>
-                      <span style={{ fontSize:"0.7rem", fontWeight:600, padding:"0.1rem 0.4rem", borderRadius:"6px", background:imp.bg[dark?"dark":"light"], color:imp.color[dark?"dark":"light"], border:`1px solid ${imp.dot}40`, whiteSpace:"nowrap" }}>{imp.label}</span>
+                      <span style={{ fontSize:"0.7rem", fontWeight:600, padding:"0.1rem 0.4rem", borderRadius:"6px", background:imp.bg, color:imp.color, border:"1px solid currentColor", whiteSpace:"nowrap" }}>{imp.label}</span>
                     </div>
-                    <p style={{ fontSize:"0.82rem", fontWeight:700, color:v("textPrimary",dark), margin:"0.1rem 0 0", lineHeight:1.3 }}>{ev.titre}</p>
+                    <p style={{ fontFamily:"var(--font-serif)", fontSize:"0.9rem", fontWeight:600, color:v("textPrimary",dark), margin:"0.1rem 0 0", lineHeight:1.3, letterSpacing:"-0.01em" }}>{ev.titre}</p>
                   </div>
                 </div>
                 {/* Body */}
@@ -4654,7 +4654,7 @@ function CalendrierSection() {
                   ))}
                   {/* Link to planning */}
                   {ev.tabId && (
-                    <button onClick={() => goTo(ev.tabId, ev.dayN)} style={{ fontSize:"0.68rem", color:dark?"#60A5FA":"#1D4ED8", background:"transparent", border:"none", cursor:"pointer", padding:0, fontWeight:600, textDecoration:"underline", fontFamily:"inherit" }}>
+                    <button onClick={() => goTo(ev.tabId, ev.dayN)} style={{ fontSize:"0.68rem", color:"var(--info)", background:"transparent", border:"none", cursor:"pointer", padding:0, fontWeight:600, textDecoration:"underline", fontFamily:"inherit" }}>
                       → Voir J{ev.dayN} dans le planning
                     </button>
                   )}
