@@ -1303,15 +1303,10 @@ body { overflow-x: hidden; max-width: 100vw; }
             />
           </div>
         </header>
-        {/* ── MODE VOYAGE ── */}
-        {voyageMode && (
-          <div style={{ background: inTrip ? "var(--success-soft)" : afterTrip ? "var(--info-soft)" : "var(--warning-soft)", padding:"0.5rem 1rem", display:"flex", alignItems:"center", gap:"0.5rem", borderBottom:`1px solid ${inTrip?"var(--success-bdr)":afterTrip?"var(--info-bdr)":"var(--warning-bdr)"}`, flexWrap:"wrap" }}>
-            {!inTrip && !afterTrip && daysToStart > 0 && (
-              <>
-                <span style={{ fontSize:"1rem" }}>⏳</span>
-                <span style={{ fontSize:"0.75rem", fontWeight:600, color:"var(--warning)", flex:1 }}>Départ dans <strong>{daysToStart}</strong> jour{daysToStart>1?"s":""} — 27 avril 2026</span>
-              </>
-            )}
+        {/* ── MODE VOYAGE ── (pre-trip variant supprimée : info redondante
+            avec le bloc DÉPART DANS du masthead) */}
+        {voyageMode && (inTrip || afterTrip) && (
+          <div style={{ background: inTrip ? "var(--success-soft)" : "var(--info-soft)", padding:"0.5rem 1rem", display:"flex", alignItems:"center", gap:"0.5rem", borderBottom:`1px solid ${inTrip?"var(--success-bdr)":"var(--info-bdr)"}`, flexWrap:"wrap" }}>
             {inTrip && currentDayObj && (
               <>
                 <span style={{ fontSize:"1rem" }}>🗾</span>
@@ -1396,40 +1391,90 @@ body { overflow-x: hidden; max-width: 100vw; }
             </span>
           )}
         </div>
-        {/* ── NAVIGATION 2 NIVEAUX ── */}
-        <nav aria-label="Navigation principale" style={{ background:v("navBg",dark), borderBottom:`1px solid ${v("navBorder",dark)}`, transition:"background 0.3s" }}>
+        {/* ── NAVIGATION 2 NIVEAUX — éditoriale (kanji + Fraunces italic) ── */}
+        <nav aria-label="Navigation principale" style={{ background:"var(--bg-page)", borderTop:`1px solid var(--border-light)`, borderBottom:`1px solid var(--border-light)` }}>
           {/* Groupe A — Destinations (toujours visible) */}
           <div className="nav-scroll-wrap" data-dark={dark ? "true" : "false"}>
-            <div style={{ display:"flex", overflowX:"auto", WebkitOverflowScrolling:"touch" }}>
+            <div style={{ display:"flex", overflowX:"auto", WebkitOverflowScrolling:"touch", padding:"0 0.5rem" }}>
               {TABS.filter(t => t.group === "A").map(tb => {
                 const cc = CITY[tb.city];
                 const active = activeTab === tb.id;
+                const kanji = CITY_KANJI[tb.city] || "";
+                const cleanLabel = tb.label.replace(/^\S+\s+/, "");
                 return (
                   <button key={tb.id}
                     onClick={() => { setActiveTab(tb.id); setShowMore(false); }}
                     role="tab" aria-selected={active} aria-current={active ? "page" : undefined}
-                    style={{ padding:"0.85rem 0.9rem", border:"none", background:"transparent", cursor:"pointer", flexShrink:0, borderBottom:active?`3px solid ${cc.color}`:"3px solid transparent", transition:"all 0.15s", outline:"none" }}>
-                    <div style={{ fontSize:"0.8rem", fontWeight:600, color:active?cc.color:v("textSec",dark), whiteSpace:"nowrap" }}>{tb.label}</div>
-                    <div style={{ fontSize:"0.68rem", color:v("textMuted",dark), marginTop:"1px" }}>{tb.sub}</div>
+                    style={{
+                      padding:"0.7rem 0.85rem 0.6rem",
+                      border:"none", background:"transparent", cursor:"pointer", flexShrink:0,
+                      borderBottom: active ? `2px solid ${cc.color}` : "2px solid transparent",
+                      transition:"border 0.15s, color 0.15s", outline:"none",
+                      textAlign:"left",
+                    }}>
+                    <div style={{ display:"flex", alignItems:"baseline", gap:"0.4rem" }}>
+                      <span aria-hidden="true" style={{
+                        fontFamily:"var(--font-kanji)",
+                        fontSize:"0.95rem", fontWeight:700,
+                        color: active ? cc.color : "var(--text-muted)",
+                        lineHeight:1, letterSpacing:"-0.02em",
+                      }}>{kanji}</span>
+                      <span style={{
+                        fontFamily:"var(--font-display)", fontStyle:"italic",
+                        fontSize:"0.94rem",
+                        fontWeight: active ? 700 : 500,
+                        color: active ? "var(--text-primary)" : "var(--text-sec)",
+                        letterSpacing:"-0.01em", whiteSpace:"nowrap", lineHeight:1,
+                      }}>{cleanLabel}</span>
+                    </div>
+                    <div style={{
+                      fontFamily:"var(--font-mono)",
+                      fontSize:"0.58rem",
+                      letterSpacing:"0.16em", textTransform:"uppercase",
+                      color: active ? cc.color : "var(--text-muted)",
+                      marginTop:"0.3rem", whiteSpace:"nowrap",
+                      opacity: active ? 1 : 0.85,
+                    }}>{tb.sub}</div>
                   </button>
                 );
               })}
-              {/* Bouton d'accès au Groupe B */}
+              {/* Bouton d'accès au Groupe B — style éditorial discret */}
               {(() => {
                 const activeBTab = TABS.find(t => t.group === "B" && t.id === activeTab);
                 const bHighlit = !!activeBTab || showMore;
+                const cleanBLabel = activeBTab ? activeBTab.label.replace(/^\S+\s+/, "") : "Ressources";
                 return (
                   <button
                     onClick={() => setShowMore(s => !s)}
                     aria-expanded={showMore}
                     aria-label={showMore ? "Fermer les ressources pratiques" : "Ouvrir les ressources pratiques"}
-                    style={{ padding:"0.85rem 0.9rem", border:"none", background:"transparent", cursor:"pointer", flexShrink:0, borderBottom:bHighlit?`3px solid ${v("textSec",dark)}`:"3px solid transparent", transition:"all 0.15s", outline:"none" }}>
-                    <div style={{ fontSize:"0.8rem", fontWeight:600, color:bHighlit?v("textPrimary",dark):v("textSec",dark), whiteSpace:"nowrap" }}>
-                      {activeBTab ? activeBTab.label : "●●● Plus"}
+                    style={{
+                      padding:"0.7rem 0.85rem 0.6rem",
+                      border:"none", background:"transparent", cursor:"pointer", flexShrink:0,
+                      borderBottom: bHighlit ? "2px solid var(--text-primary)" : "2px solid transparent",
+                      transition:"border 0.15s", outline:"none", textAlign:"left",
+                    }}>
+                    <div style={{ display:"flex", alignItems:"baseline", gap:"0.4rem" }}>
+                      <span aria-hidden="true" style={{
+                        fontFamily:"var(--font-body)", fontSize:"0.8rem",
+                        color: bHighlit ? "var(--text-primary)" : "var(--text-muted)",
+                        fontWeight:700, lineHeight:1, letterSpacing:"0.14em",
+                      }}>{showMore ? "—" : "+"}</span>
+                      <span style={{
+                        fontFamily:"var(--font-display)", fontStyle:"italic",
+                        fontSize:"0.94rem",
+                        fontWeight: bHighlit ? 700 : 500,
+                        color: bHighlit ? "var(--text-primary)" : "var(--text-sec)",
+                        letterSpacing:"-0.01em", whiteSpace:"nowrap", lineHeight:1,
+                      }}>{cleanBLabel}</span>
                     </div>
-                    <div style={{ fontSize:"0.68rem", color:v("textMuted",dark), marginTop:"1px" }}>
-                      {activeBTab ? activeBTab.sub : "Ressources"}
-                    </div>
+                    <div style={{
+                      fontFamily:"var(--font-mono)",
+                      fontSize:"0.58rem",
+                      letterSpacing:"0.16em", textTransform:"uppercase",
+                      color:"var(--text-muted)",
+                      marginTop:"0.3rem", whiteSpace:"nowrap",
+                    }}>{activeBTab ? activeBTab.sub : "Pratiques"}</div>
                   </button>
                 );
               })()}
@@ -1437,16 +1482,35 @@ body { overflow-x: hidden; max-width: 100vw; }
           </div>
           {/* Groupe B — Ressources pratiques (panneau dépliable) */}
           {showMore && (
-            <div style={{ borderTop:`1px solid ${v("borderLight",dark)}`, padding:"0.5rem 0.65rem 0.6rem", display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"0.4rem" }}>
+            <div style={{ borderTop:"1px solid var(--border-light)", padding:"0.6rem 0.75rem 0.75rem", display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:"0.5rem" }}>
               {TABS.filter(t => t.group === "B").map(tb => {
                 const active = activeTab === tb.id;
+                const cleanLabel = tb.label.replace(/^\S+\s+/, "");
                 return (
                   <button key={tb.id}
                     onClick={() => { setActiveTab(tb.id); setShowMore(false); }}
                     role="tab" aria-selected={active}
-                    style={{ padding:"0.5rem 0.35rem", border:`1px solid ${active ? "var(--accent)" : "var(--border-light)"}`, background: active ? "var(--accent-soft)" : "var(--bg-card-2)", cursor:"pointer", borderRadius:"8px", transition:"all 0.15s", outline:"none", textAlign:"center" }}>
-                    <div style={{ fontSize:"0.75rem", fontWeight:600, color: active ? "var(--accent)" : "var(--text-primary)" }}>{tb.label}</div>
-                    <div style={{ fontSize:"0.63rem", color:"var(--text-muted)", marginTop:"2px" }}>{tb.sub}</div>
+                    style={{
+                      padding:"0.5rem 0.4rem 0.55rem",
+                      border:"none", background:"transparent",
+                      borderTop: active ? "1px solid var(--accent)" : "1px solid var(--border-light)",
+                      cursor:"pointer", transition:"border 0.15s", outline:"none", textAlign:"left",
+                    }}>
+                    <div style={{
+                      fontFamily:"var(--font-display)", fontStyle:"italic",
+                      fontSize:"0.88rem",
+                      fontWeight: active ? 700 : 500,
+                      color: active ? "var(--accent)" : "var(--text-primary)",
+                      letterSpacing:"-0.01em", lineHeight:1.1,
+                    }}>{cleanLabel}</div>
+                    <div style={{
+                      fontFamily:"var(--font-mono)",
+                      fontSize:"0.56rem",
+                      letterSpacing:"0.18em", textTransform:"uppercase",
+                      color: active ? "var(--accent)" : "var(--text-muted)",
+                      marginTop:"0.25rem",
+                      opacity: active ? 1 : 0.9,
+                    }}>{tb.sub}</div>
                   </button>
                 );
               })}
