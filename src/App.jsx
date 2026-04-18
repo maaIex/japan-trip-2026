@@ -812,8 +812,11 @@ export default function App() {
   --accent:       #C73E3A;
   --accent-deep:  #9B2A27;
   --accent-soft:  rgba(199, 62, 58, 0.12);
+  --accent-wash:  rgba(199, 62, 58, 0.08);
+  --accent-bdr:   rgba(199, 62, 58, 0.35);
   --gold:         #CA9A3C;
   --gold-soft:    rgba(202, 154, 60, 0.14);
+  --gold-bdr:     rgba(202, 154, 60, 0.40);
 
   /* City hues */
   --city-tokyo:          #1B3A68;
@@ -923,8 +926,11 @@ export default function App() {
   --accent:       #E85D58;
   --accent-deep:  #C73E3A;
   --accent-soft:  rgba(232, 93, 88, 0.18);
+  --accent-wash:  rgba(232, 93, 88, 0.10);
+  --accent-bdr:   rgba(232, 93, 88, 0.45);
   --gold:         #E0B85C;
   --gold-soft:    rgba(224, 184, 92, 0.16);
+  --gold-bdr:     rgba(224, 184, 92, 0.45);
 
   --city-tokyo:          #6FA8DC;
   --city-tokyo-wash:     rgba(111, 168, 220, 0.14);
@@ -2453,7 +2459,7 @@ function ChecklistSection() {
                       display:"flex", alignItems:"center", justifyContent:"center",
                       marginTop:"1px", transition:"all 0.15s",
                     }}>
-                      {isDone && <span style={{ color:"var(--paper-bg)", fontSize:"0.78rem", fontWeight:800, lineHeight:1 }}>✓</span>}
+                      {isDone && <span style={{ color:"var(--header-ink)", fontSize:"0.78rem", fontWeight:800, lineHeight:1 }}>✓</span>}
                     </div>
                   ) : (
                     <span style={{ fontSize:"1rem", flexShrink:0, marginTop:"1px" }}>
@@ -2482,7 +2488,7 @@ function ChecklistSection() {
 // ─── GASTRO SECTION ──────────────────────────────────────────────────────────
 const GASTRO = [
   {
-    id: "ramen", emoji: "🍜", title: "Ramen & Nouilles", color: "#DC2626",
+    id: "ramen", emoji: "🍜", title: "Ramen & Nouilles", color: "var(--accent)",
     items: [
       {
         emoji:"🐖", name:"Tonkotsu (博多とんこつ)", diff:"🟢",
@@ -2553,7 +2559,7 @@ const GASTRO = [
     ]
   },
   {
-    id: "sushi", emoji: "🍣", title: "Sushis & Poissons crus", color: "#0369A1",
+    id: "sushi", emoji: "🍣", title: "Sushis & Poissons crus", color: "var(--city-tokyo)",
     items: [
       {
         emoji:"👨‍🍳", name:"Omakase (おまかせ)", diff:"🔴",
@@ -2601,7 +2607,7 @@ const GASTRO = [
     ]
   },
   {
-    id: "viandes", emoji: "🥩", title: "Viandes & Grillades", color: "#B45309",
+    id: "viandes", emoji: "🥩", title: "Viandes & Grillades", color: "var(--gold)",
     items: [
       {
         emoji:"🔥", name:"Yakiniku — Wagyu (焼肉)", diff:"🟡",
@@ -2660,7 +2666,7 @@ const GASTRO = [
     ]
   },
   {
-    id: "streetfood", emoji: "🏮", title: "Street Food & Snacks", color: "#7C3AED",
+    id: "streetfood", emoji: "🏮", title: "Street Food & Snacks", color: "var(--city-kyoto)",
     items: [
       {
         emoji:"🐙", name:"Takoyaki (たこ焼き)", diff:"🟢",
@@ -2729,7 +2735,7 @@ const GASTRO = [
     ]
   },
   {
-    id: "quotidien", emoji: "🍱", title: "Plats du Quotidien", color: "#065F46",
+    id: "quotidien", emoji: "🍱", title: "Plats du Quotidien", color: "var(--success)",
     items: [
       {
         emoji:"🍛", name:"Curry japonais (カレー)", diff:"🟢",
@@ -2788,7 +2794,7 @@ const GASTRO = [
     ]
   },
   {
-    id: "desserts", emoji: "🍡", title: "Desserts & Sucreries", color: "#BE185D",
+    id: "desserts", emoji: "🍡", title: "Desserts & Sucreries", color: "var(--city-osaka)",
     items: [
       {
         emoji:"🍡", name:"Wagashi (和菓子) — Confiseries traditionnelles", diff:"🟡",
@@ -2858,7 +2864,7 @@ const GASTRO = [
     ]
   },
   {
-    id: "boissons", emoji: "🍵", title: "Thés, Cafés & Boissons", color: "#0D9488",
+    id: "boissons", emoji: "🍵", title: "Thés, Cafés & Boissons", color: "var(--info)",
     items: [
       {
         emoji:"🍵", name:"Matcha (抹茶) — Niveaux et styles", diff:"🟡",
@@ -2894,7 +2900,7 @@ const GASTRO = [
     ]
   },
   {
-    id: "alcools", emoji: "🥃", title: "Alcools sans bière", color: "#92400E",
+    id: "alcools", emoji: "🥃", title: "Alcools sans bière", color: "var(--warning)",
     items: [
       {
         emoji:"🥃", name:"Whisky japonais — Les références", diff:"🟡",
@@ -2931,7 +2937,7 @@ const GASTRO = [
     ]
   },
   {
-    id: "konbini", emoji: "🏪", title: "Konbini & Dépachika", color: "#374151",
+    id: "konbini", emoji: "🏪", title: "Konbini & Dépachika", color: "var(--city-transit)",
     items: [
       {
         emoji:"7️⃣", name:"Konbini — Incontournables à acheter", diff:"🟢",
@@ -2968,15 +2974,16 @@ const GASTRO = [
   },
 ];
 
+const DIFF_BADGE = {
+  "🟢": { bg: "var(--success-soft)", color: "var(--success)" },
+  "🟡": { bg: "var(--warning-soft)", color: "var(--warning)" },
+  "🔴": { bg: "var(--danger-soft)",  color: "var(--danger)"  },
+};
+
 function SpotCard({ spot, catColor }) {
   const dark = useDark();
   const { goTo } = useNav();
-  const diffColor2 = {
-    "🟢": { bg: t("#DCFCE7","#14301E"), color: t("#166534","#4ADE80") },
-    "🟡": { bg: t("#FEF9C3","#1C1400"), color: t("#854D0E","#FCD34D") },
-    "🔴": { bg: t("#FEE2E2","#2D0A0A"), color: t("#991B1B","#F87171") },
-  };
-  const dc2 = diffColor2[spot.diff] || diffColor2["🟢"];
+  const dc2 = DIFF_BADGE[spot.diff] || DIFF_BADGE["🟢"];
   return (
     <div style={{ background:v("cardBg2",dark), border:`1px solid ${v("borderLight",dark)}`, borderRadius:"8px", padding:"0.55rem 0.7rem" }}>
       <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:"0.5rem", marginBottom:"0.25rem" }}>
@@ -2984,7 +2991,7 @@ function SpotCard({ spot, catColor }) {
           <span style={{ fontSize:"0.8rem", fontWeight:700, color:catColor }}>{spot.nom}</span>
           <span style={{ fontSize:"0.7rem", color:v("textMuted",dark), marginLeft:"0.4rem" }}>· {spot.quartier}</span>
         </div>
-        <span style={{ fontSize:"0.7rem", fontWeight:600, padding:"0.12rem 0.4rem", borderRadius:"6px", whiteSpace:"nowrap", flexShrink:0, background:dc2.bg[dark?"dark":"light"], color:dc2.color[dark?"dark":"light"] }}>
+        <span style={{ fontSize:"0.7rem", fontWeight:600, padding:"0.12rem 0.4rem", borderRadius:"6px", whiteSpace:"nowrap", flexShrink:0, background:dc2.bg, color:dc2.color }}>
           {spot.diff}
         </span>
       </div>
@@ -3003,7 +3010,7 @@ function SpotCard({ spot, catColor }) {
         {spot.tabId && spot.dayN && (
           <button
             onClick={() => goTo(spot.tabId, spot.dayN)}
-            style={{ fontSize:"0.68rem", color:dark?"#60A5FA":"#1D4ED8", background:"transparent", border:"none", cursor:"pointer", padding:0, fontWeight:600, textDecoration:"underline" }}>
+            style={{ fontSize:"0.68rem", color:"var(--info)", background:"transparent", border:"none", cursor:"pointer", padding:0, fontWeight:600, textDecoration:"underline" }}>
             → Voir {spot.dayLabel} dans le planning
           </button>
         )}
@@ -3044,16 +3051,12 @@ function GastroSection() {
   });
 
   const diffLabel = { "🟢": "Facile", "🟡": "Pointer du doigt", "🔴": "Réservation/japonais" };
-  const diffColor = {
-    "🟢": { bg: t("#DCFCE7","#14301E"), color: t("#166534","#4ADE80") },
-    "🟡": { bg: t("#FEF9C3","#1C1400"), color: t("#854D0E","#FCD34D") },
-    "🔴": { bg: t("#FEE2E2","#2D0A0A"), color: t("#991B1B","#F87171") },
-  };
+  const diffColor = DIFF_BADGE;
 
   const prioBadge = {
-    1: { label:"⭐ Incontournable", bg: t("#FEF3C7","#2D1800"), color: t("#92400E","#FBBF24"), border: t("#FDE68A","#78350F") },
-    2: { label:"🔶 Recommandé",     bg: t("#FFF7ED","#1C1000"), color: t("#C2410C","#FB923C"), border: t("#FED7AA","#7C2D12") },
-    3: { label:"· Bonus",            bg: t("#F3F4F6","#252525"), color: t("#6B7280","#9CA3AF"), border: t("#E5E7EB","#3A3A3A") },
+    1: { label:"⭐ Incontournable", bg:"var(--warning-soft)", color:"var(--warning)", border:"var(--warning-bdr)" },
+    2: { label:"🔶 Recommandé",     bg:"var(--accent-wash)",  color:"var(--accent)",  border:"var(--accent-bdr)"  },
+    3: { label:"· Bonus",            bg:"var(--section-bg)",  color:"var(--text-muted)", border:"var(--border-light)" },
   };
 
   const TOP10 = [
@@ -3082,17 +3085,28 @@ function GastroSection() {
     return { ...cat, items };
   }).filter(cat => cat.items.length > 0);
 
-  const rankColors = ["#DC2626","#B45309","#0369A1","#065F46","#7C3AED","#BE185D","#0D9488","#92400E","#374151","#1553C4"];
+  const rankColors = [
+    "var(--accent)",      // 1 — vermillion
+    "var(--gold)",        // 2 — gold
+    "var(--city-tokyo)",  // 3 — tokyo indigo
+    "var(--success)",     // 4 — green
+    "var(--city-kyoto)",  // 5 — plum
+    "var(--city-osaka)",  // 6 — persimmon
+    "var(--info)",        // 7 — info blue
+    "var(--warning)",     // 8 — warning amber
+    "var(--city-transit)",// 9 — stone
+    "var(--accent-deep)", // 10 — deep vermillion
+  ];
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:"0.875rem" }}>
 
       {/* ── TOP 10 SECTION ── */}
-      <div style={{ background:v("cardBg",dark), borderRadius:"12px", overflow:"hidden", border:`1px solid ${v("border",dark)}`, boxShadow:dark?"0 2px 8px rgba(0,0,0,0.4)":"0 2px 8px rgba(0,0,0,0.1)" }}>
-        <div style={{ background:"linear-gradient(135deg,#0A1428 0%,#0D1B3F 45%,#1B3A68 100%)", padding:"0.9rem 1rem" }}>
-          <p style={{ fontSize:"0.7rem", color:"rgba(255,255,255,0.6)", letterSpacing:"0.15em", textTransform:"uppercase", margin:"0 0 0.2rem" }}>Sélection éditoriale</p>
-          <h2 style={{ fontFamily:"'Fraunces',serif", fontSize:"1.25rem", fontWeight:600, color:"white", margin:"0 0 0.5rem" }}>Top 10 — Les incontournables culinaires</h2>
-          <p style={{ fontSize:"0.72rem", color:"rgba(255,255,255,0.75)", margin:0, lineHeight:1.5 }}>
+      <div style={{ background:v("cardBg",dark), borderRadius:"12px", overflow:"hidden", border:`1px solid ${v("border",dark)}`, boxShadow:"var(--shadow-card)" }}>
+        <div style={{ background:"linear-gradient(135deg, var(--header-from) 0%, var(--header-mid) 45%, var(--header-to) 100%)", padding:"0.9rem 1rem" }}>
+          <p style={{ fontFamily:"var(--font-body)", fontSize:"0.66rem", color:"rgba(243,238,224,0.68)", letterSpacing:"0.18em", textTransform:"uppercase", margin:"0 0 0.35rem", fontWeight:600 }}>Sélection éditoriale</p>
+          <h2 style={{ fontFamily:"var(--font-serif)", fontSize:"1.3rem", fontWeight:600, color:"var(--header-ink)", margin:"0 0 0.5rem", letterSpacing:"-0.01em" }}>Top 10 — Les incontournables culinaires</h2>
+          <p style={{ fontSize:"0.72rem", color:"rgba(243,238,224,0.78)", margin:0, lineHeight:1.5 }}>
             Ces 10 expériences définissent la gastronomie japonaise. Un premier voyage sans elles est incomplet. Le classement s'établit sur trois critères : unicité culturelle (faisable seulement au Japon), accessibilité (sans budget illimité), et densité d'émotion gustative. Du plus universel au plus mémorable.
           </p>
         </div>
@@ -3100,7 +3114,7 @@ function GastroSection() {
           {TOP10.map((item, i) => (
             <div key={i} style={{ display:"flex", gap:"0.75rem", alignItems:"flex-start", padding:"0.6rem 0.25rem", borderBottom: i < 9 ? `1px solid ${v("borderMid",dark)}` : "none" }}>
               <div style={{ flexShrink:0, width:"2rem", height:"2rem", borderRadius:"50%", background:rankColors[i], display:"flex", alignItems:"center", justifyContent:"center" }}>
-                <span style={{ fontSize:"0.75rem", fontWeight:800, color:"white", lineHeight:1 }}>{item.rank}</span>
+                <span style={{ fontFamily:"var(--font-serif)", fontSize:"0.82rem", fontWeight:700, color:"var(--header-ink)", lineHeight:1 }}>{item.rank}</span>
               </div>
               <div style={{ flex:1, minWidth:0 }}>
                 <div style={{ display:"flex", alignItems:"center", gap:"0.4rem", marginBottom:"0.1rem", flexWrap:"wrap" }}>
@@ -3111,7 +3125,7 @@ function GastroSection() {
                 <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", flexWrap:"wrap", marginBottom:"0.35rem" }}>
                   <span style={{ fontSize:"0.68rem", color:v("textMuted",dark) }}>📍 {item.moment}</span>
                   {item.tabId && (
-                    <button onClick={() => goTo(item.tabId, item.dayN)} style={{ fontSize:"0.68rem", color:dark?"#60A5FA":"#1D4ED8", background:"transparent", border:"none", cursor:"pointer", padding:0, fontWeight:600, textDecoration:"underline" }}>
+                    <button onClick={() => goTo(item.tabId, item.dayN)} style={{ fontSize:"0.68rem", color:"var(--info)", background:"transparent", border:"none", cursor:"pointer", padding:0, fontWeight:600, textDecoration:"underline" }}>
                       → Planning
                     </button>
                   )}
@@ -3120,9 +3134,9 @@ function GastroSection() {
                   <div style={{ borderTop:`1px solid ${v("borderMid",dark)}`, marginTop:"0.35rem", paddingTop:"0.35rem" }}>
                     <button
                       onClick={() => goToGastroItem(item.catId, item.itemName)}
-                      style={{ fontSize:"0.69rem", color:dark?"#9CA3AF":"#6B7280", background:"transparent", border:"none", cursor:"pointer", padding:0, fontFamily:"inherit", transition:"color 0.15s" }}
-                      onMouseEnter={e => e.target.style.color = dark?"#F1F0EE":"#1F2937"}
-                      onMouseLeave={e => e.target.style.color = dark?"#9CA3AF":"#6B7280"}
+                      style={{ fontSize:"0.69rem", color:"var(--text-muted)", background:"transparent", border:"none", cursor:"pointer", padding:0, fontFamily:"inherit", transition:"color 0.15s" }}
+                      onMouseEnter={e => e.currentTarget.style.color = "var(--text-primary)"}
+                      onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
                     >
                       → Détails &amp; adresses
                     </button>
@@ -3142,9 +3156,10 @@ function GastroSection() {
           { val:2, label:"🔶 Fortement recommandés" },
         ].map(btn => (
           <button key={btn.val} onClick={() => setFilter(btn.val)} style={{
-            padding:"0.35rem 0.75rem", borderRadius:"20px", border:`1.5px solid ${filter===btn.val?(dark?"#FBBF24":"#D97706"):(dark?"#3A3A3A":"#E5E7EB")}`,
-            background: filter===btn.val ? (dark?"#2D1800":"#FEF3C7") : "transparent",
-            color: filter===btn.val ? (dark?"#FBBF24":"#92400E") : v("textSec",dark),
+            padding:"0.35rem 0.75rem", borderRadius:"20px",
+            border:`1.5px solid ${filter===btn.val ? "var(--warning)" : "var(--border)"}`,
+            background: filter===btn.val ? "var(--warning-soft)" : "transparent",
+            color: filter===btn.val ? "var(--warning)" : "var(--text-sec)",
             fontSize:"0.73rem", fontWeight: filter===btn.val ? 700 : 400,
             cursor:"pointer", fontFamily:"inherit", transition:"all 0.15s",
           }}>
@@ -3161,18 +3176,18 @@ function GastroSection() {
       {/* C17 — City filter */}
       <div style={{ display:"flex", gap:"0.5rem", flexWrap:"wrap" }}>
         {[
-          { val:"all",   label:"Toutes villes",      color:"#6B7280" },
-          { val:"tokyo", label:"🗼 Tokyo",           color:"#3B7EFF" },
-          { val:"kyoto", label:"⛩ Kyoto",           color:"#A855F7" },
-          { val:"osaka", label:"🎡 Osaka",           color:"#F97316" },
+          { val:"all",   label:"Toutes villes", color:"var(--city-transit)", wash:"var(--city-transit-wash)" },
+          { val:"tokyo", label:"🗼 Tokyo",     color:"var(--city-tokyo)",   wash:"var(--city-tokyo-wash)"   },
+          { val:"kyoto", label:"⛩ Kyoto",     color:"var(--city-kyoto)",   wash:"var(--city-kyoto-wash)"   },
+          { val:"osaka", label:"🎡 Osaka",     color:"var(--city-osaka)",   wash:"var(--city-osaka-wash)"   },
         ].map(btn => {
           const active = cityFilter === btn.val;
           return (
             <button key={btn.val} onClick={() => setCityFilter(btn.val)} style={{
               padding:"0.3rem 0.7rem", borderRadius:"20px",
-              border:`1.5px solid ${active ? btn.color : (dark?"#3A3A3A":"#E5E7EB")}`,
-              background: active ? `${btn.color}22` : "transparent",
-              color: active ? btn.color : v("textSec",dark),
+              border:`1.5px solid ${active ? btn.color : "var(--border)"}`,
+              background: active ? btn.wash : "transparent",
+              color: active ? btn.color : "var(--text-sec)",
               fontSize:"0.7rem", fontWeight: active ? 700 : 400,
               cursor:"pointer", fontFamily:"inherit", transition:"all 0.15s",
             }}>
@@ -3189,7 +3204,7 @@ function GastroSection() {
           <div key={cat.id} style={{ background:v("cardBg",dark), borderRadius:"12px", overflow:"hidden", border:`1px solid ${v("border",dark)}`, boxShadow:dark?"0 1px 6px rgba(0,0,0,0.3)":"0 1px 4px rgba(0,0,0,0.07)" }}>
             <button onClick={() => toggleSection(cat.id)} style={{ width:"100%", display:"flex", alignItems:"center", gap:"0.75rem", padding:"0.85rem 1rem", background:"transparent", border:"none", cursor:"pointer", textAlign:"left", outline:"none" }}>
               <span style={{ fontSize:"1.4rem", flexShrink:0 }}>{cat.emoji}</span>
-              <span style={{ flex:1, fontSize:"0.95rem", fontWeight:700, color:cat.color }}>{cat.title}</span>
+              <span style={{ flex:1, fontFamily:"var(--font-serif)", fontSize:"1.05rem", fontWeight:600, color:cat.color, letterSpacing:"-0.01em" }}>{cat.title}</span>
               <span style={{ fontSize:"0.68rem", color:v("textMuted",dark), marginRight:"0.5rem" }}>{cat.items.length} plat{cat.items.length>1?"s":""}</span>
               <span style={{ color:v("textMuted",dark), fontSize:"0.8rem", display:"inline-block", transform:isOpen?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▼</span>
             </button>
@@ -3202,7 +3217,7 @@ function GastroSection() {
                   const itemId = "gastro-item-" + itemKey.replace(/[^a-zA-Z0-9]/g, "-");
                   const isHighlighted = highlightedItem === itemKey;
                   return (
-                    <div key={idx} id={itemId} style={{ padding:"0.8rem 1rem", borderBottom:idx<cat.items.length-1?`1px solid ${v("borderMid",dark)}`:"none", transition:"background 0.5s ease", background: isHighlighted ? (dark?"rgba(251,191,36,0.18)":"rgba(251,191,36,0.22)") : "transparent", borderRadius: isHighlighted ? "6px" : "0" }}>
+                    <div key={idx} id={itemId} style={{ padding:"0.8rem 1rem", borderBottom:idx<cat.items.length-1?`1px solid ${v("borderMid",dark)}`:"none", transition:"background 0.5s ease", background: isHighlighted ? "var(--warning-soft)" : "transparent", borderRadius: isHighlighted ? "6px" : "0" }}>
                       <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:"0.4rem", marginBottom:"0.35rem", flexWrap:"wrap" }}>
                         <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", flex:1, minWidth:0 }}>
                           <span style={{ fontSize:"1.1rem", flexShrink:0 }}>{item.emoji}</span>
@@ -3210,11 +3225,11 @@ function GastroSection() {
                         </div>
                         <div style={{ display:"flex", gap:"0.3rem", flexShrink:0, flexWrap:"wrap", justifyContent:"flex-end" }}>
                           {pb && (
-                            <span style={{ fontSize:"0.7rem", fontWeight:700, padding:"0.15rem 0.45rem", borderRadius:"8px", whiteSpace:"nowrap", background:pb.bg[dark?"dark":"light"], color:pb.color[dark?"dark":"light"], border:`1px solid ${pb.border[dark?"dark":"light"]}` }}>
+                            <span style={{ fontSize:"0.7rem", fontWeight:700, padding:"0.15rem 0.45rem", borderRadius:"8px", whiteSpace:"nowrap", background:pb.bg, color:pb.color, border:`1px solid ${pb.border}` }}>
                               {pb.label}
                             </span>
                           )}
-                          <span style={{ fontSize:"0.7rem", fontWeight:600, padding:"0.15rem 0.45rem", borderRadius:"8px", whiteSpace:"nowrap", background:dc.bg[dark?"dark":"light"], color:dc.color[dark?"dark":"light"] }}>
+                          <span style={{ fontSize:"0.7rem", fontWeight:600, padding:"0.15rem 0.45rem", borderRadius:"8px", whiteSpace:"nowrap", background:dc.bg, color:dc.color }}>
                             {item.diff} {diffLabel[item.diff]}
                           </span>
                         </div>
@@ -3448,9 +3463,9 @@ function DepartureChecklist() {
 // Si hors plage (trop loin du voyage) affiche qd même les 7 prochains jours
 // — ça permet de comparer aux moyennes saisonnières à tout moment.
 const WEATHER_CITIES = [
-  { id: "tokyo", name: "Tokyo 🗼", color: "#3B7EFF", lat: 35.6762, lon: 139.6503 },
-  { id: "kyoto", name: "Kyoto ⛩",  color: "#A855F7", lat: 35.0116, lon: 135.7681 },
-  { id: "osaka", name: "Osaka 🎡", color: "#F97316", lat: 34.6937, lon: 135.5023 },
+  { id: "tokyo", name: "Tokyo 🗼", color: "var(--city-tokyo)", lat: 35.6762, lon: 139.6503 },
+  { id: "kyoto", name: "Kyoto ⛩",  color: "var(--city-kyoto)", lat: 35.0116, lon: 135.7681 },
+  { id: "osaka", name: "Osaka 🎡", color: "var(--city-osaka)", lat: 34.6937, lon: 135.5023 },
 ];
 
 // wmoToIcon moved to ./utils/weather.js (unit-tested).
@@ -4685,7 +4700,7 @@ function PhrasebookSection() {
     "🔴":{ bg:t("#FEE2E2","#2D0A0A"), color:t("#991B1B","#F87171") },
   };
   const CATS = [
-    { id:"resto", emoji:"🍽", titre:"Au restaurant", color:"#DC2626", phrases:[
+    { id:"resto", emoji:"🍽", titre:"Au restaurant", color:"var(--accent)", phrases:[
       { fr:"Une table pour 3 personnes s'il vous plaît", jp:"3人お願いします", rom:"Sannin onegaishimasu", diff:"🟢" },
       { fr:"Le menu en anglais, s'il vous plaît", jp:"英語のメニューはありますか？", rom:"Eigo no menyu wa arimasu ka?", diff:"🟡" },
       { fr:"Je recommande celui-ci (pointer)", jp:"これをください", rom:"Kore wo kudasai", diff:"🟢" },
@@ -4701,7 +4716,7 @@ function PhrasebookSection() {
       { fr:"Encore de l'eau, s'il vous plaît", jp:"お水をお願いします", rom:"Omizu wo onegaishimasu", diff:"🟢" },
       { fr:"Pouvez-vous recommander ?", jp:"おすすめは何ですか？", rom:"Osusume wa nan desu ka?", diff:"🟡" },
     ]},
-    { id:"transport", emoji:"🚇", titre:"Dans les transports", color:"#0369A1", phrases:[
+    { id:"transport", emoji:"🚇", titre:"Dans les transports", color:"var(--city-tokyo)", phrases:[
       { fr:"Où est le quai pour [ville] ?", jp:"[都市]行きのホームはどこですか？", rom:"[toshi]-yuki no hoomu wa doko desu ka?", diff:"🔴" },
       { fr:"Ce siège est-il libre ?", jp:"ここは空いていますか？", rom:"Koko wa aite imasu ka?", diff:"🟡" },
       { fr:"Je vais à Asakusa", jp:"浅草に行きます", rom:"Asakusa ni ikimasu", diff:"🟡" },
@@ -4709,7 +4724,7 @@ function PhrasebookSection() {
       { fr:"Validez votre Suica ici (pointer)", jp:"ここでスイカをタッチしてください", rom:"Koko de Suika wo tatchi shite kudasai", diff:"🔴" },
       { fr:"À quelle heure part le prochain train ?", jp:"次の電車は何時ですか？", rom:"Tsugi no densha wa nanji desu ka?", diff:"🔴" },
     ]},
-    { id:"shopping", emoji:"🛍", titre:"Shopping", color:"#7C3AED", phrases:[
+    { id:"shopping", emoji:"🛍", titre:"Shopping", color:"var(--city-kyoto)", phrases:[
       { fr:"Combien ça coûte ?", jp:"いくらですか？", rom:"Ikura desu ka?", diff:"🟢" },
       { fr:"Je regarde seulement", jp:"見ているだけです", rom:"Mite iru dake desu", diff:"🟡" },
       { fr:"Avez-vous la taille S/M/L ?", jp:"S/M/Lサイズはありますか？", rom:"S/M/L saizu wa arimasu ka?", diff:"🟡" },
@@ -4717,7 +4732,7 @@ function PhrasebookSection() {
       { fr:"Un sac s'il vous plaît", jp:"袋をください", rom:"Fukuro wo kudasai", diff:"🟢" },
       { fr:"Avez-vous quelque chose de moins cher ?", jp:"もっと安いものはありますか？", rom:"Motto yasui mono wa arimasu ka?", diff:"🔴" },
     ]},
-    { id:"hotel", emoji:"🏨", titre:"À l'hôtel", color:"#065F46", phrases:[
+    { id:"hotel", emoji:"🏨", titre:"À l'hôtel", color:"var(--success)", phrases:[
       { fr:"J'ai une réservation au nom de...", jp:"...で予約しています", rom:"... de yoyaku shite imasu", diff:"🟡" },
       { fr:"Check-in / Check-out s'il vous plaît", jp:"チェックイン/チェックアウトお願いします", rom:"Chekku-in/Chekku-auto onegaishimasu", diff:"🟢" },
       { fr:"Des serviettes supplémentaires s'il vous plaît", jp:"タオルを追加でください", rom:"Taoru wo tsuika de kudasai", diff:"🟡" },
@@ -4725,7 +4740,7 @@ function PhrasebookSection() {
       { fr:"Pouvez-vous garder mes bagages ?", jp:"荷物を預かってもらえますか？", rom:"Nimotsu wo azukatte moraemasu ka?", diff:"🔴" },
       { fr:"La chambre est très belle, merci", jp:"部屋がとても素敵です、ありがとう", rom:"Heya ga totemo suteki desu, arigatou", diff:"🟡" },
     ]},
-    { id:"urgence", emoji:"🚨", titre:"Urgences", color:"#991B1B", phrases:[
+    { id:"urgence", emoji:"🚨", titre:"Urgences", color:"var(--danger)", phrases:[
       { fr:"Au secours !", jp:"助けてください！", rom:"Tasukete kudasai!", diff:"🟢" },
       { fr:"Appelez la police !", jp:"警察を呼んでください！", rom:"Keisatsu wo yonde kudasai!", diff:"🟡" },
       { fr:"J'ai besoin d'un médecin", jp:"医者が必要です", rom:"Isha ga hitsuyou desu", diff:"🟡" },
@@ -4738,7 +4753,7 @@ function PhrasebookSection() {
       { fr:"Je ne parle pas japonais", jp:"日本語が話せません", rom:"Nihongo ga hanasemasen", diff:"🟡" },
       { fr:"Où est l'hôpital le plus proche ?", jp:"一番近い病院はどこですか？", rom:"Ichiban chikai byouin wa doko desu ka?", diff:"🔴" },
     ]},
-    { id:"politesse", emoji:"🙏", titre:"Politesse & Formules", color:"#B45309", phrases:[
+    { id:"politesse", emoji:"🙏", titre:"Politesse & Formules", color:"var(--gold)", phrases:[
       { fr:"Merci beaucoup", jp:"ありがとうございます", rom:"Arigatou gozaimasu", diff:"🟢" },
       { fr:"Excusez-moi / Pardon", jp:"すみません", rom:"Sumimasen", diff:"🟢" },
       { fr:"Bonjour (le matin)", jp:"おはようございます", rom:"Ohayou gozaimasu", diff:"🟢" },
