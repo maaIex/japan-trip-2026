@@ -624,6 +624,24 @@ export default function App() {
   const currentDayObj = currentDayN != null
     ? DAYS.find(d => d.n === currentDayN)
     : null;
+
+  // Overall bookings progress — feeds the editorial masthead "RÉSERVÉS X/Y".
+  // Counts every "book"-status item across the whole checklist, not just
+  // the urgent subset, so the number matches the checklist page.
+  const { done: reservationsDoneSet } = useReservationStatus();
+  const reservationsTotal = useMemo(() => {
+    let n = 0;
+    CHECKLIST.forEach(cat => cat.items.forEach(it => { if (it.status === "book") n++; }));
+    return n;
+  }, []);
+  const reservationsDone = useMemo(() => {
+    let n = 0;
+    CHECKLIST.forEach((cat, ci) => cat.items.forEach(it => {
+      if (it.status === "book" && reservationsDoneSet.has(reservationKey(ci, it.name))) n++;
+    }));
+    return n;
+  }, [reservationsDoneSet]);
+
   const [timeStr, setTimeStr] = useState(() => {
     const d = new Date();
     const jp = new Intl.DateTimeFormat("fr-FR",{timeZone:"Asia/Tokyo",hour:"2-digit",minute:"2-digit"}).format(d);
@@ -1184,95 +1202,107 @@ body { overflow-x: hidden; max-width: 100vw; }
         <OfflineBanner />
         <InstallBanner />
         <EmergencyFAB />
-        <header className="safe-top" style={{ background:"linear-gradient(135deg, var(--header-from) 0%, var(--header-mid) 45%, var(--header-to) 100%)", padding:"0.9rem 1.25rem 0.75rem", position:"relative", overflow:"hidden" }}>
-          {/* Seigaiha (wave) pattern — subtle cream waves on prussian indigo,
-              masked to fade toward the bottom so it doesn't compete with the
-              header content below. pointerEvents:none to stay inert. */}
-          <div style={{
-            position:"absolute", inset:0,
-            backgroundImage:"url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='30' viewBox='0 0 60 30'><g fill='none' stroke='%23E8E3D6' stroke-width='1' opacity='0.28'><circle cx='30' cy='30' r='28'/><circle cx='30' cy='30' r='20'/><circle cx='30' cy='30' r='12'/><circle cx='30' cy='30' r='4'/><circle cx='0' cy='30' r='28'/><circle cx='0' cy='30' r='20'/><circle cx='0' cy='30' r='12'/><circle cx='0' cy='30' r='4'/><circle cx='60' cy='30' r='28'/><circle cx='60' cy='30' r='20'/><circle cx='60' cy='30' r='12'/><circle cx='60' cy='30' r='4'/></g></svg>\")",
+        <header className="safe-top" style={{ background:"var(--bg-page)", color:"var(--text-primary)", padding:"1.75rem 1.25rem 0", position:"relative", overflow:"hidden" }}>
+          {/* Seigaiha wave band — inked strokes on paper, fades to the
+              bottom so the editorial block below reads cleanly. */}
+          <div aria-hidden="true" style={{
+            position:"absolute", top:0, left:0, right:0, height:"240px",
+            backgroundImage:"url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='30' viewBox='0 0 60 30'><g fill='none' stroke='%230D1B3F' stroke-width='1' opacity='0.22'><circle cx='30' cy='30' r='28'/><circle cx='30' cy='30' r='20'/><circle cx='30' cy='30' r='12'/><circle cx='30' cy='30' r='4'/><circle cx='0' cy='30' r='28'/><circle cx='0' cy='30' r='20'/><circle cx='0' cy='30' r='12'/><circle cx='0' cy='30' r='4'/><circle cx='60' cy='30' r='28'/><circle cx='60' cy='30' r='20'/><circle cx='60' cy='30' r='12'/><circle cx='60' cy='30' r='4'/></g></svg>\")",
             backgroundSize:"60px 30px",
-            maskImage:"linear-gradient(180deg,#000 0%,#000 55%,transparent 100%)",
-            WebkitMaskImage:"linear-gradient(180deg,#000 0%,#000 55%,transparent 100%)",
+            maskImage:"linear-gradient(180deg,#000 0%,#000 40%,transparent 100%)",
+            WebkitMaskImage:"linear-gradient(180deg,#000 0%,#000 40%,transparent 100%)",
             pointerEvents:"none",
           }}/>
-          {/* Kanji watermark 旅 (voyage) — top right, very soft. */}
-          <div style={{
-            position:"absolute", right:"-8px", top:"-14px",
-            fontFamily:"var(--font-kanji)", fontWeight:700,
-            fontSize:"170px", lineHeight:0.85,
-            color:"var(--header-ink)", opacity:0.08,
-            pointerEvents:"none", userSelect:"none",
-          }}>旅</div>
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", position:"relative" }}>
-            <div style={{ flex:1 }}>
-              <p style={{ fontFamily:"var(--font-body)", color:"rgba(232,227,214,0.62)", fontSize:"0.72rem", letterSpacing:"0.24em", textTransform:"uppercase", marginBottom:"0.35rem", fontWeight:500 }}>Vol. 01 · 3 adultes · 27 avr – 11 mai 2026</p>
-              <h1 style={{ fontFamily:"var(--font-display)", color:"var(--header-ink)", fontSize:"1.95rem", fontWeight:600, lineHeight:1.05, marginBottom:"0.4rem", letterSpacing:"-0.025em", fontVariationSettings:'"opsz" 144' }}>
-                Itinéraire <span style={{ fontStyle:"italic", fontWeight:700, color:"var(--header-accent)" }}>Complet</span>
-              </h1>
+
+          {/* Vol. 01 · Printemps header rail + toggles (ink text) */}
+          <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", position:"relative", zIndex:1 }}>
+            <div style={{ width:"22px", height:"1px", background:"var(--text-primary)", opacity:0.55, flexShrink:0 }}/>
+            <span style={{ fontFamily:"var(--font-body)", fontSize:"0.62rem", letterSpacing:"0.22em", textTransform:"uppercase", color:"var(--text-muted)", fontWeight:600 }}>Vol. 01 · Printemps</span>
+            <div style={{ flex:1 }}/>
+            <span style={{ fontFamily:"var(--font-mono)", fontSize:"0.62rem", letterSpacing:"0.08em", color:"var(--text-muted)" }}>2026</span>
+            <button
+              onClick={()=>setLargeText(t=>!t)}
+              title={largeText?"Texte normal":"Grand texte"}
+              aria-label={largeText?"Passer en texte normal":"Passer en grand texte"}
+              aria-pressed={largeText}
+              style={{ marginLeft:"0.6rem", border:"none", background:"transparent", cursor:"pointer", color:"var(--text-primary)", fontFamily:"var(--font-mono)", fontSize:"0.66rem", letterSpacing:"0.14em", padding:"0.3rem 0.3rem", textTransform:"uppercase", fontWeight:700 }}
+            >{largeText?"A−":"A+"}</button>
+            <button
+              onClick={()=>setDark(d=>!d)}
+              title={dark?"Mode clair":"Mode sombre"}
+              aria-label={dark?"Passer en mode clair":"Passer en mode sombre"}
+              aria-pressed={dark}
+              style={{ border:"none", background:"transparent", cursor:"pointer", color:"var(--text-primary)", fontSize:"1rem", padding:"0.25rem 0.2rem", lineHeight:1 }}
+            >{dark?"🌙":"☀️"}</button>
+          </div>
+
+          {/* Headline — Japon / '26 */}
+          <h1 style={{ margin:"1.1rem 0 0.75rem", position:"relative", zIndex:1 }}>
+            <span style={{ display:"block", fontFamily:"var(--font-display)", fontSize:"clamp(3.4rem, 16vw, 4.25rem)", fontWeight:500, lineHeight:0.88, letterSpacing:"-0.04em", color:"var(--text-primary)", fontVariationSettings:'"opsz" 144' }}>Japon</span>
+            <span style={{ display:"block", fontFamily:"var(--font-display)", fontSize:"clamp(3.4rem, 16vw, 4.25rem)", fontWeight:900, lineHeight:0.88, letterSpacing:"-0.04em", color:"var(--accent)", fontStyle:"italic", fontVariationSettings:'"opsz" 144' }}>'26</span>
+          </h1>
+
+          {/* Subtitle + 旅 kanji */}
+          <div style={{ display:"flex", alignItems:"flex-end", justifyContent:"space-between", gap:"1rem", marginBottom:"0.9rem", position:"relative", zIndex:1 }}>
+            <div>
+              <div style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"1.02rem", color:"var(--text-sec)", lineHeight:1.3, marginBottom:"0.2rem" }}>
+                Carnet d'itinéraire<br/>16 jours, 3 villes.
+              </div>
+              <div style={{ fontFamily:"var(--font-body)", fontSize:"0.62rem", letterSpacing:"0.22em", textTransform:"uppercase", color:"var(--text-muted)", fontWeight:600, marginTop:"0.55rem" }}>27 Avril — 11 Mai</div>
             </div>
-            <div style={{ display:"flex", gap:"0.4rem", flexShrink:0, marginLeft:"0.75rem" }}>
+            <div aria-hidden="true" style={{ fontFamily:"var(--font-kanji)", fontSize:"3.4rem", color:"var(--text-primary)", opacity:dark?0.5:0.38, lineHeight:0.9, fontWeight:700, letterSpacing:"-0.03em" }}>旅</div>
+          </div>
+
+          {/* Départ dans · J-N  |  Réservés X/Y (with 3px progress bar) */}
+          <div style={{ borderTop:"1px solid var(--text-primary)", borderBottom:"1px solid var(--text-primary)", padding:"0.9rem 0 1rem", position:"relative", zIndex:1 }}>
+            <div style={{ display:"flex", alignItems:"baseline", justifyContent:"space-between", gap:"0.75rem", marginBottom:"0.85rem" }}>
+              <div>
+                <div style={{ fontFamily:"var(--font-body)", fontSize:"0.56rem", letterSpacing:"0.24em", textTransform:"uppercase", color:"var(--text-muted)", fontWeight:600, marginBottom:"0.1rem" }}>
+                  {afterTrip ? "Voyage" : inTrip ? "Jour actuel" : "Départ dans"}
+                </div>
+                <div style={{ fontFamily:"var(--font-display)", fontSize:"2.65rem", fontWeight:900, color:"var(--accent)", lineHeight:0.9, fontStyle:"italic", letterSpacing:"-0.04em", fontVariationSettings:'"opsz" 144' }}>
+                  {afterTrip ? "✓" : inTrip ? `J${currentDayN}` : `J–${daysToStart}`}
+                </div>
+              </div>
               <button
-                onClick={()=>setLargeText(t=>!t)}
-                title={largeText?"Texte normal":"Grand texte"}
-                aria-label={largeText?"Passer en texte normal":"Passer en grand texte"}
-                aria-pressed={largeText}
-                style={{
-                  width:"44px", height:"44px",
-                  borderRadius:"12px", border:"none", cursor:"pointer",
-                  background: largeText ? "rgba(232,227,214,0.28)" : "rgba(232,227,214,0.14)",
-                  display:"flex", alignItems:"center", justifyContent:"center",
-                  fontSize:"0.95rem", fontFamily:"inherit", fontWeight:700,
-                  color:"var(--header-ink)", letterSpacing:"0.02em",
-                  transition:"background 0.2s",
-                }}
+                type="button"
+                onClick={() => setActiveTab("checklist")}
+                aria-label="Voir la checklist des réservations"
+                style={{ textAlign:"right", border:"none", background:"transparent", cursor:"pointer", padding:0, fontFamily:"inherit" }}
               >
-                {largeText ? "A−" : "A+"}
+                <div style={{ fontFamily:"var(--font-body)", fontSize:"0.56rem", letterSpacing:"0.24em", textTransform:"uppercase", color:"var(--text-muted)", fontWeight:600, marginBottom:"0.1rem" }}>Réservés</div>
+                <div style={{ fontFamily:"var(--font-display)", fontSize:"1.35rem", fontWeight:600, lineHeight:1, fontStyle:"italic", fontVariantNumeric:"tabular-nums" }}>
+                  <span style={{ color:"var(--accent)" }}>{reservationsDone}</span>
+                  <span style={{ color:"var(--text-muted)", fontWeight:400 }}> / {reservationsTotal}</span>
+                </div>
               </button>
-              <button
-                onClick={()=>setDark(d=>!d)}
-                title={dark?"Mode clair":"Mode sombre"}
-                aria-label={dark?"Passer en mode clair":"Passer en mode sombre"}
-                aria-pressed={dark}
-                style={{
-                  width:"44px", height:"44px",
-                  borderRadius:"12px", border:"none", cursor:"pointer",
-                  background: dark ? "rgba(224,184,92,0.24)" : "rgba(232,227,214,0.14)",
-                  display:"flex", alignItems:"center", justifyContent:"center",
-                  fontSize:"1.1rem",
-                  transition:"background 0.2s",
-                }}
-              >
-                {dark ? "🌙" : "☀️"}
-              </button>
+            </div>
+            {/* 3px editorial progress bar — bookings ratio */}
+            <div style={{ height:"3px", background:"var(--border-light)", position:"relative" }}>
+              <div style={{ width:`${reservationsTotal>0 ? (reservationsDone/reservationsTotal)*100 : 0}%`, height:"100%", background:"var(--accent)", transition:"width 0.3s ease" }}/>
             </div>
           </div>
-          {/* U1 — Trip progress bar */}
-          <TripProgressBar
-            currentDayN={currentDayN}
-            inTrip={inTrip}
-            afterTrip={afterTrip}
-            onJump={(dayN) => {
-              const tabForDay = findTabForDay(dayN);
-              if (tabForDay) {
-                setActiveTab(tabForDay.id);
-                setOpenDays(prev => new Set(prev).add(dayN));
-                setTimeout(() => {
-                  const el = document.getElementById("day-" + dayN);
-                  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-                }, 120);
-              }
-            }}
-          />
+
+          {/* Day-by-day trip progress — kept below the editorial block */}
+          <div style={{ padding:"0.9rem 0 1rem", position:"relative", zIndex:1 }}>
+            <TripProgressBar
+              currentDayN={currentDayN}
+              inTrip={inTrip}
+              afterTrip={afterTrip}
+              onJump={(dayN) => {
+                const tabForDay = findTabForDay(dayN);
+                if (tabForDay) {
+                  setActiveTab(tabForDay.id);
+                  setOpenDays(prev => new Set(prev).add(dayN));
+                  setTimeout(() => {
+                    const el = document.getElementById("day-" + dayN);
+                    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }, 120);
+                }
+              }}
+            />
+          </div>
         </header>
-        <div
-          onClick={() => setActiveTab("checklist")}
-          style={{ background:v("urgentBg",dark), borderBottom:`2px solid ${v("urgentBdr",dark)}`, padding:"0.6rem 1.25rem", transition:"background 0.3s", cursor:"pointer" }}
-          role="button"
-          aria-label="Voir la checklist des réservations"
-        >
-          <UrgentReservationsBanner />
-        </div>
         {/* ── MODE VOYAGE ── */}
         {voyageMode && (
           <div style={{ background: inTrip ? "var(--success-soft)" : afterTrip ? "var(--info-soft)" : "var(--warning-soft)", padding:"0.5rem 1rem", display:"flex", alignItems:"center", gap:"0.5rem", borderBottom:`1px solid ${inTrip?"var(--success-bdr)":afterTrip?"var(--info-bdr)":"var(--warning-bdr)"}`, flexWrap:"wrap" }}>
@@ -1334,17 +1364,17 @@ body { overflow-x: hidden; max-width: 100vw; }
             >✕</button>
           </div>
         )}
-        {/* ── SEARCH BAR ── */}
-        <div style={{ background:v("cardBg",dark), borderBottom:`1px solid ${v("navBorder",dark)}`, padding:"0.55rem 1rem", display:"flex", alignItems:"center", gap:"0.5rem", transition:"background 0.3s" }}>
-          <div style={{ flex:1, display:"flex", alignItems:"center", gap:"0.5rem", background:v("cardBg2",dark), border:`1px solid ${v("borderLight",dark)}`, borderRadius:"8px", padding:"0.38rem 0.7rem" }}>
-            <span style={{ color:v("textMuted",dark), fontSize:"0.82rem", flexShrink:0, userSelect:"none" }}>🔍</span>
+        {/* ── SEARCH BAR — editorial: thin ink underline, mono placeholder ── */}
+        <div style={{ background:"var(--bg-page)", padding:"0.3rem 1.25rem 0.45rem", display:"flex", alignItems:"center", gap:"0.65rem" }}>
+          <div style={{ flex:1, display:"flex", alignItems:"center", gap:"0.55rem", borderBottom:`1px solid ${query ? "var(--accent)" : "var(--text-primary)"}`, padding:"0.35rem 0" }}>
+            <span aria-hidden="true" style={{ fontFamily:"var(--font-body)", fontSize:"0.58rem", letterSpacing:"0.22em", textTransform:"uppercase", color:"var(--text-muted)", fontWeight:700, flexShrink:0 }}>Cherchez</span>
             <input
               ref={searchRef}
               type="text"
-              placeholder="Rechercher un lieu, activité, restaurant…"
+              placeholder="lieu · activité · restaurant"
               value={query}
               onChange={e => setQuery(e.target.value)}
-              style={{ flex:1, border:"none", outline:"none", background:"transparent", fontSize:"0.78rem", color:v("textPrimary",dark), fontFamily:"inherit" }}
+              style={{ flex:1, minWidth:0, border:"none", outline:"none", background:"transparent", fontSize:"0.82rem", color:"var(--text-primary)", fontFamily:"var(--font-display)", fontStyle:"italic" }}
             />
             {query && (
               <button
@@ -1353,31 +1383,17 @@ body { overflow-x: hidden; max-width: 100vw; }
                 data-tap="icon"
                 style={{
                   border:"none", background:"transparent", cursor:"pointer",
-                  color:v("textMuted",dark), fontSize:"1.05rem",
-                  display:"flex", alignItems:"center", justifyContent:"center",
-                  borderRadius:"8px", lineHeight:1, flexShrink:0,
+                  color:"var(--text-muted)", fontSize:"1rem",
+                  lineHeight:1, flexShrink:0, padding:"0 0.15rem",
+                  fontFamily:"inherit",
                 }}
               >✕</button>
             )}
           </div>
           {query && (
-            <>
-              <span style={{ fontSize:"0.72rem", color:v("textSec",dark), whiteSpace:"nowrap", flexShrink:0 }}>
-                {totalMatches > 0 ? `${totalMatches}` : "0"}
-              </span>
-              <button
-                onClick={() => {
-                  setQuery("");
-                  if (searchRef.current) searchRef.current.blur();
-                }}
-                style={{
-                  fontSize:"0.75rem", fontWeight:600,
-                  color: "var(--accent)",
-                  background:"transparent", border:"none", cursor:"pointer",
-                  padding:"0.4rem 0.35rem", fontFamily:"inherit", flexShrink:0,
-                }}
-              >Annuler</button>
-            </>
+            <span style={{ fontFamily:"var(--font-mono)", fontSize:"0.68rem", color:"var(--text-muted)", whiteSpace:"nowrap", flexShrink:0, letterSpacing:"0.1em" }}>
+              {totalMatches}
+            </span>
           )}
         </div>
         {/* ── NAVIGATION 2 NIVEAUX ── */}
@@ -1454,10 +1470,10 @@ body { overflow-x: hidden; max-width: 100vw; }
           {activeTab==="phrasebook"&& <PhrasebookSection />}
           {activeTab==="calendrier"&& <CalendrierSection />}
           {!["infos","checklist","gastro","meteo","phrasebook","calendrier"].includes(activeTab) && (
-            <div style={{ display:"flex", flexDirection:"column", gap:"0.75rem" }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:0 }}>
               {/* U16 — Expand/Collapse all */}
               {!query && days.length > 0 && (
-                <div style={{ display:"flex", gap:"0.5rem", justifyContent:"flex-end" }}>
+                <div style={{ display:"flex", gap:"0.5rem", justifyContent:"flex-end", marginBottom:"0.5rem" }}>
                   <button
                     onClick={() => setOpenDays(new Set(days.map(d => d.n)))}
                     data-tap="action"
@@ -1491,16 +1507,33 @@ body { overflow-x: hidden; max-width: 100vw; }
                   <p style={{ fontSize:"0.78rem", margin:0 }}>Essayez un autre mot-clé ou changez d'onglet.</p>
                 </div>
               ) : (
-                days.map((d) => (
-                  <DayCard
-                    key={d.n}
-                    day={d}
-                    isOpen={query ? true : openDays.has(d.n)}
-                    onToggle={() => toggleDay(d.n)}
-                    query={query}
-                    matchCount={itemMatchesByDay ? itemMatchesByDay[d.n] : 0}
-                  />
-                ))
+                <>
+                  {/* Editorial city section marker — kanji + label + count */}
+                  {tab && !query && days.length > 0 && (
+                    <div style={{ display:"flex", alignItems:"baseline", gap:"0.6rem", borderBottom:"1px solid var(--text-primary)", padding:"0.2rem 0 0.4rem", marginBottom:"0.3rem" }}>
+                      <span aria-hidden="true" style={{ fontFamily:"var(--font-kanji)", fontSize:"1.6rem", color:"var(--accent)", fontWeight:700, lineHeight:1, letterSpacing:"-0.02em" }}>
+                        {CITY_KANJI[tab.city] || ""}
+                      </span>
+                      <span style={{ fontFamily:"var(--font-display)", fontSize:"1.15rem", fontWeight:700, color:"var(--text-primary)", fontStyle:"italic", letterSpacing:"-0.01em", lineHeight:1 }}>
+                        {tab.label.replace(/^[^\s]+\s/, "")}
+                      </span>
+                      <span style={{ flex:1 }}/>
+                      <span style={{ fontFamily:"var(--font-mono)", fontSize:"0.68rem", color:"var(--text-muted)", letterSpacing:"0.12em" }}>
+                        {days.length} jour{days.length>1?"s":""}
+                      </span>
+                    </div>
+                  )}
+                  {days.map((d) => (
+                    <DayCard
+                      key={d.n}
+                      day={d}
+                      isOpen={query ? true : openDays.has(d.n)}
+                      onToggle={() => toggleDay(d.n)}
+                      query={query}
+                      matchCount={itemMatchesByDay ? itemMatchesByDay[d.n] : 0}
+                    />
+                  ))}
+                </>
               )}
             </div>
           )}
@@ -1617,18 +1650,16 @@ const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query, matc
   const cityNames = { tokyo:"TOKYO", kyoto:"KYOTO", osaka:"OSAKA", transit:"TRANSIT", depart:"DÉPART" };
   const kanji = CITY_KANJI[day.city] || "";
   const nLabel = day.nLabel || String(day.n).padStart(2, "0");
+  const hasBooking = day.sections?.some(s => s.items?.some(i => i.s === "ok" || i.s === "book"));
   return (
     <article
       ref={ref}
       id={"day-" + day.n}
       style={{
-        background: "var(--bg-card)",
-        borderRadius: "14px",
+        background: isOpen ? "var(--bg-card)" : "transparent",
+        borderBottom: "1px solid var(--border-light)",
         overflow: "hidden",
-        boxShadow: "var(--shadow-card)",
-        border: "1px solid var(--border)",
-        borderLeft: `4px solid ${cc.color}`,
-        transition: "background 0.3s, border 0.3s, box-shadow 0.2s",
+        transition: "background 0.2s",
       }}
     >
       <button
@@ -1639,8 +1670,8 @@ const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query, matc
           width: "100%",
           display: "flex",
           alignItems: "flex-start",
-          gap: "0.9rem",
-          padding: "1rem 1rem 0.9rem 1.05rem",
+          gap: "0.85rem",
+          padding: "1.05rem 0.5rem 1rem",
           background: "transparent",
           border: "none",
           cursor: "pointer",
@@ -1651,70 +1682,79 @@ const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query, matc
         }}
       >
         {/* Left: big editorial day number + date line */}
-        <div style={{ minWidth: "3rem", display: "flex", flexDirection: "column", alignItems: "flex-start", flexShrink: 0, paddingTop: "0.1rem" }}>
+        <div style={{ minWidth: "3.4rem", display: "flex", flexDirection: "column", alignItems: "flex-start", flexShrink: 0, paddingTop: "0.15rem" }}>
           <div style={{
             fontFamily: "var(--font-display)",
             fontStyle: "italic",
             fontWeight: 900,
-            fontSize: "2.4rem",
+            fontSize: "2.6rem",
             lineHeight: 0.9,
             letterSpacing: "-0.04em",
             color: "var(--text-primary)",
             fontVariationSettings: '"opsz" 144',
           }}>{nLabel}</div>
           <div style={{
-            fontFamily: "var(--font-mono, ui-monospace, monospace)",
+            fontFamily: "var(--font-mono)",
             fontSize: "0.62rem",
             fontWeight: 600,
             color: "var(--text-muted)",
             letterSpacing: "0.1em",
             textTransform: "uppercase",
-            marginTop: "0.4rem",
+            marginTop: "0.45rem",
+            whiteSpace: "nowrap",
           }}>{day.day} · {day.date}</div>
         </div>
 
         {/* Middle: city chip + badges + title */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ flex: 1, minWidth: 0, paddingTop: "0.25rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "0.45rem", flexWrap: "wrap", marginBottom: "0.45rem" }}>
             <span style={{
               fontFamily: "var(--font-body)",
-              fontSize: "0.6rem",
+              fontSize: "0.58rem",
               fontWeight: 700,
               letterSpacing: "0.18em",
               textTransform: "uppercase",
               color: "var(--bg-page)",
               background: cc.color,
               padding: "0.18rem 0.5rem",
-              borderRadius: "2px",
               flexShrink: 0,
               lineHeight: 1.1,
             }}>{cityNames[day.city]||day.city}</span>
+            {hasBooking && (
+              <span style={{
+                display: "inline-flex", alignItems: "center", gap: "0.3rem",
+                fontFamily: "var(--font-body)",
+                fontSize: "0.58rem",
+                fontWeight: 700,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "var(--accent)",
+                lineHeight: 1.1,
+              }}>
+                <span aria-hidden="true" style={{ width:"5px", height:"5px", borderRadius:"50%", background:"var(--accent)" }}/>
+                Réservé
+              </span>
+            )}
             {day.alert && (
               <span style={{
-                fontSize: "0.65rem",
+                fontSize: "0.62rem",
                 fontWeight: 700,
-                letterSpacing: "0.06em",
+                letterSpacing: "0.08em",
                 textTransform: "uppercase",
-                background: "var(--alert-bg)",
                 color: "var(--alert-txt)",
-                border: "1px solid var(--alert-bdr)",
-                padding: "0.12rem 0.45rem",
-                borderRadius: "3px",
+                lineHeight: 1.1,
               }}>🎌 Férié</span>
             )}
             {query && matchCount > 0 && (
               <span
                 title={`${matchCount} activité${matchCount>1?"s":""} correspond${matchCount>1?"ent":""} à « ${query} »`}
                 style={{
-                  fontSize: "0.65rem",
+                  fontSize: "0.62rem",
                   fontWeight: 700,
-                  letterSpacing: "0.06em",
+                  letterSpacing: "0.1em",
                   textTransform: "uppercase",
                   color: "var(--accent)",
-                  background: "var(--accent-soft)",
-                  border: "1px solid var(--accent)",
-                  padding: "0.12rem 0.45rem",
-                  borderRadius: "3px",
+                  lineHeight: 1.1,
                   flexShrink: 0,
                 }}
               >
@@ -1724,41 +1764,31 @@ const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query, matc
           </div>
           <div style={{
             fontFamily: "var(--font-display)",
-            fontSize: "1.05rem",
+            fontSize: "1.15rem",
             fontWeight: 600,
             letterSpacing: "-0.01em",
             color: "var(--text-primary)",
-            lineHeight: 1.25,
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
+            lineHeight: 1.22,
             wordBreak: "break-word",
+            textWrap: "pretty",
           }}>{day.title}</div>
         </div>
 
-        {/* Right: kanji column + chevron */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.65rem", flexShrink: 0, paddingTop: "0.1rem" }}>
-          {kanji && (
-            <span aria-hidden="true" style={{
-              fontFamily: "var(--font-kanji)",
-              fontSize: "1.15rem",
-              fontWeight: 700,
-              color: cc.color,
-              writingMode: "vertical-rl",
-              letterSpacing: "0.08em",
-              opacity: 0.9,
-              lineHeight: 1,
-            }}>{kanji}</span>
-          )}
-          <span style={{
-            color: "var(--text-muted)",
-            fontSize: "0.75rem",
-            display: "inline-block",
-            transform: isOpen ? "rotate(180deg)" : "none",
-            transition: "transform 0.2s",
-          }}>▼</span>
-        </div>
+        {/* Right: vertical kanji column (no chevron — editorial style) */}
+        {kanji && (
+          <span aria-hidden="true" style={{
+            fontFamily: "var(--font-kanji)",
+            fontSize: "1.35rem",
+            fontWeight: 700,
+            color: cc.color,
+            writingMode: "vertical-rl",
+            letterSpacing: "0.1em",
+            opacity: dark ? 0.9 : 0.85,
+            lineHeight: 1,
+            flexShrink: 0,
+            paddingTop: "0.3rem",
+          }}>{kanji}</span>
+        )}
       </button>
       {day.alert && (
         <div style={{ margin:"0 0.9rem 0.75rem", padding:"0.55rem 0.75rem", background:"var(--alert-bg)", borderRadius:"6px", borderLeft:"3px solid var(--alert-bdr)" }}>
@@ -2348,54 +2378,6 @@ function useReservationStatus() {
   };
 
   return { done, toggle };
-}
-
-// Get all "urgent" book items (= items needing booking, in the "Urgence absolue" category)
-const getUrgentBookItems = () => {
-  const out = [];
-  CHECKLIST.forEach((cat, ci) => {
-    if (!cat.cat.includes("Urgence")) return;
-    cat.items.forEach(item => {
-      if (item.status === "book") out.push({ catIdx: ci, name: item.name, date: item.date });
-    });
-  });
-  return out;
-};
-
-function UrgentReservationsBanner() {
-  const dark = useDark();
-  const { done } = useReservationStatus();
-  const urgent = getUrgentBookItems();
-  const total = urgent.length;
-  const doneCount = urgent.filter(it => done.has(reservationKey(it.catIdx, it.name))).length;
-  const remaining = total - doneCount;
-  const allDone = remaining === 0 && total > 0;
-  const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
-
-  return (
-    <div>
-      <div style={{ display:"flex", alignItems:"center", gap:"0.6rem", marginBottom:"0.4rem" }}>
-        <span style={{ fontSize:"1rem", flexShrink:0 }}>{allDone ? "🎉" : "⚠️"}</span>
-        <p style={{ color:v("urgentTxt",dark), fontSize:"0.78rem", lineHeight:1.4, margin:0, fontWeight:700, flex:1 }}>
-          {allDone
-            ? "Toutes les réservations urgentes sont faites !"
-            : <>Réservations urgentes : <strong style={{ fontSize:"0.92rem" }}>{doneCount}/{total}</strong> faites — <strong>{remaining} restante{remaining > 1 ? "s" : ""}</strong></>
-          }
-        </p>
-        <span style={{ fontSize:"0.7rem", color:v("urgentTxt",dark), opacity:0.7, flexShrink:0 }}>Voir →</span>
-      </div>
-      {/* Progress bar */}
-      <div style={{ height:"5px", borderRadius:"3px", background:"var(--border-light)", overflow:"hidden" }}>
-        <div style={{
-          height:"100%", width:`${pct}%`,
-          background: allDone
-            ? "linear-gradient(90deg, var(--success), var(--success))"
-            : "linear-gradient(90deg, var(--danger), var(--warning))",
-          borderRadius:"3px", transition:"width 0.3s ease",
-        }} />
-      </div>
-    </div>
-  );
 }
 
 function ChecklistSection() {
@@ -4359,14 +4341,16 @@ function TripProgressBar({ currentDayN, inTrip, afterTrip, onJump }) {
   // Build sorted list of all 15 days
   const sortedDays = [...DAYS].sort((a, b) => a.n - b.n);
   return (
-    <div style={{ marginTop:"1rem" }}>
-      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"0.35rem" }}>
-        <span style={{ fontSize:"0.7rem", color:"rgba(255,255,255,0.6)", fontWeight:600, letterSpacing:"0.08em", textTransform:"uppercase" }}>Progression du voyage</span>
-        <span style={{ fontSize:"0.7rem", color:"rgba(255,255,255,0.6)", fontWeight:600 }}>
-          {afterTrip ? "✓ Terminé" : inTrip && currentDayN ? `J${currentDayN} / 15` : "J0 / 15"}
+    <div>
+      <div style={{ display:"flex", alignItems:"baseline", gap:"0.65rem", marginBottom:"0.4rem" }}>
+        <div style={{ width:"18px", height:"1px", background:"var(--accent)", flexShrink:0 }}/>
+        <span style={{ fontFamily:"var(--font-body)", fontSize:"0.64rem", color:"var(--accent)", fontWeight:700, letterSpacing:"0.22em", textTransform:"uppercase" }}>Itinéraire</span>
+        <div style={{ flex:1 }}/>
+        <span style={{ fontFamily:"var(--font-mono)", fontSize:"0.62rem", color:"var(--text-muted)", letterSpacing:"0.1em" }}>
+          {afterTrip ? "✓ Terminé" : inTrip && currentDayN ? `J${currentDayN} → J15` : "J1 → J15"}
         </span>
       </div>
-      <div style={{ display:"flex", gap:"3px" }}>
+      <div style={{ display:"flex", gap:"2px" }}>
         {sortedDays.map(d => {
           const cc = CITY[d.city] || CITY.transit;
           const isCurrent = inTrip && currentDayN === d.n;
@@ -4379,26 +4363,19 @@ function TripProgressBar({ currentDayN, inTrip, afterTrip, onJump }) {
               title={`J${d.nLabel || d.n} · ${d.date} — ${d.title}`}
               style={{
                 flex:1,
-                height: isCurrent ? "10px" : "6px",
-                background: isCurrent ? cc.color : isPast ? cc.color : "rgba(255,255,255,0.25)",
+                height: isCurrent ? "10px" : "4px",
+                background: (isCurrent || isPast) ? cc.color : "var(--border-light)",
                 opacity: isCurrent ? 1 : isPast ? 0.85 : 1,
                 border:"none",
-                borderRadius:"3px",
+                borderRadius:0,
                 cursor:"pointer",
                 padding:0,
                 transition:"all 0.2s",
-                boxShadow: isCurrent ? `0 0 0 2px rgba(255,255,255,0.5), 0 0 8px ${cc.color}` : "none",
+                boxShadow: isCurrent ? `0 0 0 1px var(--bg-page), 0 0 0 2px ${cc.color}` : "none",
               }}
             />
           );
         })}
-      </div>
-      {/* City labels under */}
-      <div style={{ display:"flex", justifyContent:"space-between", marginTop:"0.25rem", fontSize:"0.68rem", color:"rgba(255,255,255,0.55)", fontWeight:600, letterSpacing:"0.04em" }}>
-        <span>🗼 Tokyo</span>
-        <span>⛩ Kyoto</span>
-        <span>🎡 Osaka</span>
-        <span>✈️</span>
       </div>
     </div>
   );

@@ -4,6 +4,43 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ---
 
+## Session 6 — 2026-04-19
+
+**Contexte :** Les couleurs Ukiyo-e sont en place (Session 5), mais la *disposition* de l'en-tête, des bannières de réservation et du listing des jours ne correspondait pas encore au prototype `voyage-japon/project/Voyage Japon.html`. L'objectif de cette session : aligner la mise en page pixel-près sur le mock éditorial.
+
+### Masthead éditorial sur papier
+
+- **Remplacement du bandeau dégradé prussien** par un masthead sur fond `--bg-page` (papier kozo) comme dans le prototype Indigo.
+- **Rail supérieur** : filet ink 22 px + « Vol. 01 · Printemps » en sans 0.22em uppercase, « 2026 » en JetBrains Mono à droite. Les boutons A+ et mode nuit sont devenus des toggles ink discrets au lieu de pills sombres.
+- **Titre géant** : « Japon '26 » en Fraunces clamp(3.4rem, 16vw, 4.25rem), weight 500 puis 900 italic vermillon. `opsz 144` activé.
+- **Sous-titre + kanji 旅** : « Carnet d'itinéraire · 16 jours, 3 villes. » en Fraunces italic, dates micro-label dessous, 旅 à 3.4rem opacité 0.38 light / 0.5 dark.
+- **Bloc à filets horizontaux** : `DÉPART DANS J-N` (Fraunces 2.65rem italic weight 900 vermillon) à gauche, `RÉSERVÉS X/Y` (Fraunces 1.35rem italic, X en vermillon, /Y en ink-muted) à droite — cliquable pour sauter vers la Checklist. Barre de progression éditoriale 3 px juste en-dessous, alimentée par `reservationsDone / reservationsTotal` (compte *tous* les items `status: "book"` du `CHECKLIST`, pas seulement les urgents).
+- **`TripProgressBar` repensé** pour le fond papier : plus de `rgba(255,255,255,*)` codé en dur, tokens ink partout, dots rectangulaires 4 px (10 px pour le jour courant), marqueur `— Itinéraire / J1 → J15` en accent vermillon + mono.
+
+### Suppression de la bannière urgente redondante
+
+- L'ancien bandeau « Réservations urgentes : X/Y » est absorbé dans le bloc RÉSERVÉS du masthead. La composante `UrgentReservationsBanner` et son helper `getUrgentBookItems` sont supprimés (dead code après refonte).
+
+### Barre de recherche éditoriale
+
+- **Plus de pill arrondie grise** : filet ink 1 px, label `CHERCHEZ` en sans uppercase, placeholder « lieu · activité · restaurant » en Fraunces italique, compteur de matches en JetBrains Mono. Vire l'icône 🔍 émoji pour un rendu texte 100 % éditorial.
+
+### Jours — section marker + cartes éditoriales
+
+- **Nouveau marker par ville** au-dessus du listing : kanji accent 1.6rem + label ville en Fraunces italic + `N jours` en mono aligné à droite, séparé par un filet ink 1 px — exactement comme le prototype.
+- **`DayCard` refondu** : plus de carte arrondie avec ombre + bordure gauche 4 px. Les jours partagent maintenant un filet `--border-light` comme séparateur, fond transparent (ou `--bg-card` quand ouvert), padding vertical accru. La colonne de droite n'affiche plus le chevron : juste le kanji de ville (vertical-rl, 1.35rem). Une pastille vermillon `● Réservé` apparaît si le jour contient des items `ok` ou `book`.
+
+### Build & vérifications
+
+- `npm run build` OK (845 ms, 35 modules, ~456 kB).
+- Diff App.jsx : 237 lignes supprimées, 214 ajoutées — refactor net.
+
+### Intention design
+
+> Le lecteur ouvre le carnet, le papier est à nu. Avant la table des matières, trois blocs : le volume de l'année, le titre, le compte à rebours. Rien d'autre — pas de panneau d'alerte rouge, pas de gradient tape-à-l'œil. L'encre fait le travail.
+
+---
+
 ## Session 5 — 2026-04-18
 
 **Contexte :** Application complète et uniforme du design **Indigo Ukiyo-e** (handoff Claude Design `voyage-japon`). L'objectif : typographie éditoriale (Fraunces + Inter Tight + Shippori Mincho) partout, plus aucune couleur codée en dur, light + dark tuned automatiquement via les variables CSS, sans régression fonctionnelle.
