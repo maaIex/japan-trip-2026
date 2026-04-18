@@ -1787,9 +1787,25 @@ const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query, matc
           <>{day.sections.filter(s=>s.items.length>0).map(section=><SectionBlock key={section.id} section={section} query={query} dayN={day.n} dayCity={day.city} />)}</>
           )}
           {day.tips?.length>0 && (
-            <div style={{ marginTop:"0.75rem", padding:"0.65rem 0.75rem", background:v("tipsBg",dark), borderRadius:"8px", borderLeft:`3px solid ${v("tipsBdr",dark)}` }}>
-              <p style={{ fontSize:"0.72rem", fontWeight:700, color:v("tipsHead",dark), marginBottom:"0.35rem", textTransform:"uppercase", letterSpacing:"0.06em" }}>💡 Conseils du jour</p>
-              {day.tips.map((tip,i)=><p key={i} style={{ fontSize:"0.75rem", color:v("tipsTxt",dark), lineHeight:1.45, margin:i>0?"0.3rem 0 0":0 }}>{query ? highlight(tip, query, dark) : tip}</p>)}
+            <div style={{
+              marginTop:"0.85rem", padding:"0.8rem 0.95rem",
+              background:"var(--tips-bg)", border:"1px solid var(--tips-bdr)",
+              position:"relative",
+            }}>
+              <p style={{
+                fontFamily:"var(--font-body)",
+                fontSize:"0.66rem", fontWeight:700,
+                letterSpacing:"0.2em", textTransform:"uppercase",
+                color:"var(--accent)",
+                marginBottom:"0.55rem",
+              }}>※ Notes de voyage</p>
+              {day.tips.map((tip,i)=>(
+                <p key={i} style={{
+                  fontFamily:"var(--font-display)", fontStyle:"italic",
+                  fontSize:"0.86rem", color:"var(--tips-txt)",
+                  lineHeight:1.55, margin:i>0?"0.4rem 0 0":0,
+                }}>— {query ? highlight(tip, query, dark) : tip}</p>
+              ))}
             </div>
           )}
           {/* U13 — Personal day notes */}
@@ -1807,14 +1823,16 @@ const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query, matc
             }}
             style={{
               width:"100%",
-              marginTop:"0.75rem",
+              marginTop:"0.85rem",
               padding:"0.55rem",
               background:"transparent",
-              border:`1px dashed ${v("borderLight",dark)}`,
+              border:"1px dashed var(--border-light)",
               borderRadius:"8px",
-              color:v("textMuted",dark),
-              fontSize:"0.72rem", fontWeight:600,
-              cursor:"pointer", fontFamily:"inherit",
+              color:"var(--text-muted)",
+              fontFamily:"var(--font-body)",
+              fontSize:"0.66rem", fontWeight:700,
+              letterSpacing:"0.14em", textTransform:"uppercase",
+              cursor:"pointer",
               minHeight:"40px",
             }}
           >
@@ -1830,17 +1848,17 @@ const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query, matc
 
 // ─── DAY NOTES (U13) ─────────────────────────────────────────────
 function DayNotes({ dayN }) {
-  const dark = useDark();
   const [note, setNote] = useDayNote(dayN);
   const [expanded, setExpanded] = useState(!!note);
   return (
-    <div style={{ marginTop:"0.75rem", padding:"0.65rem 0.75rem", background:v("cardBg2",dark), borderRadius:"8px", border:`1px dashed ${v("borderLight",dark)}` }}>
+    <div style={{ marginTop:"0.75rem", padding:"0.65rem 0.8rem", background:"var(--bg-card-2)", borderRadius:"8px", border:"1px dashed var(--border-light)" }}>
       <button
         onClick={() => setExpanded(e => !e)}
         style={{
           background:"transparent", border:"none", padding:0, cursor:"pointer",
-          fontFamily:"inherit", display:"flex", alignItems:"center", gap:"0.4rem",
-          color:v("textSec",dark), fontSize:"0.7rem", fontWeight:600,
+          fontFamily:"var(--font-body)", display:"flex", alignItems:"center", gap:"0.4rem",
+          color:"var(--text-sec)", fontSize:"0.66rem", fontWeight:700,
+          letterSpacing:"0.14em", textTransform:"uppercase",
           width:"100%", justifyContent:"space-between",
         }}
       >
@@ -1854,11 +1872,11 @@ function DayNotes({ dayN }) {
           placeholder="Tes impressions, ce que tu as aimé, à retenir pour la prochaine fois..."
           rows={3}
           style={{
-            width:"100%", marginTop:"0.5rem", padding:"0.5rem 0.6rem",
-            border:`1px solid ${v("borderLight",dark)}`, borderRadius:"6px",
-            background:v("cardBg",dark), color:v("textPrimary",dark),
-            fontSize:"0.78rem", fontFamily:"inherit", resize:"vertical",
-            outline:"none", boxSizing:"border-box", lineHeight:1.45,
+            width:"100%", marginTop:"0.55rem", padding:"0.55rem 0.7rem",
+            border:"1px solid var(--border-light)", borderRadius:"6px",
+            background:"var(--bg-card)", color:"var(--text-primary)",
+            fontSize:"0.82rem", fontFamily:"var(--font-body)", resize:"vertical",
+            outline:"none", boxSizing:"border-box", lineHeight:1.5,
           }}
         />
       )}
@@ -1868,7 +1886,6 @@ function DayNotes({ dayN }) {
 
 // ─── DAY PREV/NEXT NAV (U2) ──────────────────────────────────────
 function DayNav({ dayN }) {
-  const dark = useDark();
   const { goTo } = useNav();
   const sortedDays = [...DAYS].sort((a,b) => a.n - b.n);
   const idx = sortedDays.findIndex(d => d.n === dayN);
@@ -1880,30 +1897,30 @@ function DayNav({ dayN }) {
   };
   const btnStyle = (disabled) => ({
     flex:1,
-    display:"flex", alignItems:"center", gap:"0.4rem",
-    padding:"0.5rem 0.7rem",
+    display:"flex", alignItems:"center", gap:"0.5rem",
+    padding:"0.55rem 0.8rem",
     background:"transparent",
-    border:`1px solid ${v("borderLight",dark)}`,
+    border:"1px solid var(--border-light)",
     borderRadius:"8px",
     cursor: disabled ? "default" : "pointer",
     opacity: disabled ? 0.35 : 1,
-    fontFamily:"inherit",
-    color: v("textPrimary",dark),
-    fontSize:"0.72rem",
+    fontFamily:"var(--font-body)",
+    color:"var(--text-primary)",
+    fontSize:"0.76rem",
     minWidth:0,
   });
   return (
-    <div style={{ display:"flex", gap:"0.5rem", marginTop:"0.65rem" }}>
+    <div style={{ display:"flex", gap:"0.5rem", marginTop:"0.7rem" }}>
       <button
         disabled={!prev}
         onClick={() => prev && goTo(tabForDay(prev), prev.n)}
         style={{ ...btnStyle(!prev), justifyContent:"flex-start" }}
         aria-label={prev ? `Jour précédent : J${prev.n}` : "Pas de jour précédent"}
       >
-        <span style={{ fontSize:"0.85rem", flexShrink:0 }}>←</span>
+        <span style={{ fontSize:"0.9rem", flexShrink:0, color:"var(--accent)" }}>←</span>
         <div style={{ minWidth:0, flex:1, textAlign:"left" }}>
-          <div style={{ fontSize:"0.7rem", color:v("textMuted",dark), fontWeight:600 }}>Précédent</div>
-          {prev && <div style={{ fontWeight:600, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>J{prev.nLabel || prev.n} · {prev.date}</div>}
+          <div style={{ fontSize:"0.62rem", color:"var(--text-muted)", fontWeight:700, letterSpacing:"0.14em", textTransform:"uppercase" }}>Précédent</div>
+          {prev && <div style={{ fontFamily:"var(--font-display)", fontWeight:600, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>J{prev.nLabel || prev.n} · {prev.date}</div>}
         </div>
       </button>
       <button
@@ -1913,10 +1930,10 @@ function DayNav({ dayN }) {
         aria-label={next ? `Jour suivant : J${next.n}` : "Pas de jour suivant"}
       >
         <div style={{ minWidth:0, flex:1, textAlign:"right" }}>
-          <div style={{ fontSize:"0.7rem", color:v("textMuted",dark), fontWeight:600 }}>Suivant</div>
-          {next && <div style={{ fontWeight:600, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>J{next.nLabel || next.n} · {next.date}</div>}
+          <div style={{ fontSize:"0.62rem", color:"var(--text-muted)", fontWeight:700, letterSpacing:"0.14em", textTransform:"uppercase" }}>Suivant</div>
+          {next && <div style={{ fontFamily:"var(--font-display)", fontWeight:600, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>J{next.nLabel || next.n} · {next.date}</div>}
         </div>
-        <span style={{ fontSize:"0.85rem", flexShrink:0 }}>→</span>
+        <span style={{ fontSize:"0.9rem", flexShrink:0, color:"var(--accent)" }}>→</span>
       </button>
     </div>
   );
@@ -1959,11 +1976,14 @@ function TimelineView({ sections, city }) {
   const PX_PER_H = 52;
   const totalHeight = TOTAL_H * PX_PER_H;
 
+  // Period pills — resolved as CSS-variable strings so light/dark retune
+  // automatically. Kept here as inline strings (not `var(...)`) inside style
+  // to let React serialize them cleanly.
   const sectionColors = {
-    matin: { bg: "#FDE68A", color: "#92400E" },
-    aprem: { bg: "#BFDBFE", color: "#1E40AF" },
-    soir:  { bg: "#DDD6FE", color: "#4C1D95" },
-    nuit:  { bg: "#CBD5E1", color: "#374151" },
+    matin: { bg: "var(--period-matin-bg)", color: "var(--period-matin)" },
+    aprem: { bg: "var(--period-aprem-bg)", color: "var(--period-aprem)" },
+    soir:  { bg: "var(--period-soir-bg)",  color: "var(--period-soir)"  },
+    nuit:  { bg: "var(--period-nuit-bg)",  color: "var(--period-nuit)"  },
   };
 
   const statusIcon = { ok:"✅", book:"⚠️", free:"🔓", note:"ℹ️", opt:"✨" };
@@ -1975,14 +1995,14 @@ function TimelineView({ sections, city }) {
         <div style={{ position:"absolute", left:0, top:"0.5rem", width:"2.5rem", height:totalHeight }}>
           {Array.from({ length: TOTAL_H + 1 }, (_, i) => i + START_H).map(h => (
             <div key={h} style={{ position:"absolute", top: (h - START_H) * PX_PER_H - 6, left:0, width:"100%" }}>
-              <span style={{ fontSize:"0.68rem", color:v("textMuted",dark), fontWeight:600, display:"block", textAlign:"right", paddingRight:"6px", lineHeight:1 }}>{h}h</span>
+              <span style={{ fontFamily:"var(--font-mono, ui-monospace, monospace)", fontSize:"0.68rem", color:"var(--text-muted)", fontWeight:600, display:"block", textAlign:"right", paddingRight:"6px", lineHeight:1 }}>{h}h</span>
             </div>
           ))}
         </div>
         {/* Grid lines */}
         <div style={{ position:"absolute", left:"2.5rem", right:"0.5rem", top:"0.5rem", height:totalHeight, pointerEvents:"none" }}>
           {Array.from({ length: TOTAL_H + 1 }, (_, i) => i + START_H).map(h => (
-            <div key={h} style={{ position:"absolute", top: (h - START_H) * PX_PER_H, left:0, right:0, height:"1px", background: h % 2 === 0 ? (dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.06)") : (dark?"rgba(255,255,255,0.03)":"rgba(0,0,0,0.03)") }} />
+            <div key={h} style={{ position:"absolute", top: (h - START_H) * PX_PER_H, left:0, right:0, height:"1px", background: h % 2 === 0 ? "var(--border)" : "var(--border-light)", opacity: h % 2 === 0 ? 0.75 : 0.4 }} />
           ))}
         </div>
         {/* Activity blocks */}
@@ -2002,32 +2022,32 @@ function TimelineView({ sections, city }) {
                   padding:"0.25rem 0.4rem",
                   cursor:"pointer",
                   zIndex: isExp ? 10 : 1,
-                  boxShadow: isExp ? (dark?"0 4px 12px rgba(0,0,0,0.4)":"0 4px 12px rgba(0,0,0,0.15)") : "none",
-                  border:`1px solid ${isExp?cc.color:(dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.08)")}`,
+                  boxShadow: isExp ? "var(--shadow-card-hov)" : "none",
+                  border:`1px solid ${isExp ? cc.color : "var(--border-light)"}`,
                   borderLeftWidth:"3px",
                   transition:"all 0.2s",
                   maxHeight: isExp ? "400px" : "52px",
                   overflow:"hidden",
                   background: isExp
-                    ? (dark?"#1A1A1A":"white")
+                    ? "var(--bg-card)"
                     : isOpt
-                      ? (dark?"rgba(124,58,237,0.18)":"rgba(124,58,237,0.1)")
-                      : (dark?"rgba(255,255,255,0.04)":"rgba(0,0,0,0.03)"),
+                      ? "var(--opt-bg)"
+                      : "var(--bg-card-2)",
                 }}
               >
                 <div style={{ display:"flex", alignItems:"center", gap:"0.3rem", flexWrap:"wrap" }}>
-                  <span style={{ fontSize:"0.7rem", fontWeight:700, padding:"0.08rem 0.3rem", borderRadius:"4px", background:sc.bg, color:sc.color, flexShrink:0 }}>
+                  <span style={{ fontFamily:"var(--font-mono, ui-monospace, monospace)", fontSize:"0.7rem", fontWeight:700, padding:"0.08rem 0.3rem", borderRadius:"4px", background:sc.bg, color:sc.color, flexShrink:0 }}>
                     {item.hour % 1 === 0 ? `${Math.floor(item.hour)}h` : `${Math.floor(item.hour)}h${Math.round((item.hour%1)*60).toString().padStart(2,"0")}`}
                   </span>
                   <span style={{ fontSize:"0.7rem", flexShrink:0 }}>{statusIcon[item.s]||""}</span>
-                  <span style={{ fontSize:"0.7rem", fontWeight:600, color:v("textPrimary",dark), lineHeight:1.2, flex:1 }}>
+                  <span style={{ fontSize:"0.72rem", fontWeight:600, color:"var(--text-primary)", lineHeight:1.2, flex:1 }}>
                     {item.t.replace(/^[🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚🕛🕜🕝🕞🕟🕠🕡🕢🕣🕤🕥🕦🕧]\s*\d{1,2}h\d{0,2}\s*—\s*/u,"").slice(0,50)}
                   </span>
                 </div>
                 {isExp && item.sub && (
-                  <div style={{ marginTop:"0.4rem", paddingTop:"0.4rem", borderTop:`1px solid ${v("borderLight",dark)}` }}>
+                  <div style={{ marginTop:"0.4rem", paddingTop:"0.4rem", borderTop:"1px solid var(--border-light)" }}>
                     {item.sub.split("\n\n").map((para, pi) => (
-                      <p key={pi} style={{ fontSize:"0.68rem", color:v("textSec",dark), margin: pi > 0 ? "0.3rem 0 0" : 0, lineHeight:1.45 }}>{para}</p>
+                      <p key={pi} style={{ fontSize:"0.72rem", color:"var(--text-sec)", margin: pi > 0 ? "0.3rem 0 0" : 0, lineHeight:1.45 }}>{para}</p>
                     ))}
                   </div>
                 )}
@@ -2128,11 +2148,13 @@ const mapsLink = (query, city) => {
 
 
 function SectionBlock({ section, query, dayN, dayCity }) {
-  const dark = useDark();
-  const cfg = PERIOD[section.id]||{ label:section.id, color:t("#374151","#CBD5E1"), bg:t("#F9FAFB","#1E1E1E"), line:t("#E5E7EB","#2D2D2D") };
+  const cfg = PERIOD[section.id] || PERIOD.aprem;
+  // cfg.* carry {light:var(...), dark:var(...)} — both strings resolve to the
+  // same CSS variable, so we can read either branch.
+  const cfgColor = cfg.color.light;
+  const cfgBg    = cfg.bg.light;
+  const cfgLine  = cfg.line.light;
   // U6: when searching, only render items in this section that actually match.
-  // The period label above acts as a breadcrumb: user sees "☀️ Matin" only for
-  // matching items, so context is preserved without verbose breadcrumb chips.
   const visibleItems = query
     ? section.items
         .map((item, i) => ({ item, i }))
@@ -2147,13 +2169,21 @@ function SectionBlock({ section, query, dayN, dayCity }) {
 
   return (
     <div>
-      <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", margin:"0.75rem 0 0.45rem" }}>
-        <div style={{ height:"1px", background:cfg.line[dark?"dark":"light"], flex:1 }}/>
-        <span style={{ fontSize:"0.72rem", fontWeight:700, color:cfg.color[dark?"dark":"light"], background:cfg.bg[dark?"dark":"light"], padding:"0.18rem 0.6rem", borderRadius:"12px", whiteSpace:"nowrap", border:`1px solid ${cfg.line[dark?"dark":"light"]}` }}>
+      <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", margin:"0.85rem 0 0.5rem" }}>
+        <div style={{ height:"1px", background:cfgLine, flex:1 }}/>
+        <span style={{
+          fontFamily:"var(--font-body)",
+          fontSize:"0.68rem", fontWeight:700,
+          letterSpacing:"0.14em", textTransform:"uppercase",
+          color:cfgColor, background:cfgBg,
+          padding:"0.22rem 0.7rem", borderRadius:"2px",
+          whiteSpace:"nowrap",
+          border:`1px solid ${cfgLine}`,
+        }}>
           {cfg.label}
-          {query && <span style={{ marginLeft:"0.35rem", opacity:0.7 }}>· {visibleItems.length}</span>}
+          {query && <span style={{ marginLeft:"0.4rem", opacity:0.7 }}>· {visibleItems.length}</span>}
         </span>
-        <div style={{ height:"1px", background:cfg.line[dark?"dark":"light"], flex:1 }}/>
+        <div style={{ height:"1px", background:cfgLine, flex:1 }}/>
       </div>
       <div style={{ display:"flex", flexDirection:"column", gap:"0.4rem" }}>
         {visibleItems.map(({ item, i }) => (
@@ -2173,37 +2203,48 @@ function SectionBlock({ section, query, dayN, dayCity }) {
 function ActivityItem({ item, query, itemKey, dayCity }) {
   const dark = useDark();
   const { done, toggle } = useDoneItems();
-  const st = ST[item.s]||ST.free;
-  const isOpt = item.s==="opt";
+  const st = ST[item.s] || ST.free;
+  const isOpt = item.s === "opt";
   const isDone = itemKey ? done.has(itemKey) : false;
   const cityName = { tokyo:"Tokyo", kyoto:"Kyoto", osaka:"Osaka" }[dayCity] || "";
 
   return (
     <div style={{
-      padding:"0.6rem 0.75rem",
+      padding:"0.7rem 0.85rem",
       background: isDone
-        ? (dark ? "rgba(16,185,129,0.08)" : "rgba(16,185,129,0.05)")
-        : (isOpt ? v("optBg",dark) : v("cardBg2",dark)),
+        ? "var(--success-soft)"
+        : (isOpt ? "var(--opt-bg)" : "var(--bg-card-2)"),
       borderRadius:"8px",
-      border:`1px solid ${isDone ? "rgba(16,185,129,0.3)" : (isOpt ? v("optBdr",dark) : v("borderLight",dark))}`,
+      border:`1px solid ${isDone ? "var(--success-bdr)" : (isOpt ? "var(--opt-bdr)" : "var(--border-light)")}`,
       transition:"background 0.2s, border 0.2s",
     }}>
       <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:"0.5rem" }}>
         <p style={{
-          fontSize:"0.83rem", fontWeight:600,
-          color: isDone ? v("textMuted",dark) : (isOpt ? v("optTxt",dark) : v("textPrimary",dark)),
-          lineHeight:1.35, flex:1, margin:0,
+          fontFamily:"var(--font-display)",
+          fontSize:"0.88rem", fontWeight:600,
+          color: isDone ? "var(--text-muted)" : (isOpt ? "var(--opt-txt)" : "var(--text-primary)"),
+          lineHeight:1.3, flex:1, margin:0,
+          letterSpacing:"-0.005em",
           textDecoration: isDone ? "line-through" : "none",
-          opacity: isDone ? 0.7 : 1,
+          opacity: isDone ? 0.75 : 1,
         }}>{query ? highlight(item.t, query, dark) : item.t}</p>
-        <span style={{ fontSize:"0.68rem", fontWeight:500, padding:"0.15rem 0.4rem", borderRadius:"6px", whiteSpace:"nowrap", flexShrink:0, marginTop:"1px", background:st.bg[dark?"dark":"light"], color:st.color[dark?"dark":"light"], border:`1px solid ${st.bdr[dark?"dark":"light"]}` }}>{st.label}</span>
+        <span style={{
+          fontFamily:"var(--font-body)",
+          fontSize:"0.62rem", fontWeight:700,
+          letterSpacing:"0.08em", textTransform:"uppercase",
+          padding:"0.2rem 0.45rem", borderRadius:"3px",
+          whiteSpace:"nowrap", flexShrink:0, marginTop:"2px",
+          background:st.bg.light, color:st.color.light,
+          border:`1px solid ${st.bdr.light}`,
+        }}>{st.label}</span>
       </div>
       {item.sub && (
         <div style={{
-          fontSize:"0.75rem",
-          color: isDone ? v("textMuted",dark) : (isOpt ? v("optTxt",dark) : v("textSec",dark)),
-          lineHeight:1.55, margin:"0.35rem 0 0",
-          opacity: isDone ? 0.6 : (isOpt ? 0.9 : 1),
+          fontFamily:"var(--font-body)",
+          fontSize:"0.78rem",
+          color: isDone ? "var(--text-muted)" : (isOpt ? "var(--opt-txt)" : "var(--text-sec)"),
+          lineHeight:1.55, margin:"0.4rem 0 0",
+          opacity: isDone ? 0.65 : (isOpt ? 0.92 : 1),
         }}>
           {item.sub.split("\n\n").map((para, pi) => (
             <p key={pi} style={{ margin: pi > 0 ? "0.45rem 0 0" : 0 }}>
@@ -2214,16 +2255,18 @@ function ActivityItem({ item, query, itemKey, dayCity }) {
       )}
       {/* Action bar: mark as done + open in maps */}
       {itemKey && (
-        <div style={{ display:"flex", gap:"0.4rem", marginTop:"0.55rem", paddingTop:"0.5rem", borderTop:`1px solid ${v("borderLight",dark)}`, flexWrap:"wrap" }}>
+        <div style={{ display:"flex", gap:"0.4rem", marginTop:"0.6rem", paddingTop:"0.55rem", borderTop:"1px solid var(--border-light)", flexWrap:"wrap" }}>
           <button
             onClick={(e) => { e.stopPropagation(); toggle(itemKey); }}
             aria-pressed={isDone}
             style={{
-              fontSize:"0.7rem", fontWeight:600, padding:"0.28rem 0.55rem",
-              borderRadius:"6px", cursor:"pointer", fontFamily:"inherit",
-              border: `1px solid ${isDone ? "#10B981" : v("borderLight",dark)}`,
-              background: isDone ? "#10B981" : "transparent",
-              color: isDone ? "white" : v("textMuted",dark),
+              fontFamily:"var(--font-body)",
+              fontSize:"0.68rem", fontWeight:700, letterSpacing:"0.05em", textTransform:"uppercase",
+              padding:"0.32rem 0.65rem",
+              borderRadius:"6px", cursor:"pointer",
+              border: `1px solid ${isDone ? "var(--success)" : "var(--border-light)"}`,
+              background: isDone ? "var(--success)" : "transparent",
+              color: isDone ? "var(--bg-page)" : "var(--text-muted)",
               transition:"all 0.15s",
             }}
           >
@@ -2235,11 +2278,13 @@ function ActivityItem({ item, query, itemKey, dayCity }) {
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
             style={{
-              fontSize:"0.7rem", fontWeight:600, padding:"0.28rem 0.55rem",
-              borderRadius:"6px", textDecoration:"none", fontFamily:"inherit",
-              border: `1px solid ${v("borderLight",dark)}`,
+              fontFamily:"var(--font-body)",
+              fontSize:"0.68rem", fontWeight:700, letterSpacing:"0.05em", textTransform:"uppercase",
+              padding:"0.32rem 0.65rem",
+              borderRadius:"6px", textDecoration:"none",
+              border:"1px solid var(--border-light)",
               background:"transparent",
-              color: dark ? "#60A5FA" : "#0369A1",
+              color:"var(--accent)",
             }}
           >
             🗺 Ouvrir dans Maps
