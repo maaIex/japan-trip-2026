@@ -4695,9 +4695,9 @@ function PhrasebookSection() {
     setTimeout(() => setCopied(null), 1500);
   };
   const DIFF = {
-    "🟢":{ bg:t("#DCFCE7","#14301E"), color:t("#166534","#4ADE80") },
-    "🟡":{ bg:t("#FEF9C3","#1C1400"), color:t("#854D0E","#FCD34D") },
-    "🔴":{ bg:t("#FEE2E2","#2D0A0A"), color:t("#991B1B","#F87171") },
+    "🟢":{ bg:"var(--success-soft)", color:"var(--success)" },
+    "🟡":{ bg:"var(--warning-soft)", color:"var(--warning)" },
+    "🔴":{ bg:"var(--danger-soft)",  color:"var(--danger)"  },
   };
   const CATS = [
     { id:"resto", emoji:"🍽", titre:"Au restaurant", color:"var(--accent)", phrases:[
@@ -4811,7 +4811,7 @@ function PhrasebookSection() {
                     <div key={pi} style={{ padding:"0.75rem 1rem", borderBottom: pi<cat.phrases.length-1?`1px solid ${v("borderMid",dark)}`:"none" }}>
                       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:"0.5rem", marginBottom:"0.3rem" }}>
                         <p style={{ fontSize:"0.73rem", color:v("textSec",dark), margin:0 }}>{p.fr}</p>
-                        <span style={{ fontSize:"0.68rem", fontWeight:600, padding:"0.12rem 0.4rem", borderRadius:"6px", whiteSpace:"nowrap", flexShrink:0, background:dc.bg[dark?"dark":"light"], color:dc.color[dark?"dark":"light"] }}>{p.diff}</span>
+                        <span style={{ fontSize:"0.68rem", fontWeight:600, padding:"0.12rem 0.4rem", borderRadius:"6px", whiteSpace:"nowrap", flexShrink:0, background:dc.bg, color:dc.color }}>{p.diff}</span>
                       </div>
                       <p style={{ fontSize:"0.88rem", fontWeight:700, color:cat.color, margin:"0 0 0.2rem", letterSpacing:"0.02em" }}>{p.rom}</p>
                       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", gap:"0.5rem" }}>
@@ -4824,7 +4824,7 @@ function PhrasebookSection() {
                           >
                             🔊 Lire
                           </button>
-                          <button onClick={()=>copyPhrase(p.jp, `${cat.id}-${pi}`)} style={{ fontSize:"0.7rem", padding:"0.2rem 0.5rem", borderRadius:"6px", border:`1px solid ${v("borderLight",dark)}`, background: isCopied ? (dark?"#14301E":"#DCFCE7") : "transparent", color: isCopied ? "#10B981" : v("textMuted",dark), cursor:"pointer", fontFamily:"inherit", transition:"all 0.2s", whiteSpace:"nowrap" }}>
+                          <button onClick={()=>copyPhrase(p.jp, `${cat.id}-${pi}`)} style={{ fontSize:"0.7rem", padding:"0.2rem 0.5rem", borderRadius:"6px", border:`1px solid ${v("borderLight",dark)}`, background: isCopied ? "var(--success-soft)" : "transparent", color: isCopied ? "var(--success)" : v("textMuted",dark), cursor:"pointer", fontFamily:"inherit", transition:"all 0.2s", whiteSpace:"nowrap" }}>
                             {isCopied ? "✓ Copié" : "Copier"}
                           </button>
                         </div>
@@ -4920,24 +4920,24 @@ function ShareSection() {
   });
 
   return (
-    <InfoCard title="📤 Partager & Exporter" color="#0369A1" headerBg={t("#F0F9FF","#0C1F35")}>
+    <InfoCard title="📤 Partager & Exporter" color="var(--info)" headerBg="var(--info-soft)">
       <div style={{ display:"flex", flexDirection:"column", gap:"0.5rem" }}>
-        <button style={btnStyle("#0369A1")} onClick={printPlanning}>
+        <button style={btnStyle("var(--info)")} onClick={printPlanning}>
           🖨️ <span>Télécharger en PDF</span>
           <span style={{ marginLeft:"auto", fontSize:"0.7rem", color:v("textMuted",dark) }}>Cmd+P / Ctrl+P</span>
         </button>
-        <button style={btnStyle(copied?"#10B981":"#0369A1")} onClick={copyText}>
+        <button style={btnStyle(copied?"var(--success)":"var(--info)")} onClick={copyText}>
           {copied ? "✅" : "📋"} <span>{copied ? "Copié !" : "Copier le résumé texte"}</span>
         </button>
-        <button style={btnStyle("#7C3AED")} onClick={loadQR}>
+        <button style={btnStyle("var(--city-kyoto)")} onClick={loadQR}>
           📲 <span>Générer un QR Code</span>
           <span style={{ marginLeft:"auto", fontSize:"0.7rem", color:v("textMuted",dark) }}>qrcode.js</span>
         </button>
         {qrVisible && (
           <div style={{ background:v("cardBg2",dark), borderRadius:"10px", padding:"0.875rem", textAlign:"center", border:`1px solid ${v("borderLight",dark)}` }}>
-            <div id="qr-canvas" style={{ display:"inline-block", padding:"0.5rem", background:"white", borderRadius:"8px" }} />
+            <div id="qr-canvas" style={{ display:"inline-block", padding:"0.5rem", background:"#FFFFFF", borderRadius:"8px" }} />
             <p style={{ fontSize:"0.7rem", color:v("textSec",dark), margin:"0.5rem 0 0.5rem" }}>Scannez pour partager l'app</p>
-            <button onClick={downloadQR} style={{ fontSize:"0.72rem", color:"#7C3AED", background:"transparent", border:`1px solid #7C3AED`, borderRadius:"6px", padding:"0.25rem 0.75rem", cursor:"pointer", fontFamily:"inherit" }}>
+            <button onClick={downloadQR} style={{ fontSize:"0.72rem", color:"var(--city-kyoto)", background:"transparent", border:"1px solid var(--city-kyoto)", borderRadius:"6px", padding:"0.25rem 0.75rem", cursor:"pointer", fontFamily:"inherit" }}>
               ⬇️ Télécharger en PNG
             </button>
           </div>
@@ -5067,32 +5067,32 @@ function NotificationsSection() {
   const days_list = ["27 avr","28 avr","29 avr","30 avr","1 mai","2 mai","3 mai","4 mai","5 mai","6 mai","7 mai","8 mai","9 mai","10 mai","11 mai"];
 
   return (
-    <InfoCard title="🔔 Rappels & Notifications" color="#7C3AED" headerBg={t("#F5F3FF","#1C0F2E")}>
+    <InfoCard title="🔔 Rappels & Notifications" color="var(--city-kyoto)" headerBg="var(--city-kyoto-wash)">
       {permission === "unsupported" ? (
         <div style={{ marginBottom:"0.75rem" }}>
           <p style={{ fontSize:"0.74rem", color:v("textSec",dark), margin:"0 0 0.5rem" }}>⚠️ Les notifications navigateur ne sont pas supportées ici. Exportez vos activités dans votre calendrier :</p>
-          <button onClick={exportICS} style={{ fontSize:"0.75rem", fontWeight:600, color:"#7C3AED", background:"transparent", border:"1px solid #7C3AED", borderRadius:"8px", padding:"0.4rem 0.75rem", cursor:"pointer", fontFamily:"inherit" }}>
+          <button onClick={exportICS} style={{ fontSize:"0.75rem", fontWeight:600, color:"var(--city-kyoto)", background:"transparent", border:"1px solid var(--city-kyoto)", borderRadius:"8px", padding:"0.4rem 0.75rem", cursor:"pointer", fontFamily:"inherit" }}>
             📅 Exporter en .ics (Google/Apple Calendar)
           </button>
         </div>
       ) : permission === "denied" ? (
-        <p style={{ fontSize:"0.74rem", color:"#DC2626", margin:"0 0 0.75rem" }}>🚫 Notifications bloquées dans les paramètres du navigateur. Activez-les dans les préférences du site.</p>
+        <p style={{ fontSize:"0.74rem", color:"var(--danger)", margin:"0 0 0.75rem" }}>🚫 Notifications bloquées dans les paramètres du navigateur. Activez-les dans les préférences du site.</p>
       ) : permission !== "granted" ? (
         <div style={{ marginBottom:"0.75rem" }}>
           <p style={{ fontSize:"0.74rem", color:v("textSec",dark), margin:"0 0 0.5rem", lineHeight:1.5 }}>Recevez des rappels avant vos activités importantes du voyage.</p>
           <div style={{ display:"flex", gap:"0.5rem", flexWrap:"wrap" }}>
-            <button onClick={requestPermission} style={{ fontSize:"0.75rem", fontWeight:600, color:"white", background:"#7C3AED", border:"none", borderRadius:"8px", padding:"0.4rem 0.75rem", cursor:"pointer", fontFamily:"inherit" }}>
+            <button onClick={requestPermission} style={{ fontSize:"0.75rem", fontWeight:600, color:"var(--header-ink)", background:"var(--city-kyoto)", border:"none", borderRadius:"8px", padding:"0.4rem 0.75rem", cursor:"pointer", fontFamily:"inherit" }}>
               🔔 Activer les rappels
             </button>
-            <button onClick={exportICS} style={{ fontSize:"0.75rem", fontWeight:600, color:"#7C3AED", background:"transparent", border:"1px solid #7C3AED", borderRadius:"8px", padding:"0.4rem 0.75rem", cursor:"pointer", fontFamily:"inherit" }}>
+            <button onClick={exportICS} style={{ fontSize:"0.75rem", fontWeight:600, color:"var(--city-kyoto)", background:"transparent", border:"1px solid var(--city-kyoto)", borderRadius:"8px", padding:"0.4rem 0.75rem", cursor:"pointer", fontFamily:"inherit" }}>
               📅 Exporter en .ics
             </button>
           </div>
         </div>
       ) : (
-        <div style={{ display:"flex", alignItems:"center", gap:"0.4rem", marginBottom:"0.75rem", padding:"0.4rem 0.6rem", background:dark?"#14301E":"#DCFCE7", borderRadius:"6px" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:"0.4rem", marginBottom:"0.75rem", padding:"0.4rem 0.6rem", background:"var(--success-soft)", borderRadius:"6px" }}>
           <span style={{ fontSize:"0.8rem" }}>✅</span>
-          <span style={{ fontSize:"0.73rem", fontWeight:600, color:dark?"#4ADE80":"#166534" }}>Notifications activées</span>
+          <span style={{ fontSize:"0.73rem", fontWeight:600, color:"var(--success)" }}>Notifications activées</span>
           <button onClick={exportICS} style={{ marginLeft:"auto", fontSize:"0.68rem", color:v("textMuted",dark), background:"transparent", border:"none", cursor:"pointer", fontFamily:"inherit" }}>📅 Export .ics</button>
         </div>
       )}
@@ -5102,7 +5102,7 @@ function NotificationsSection() {
           <p style={{ fontSize:"0.68rem", fontWeight:700, color:v("textPrimary",dark), margin:"0 0 0.35rem", textTransform:"uppercase", letterSpacing:"0.05em" }}>Rappels programmés</p>
           {reminders.map(r => (
             <div key={r.id} style={{ display:"flex", alignItems:"center", gap:"0.5rem", padding:"0.3rem 0.5rem", background:v("cardBg2",dark), borderRadius:"6px", marginBottom:"0.25rem" }}>
-              <span style={{ fontSize:"0.72rem", fontWeight:600, color:"#7C3AED", flexShrink:0 }}>{r.day} {r.time}</span>
+              <span style={{ fontSize:"0.72rem", fontWeight:600, color:"var(--city-kyoto)", flexShrink:0 }}>{r.day} {r.time}</span>
               <span style={{ fontSize:"0.72rem", color:v("textSec",dark), flex:1 }}>{r.text}</span>
               <button onClick={()=>removeReminder(r.id)} style={{ fontSize:"0.7rem", color:v("textMuted",dark), background:"transparent", border:"none", cursor:"pointer", padding:"0.1rem", flexShrink:0 }}>✕</button>
             </div>
@@ -5111,7 +5111,7 @@ function NotificationsSection() {
       )}
       {/* Add reminder */}
       {!showForm ? (
-        <button onClick={()=>setShowForm(true)} style={{ fontSize:"0.73rem", color:"#7C3AED", background:"transparent", border:"1px dashed #7C3AED", borderRadius:"6px", padding:"0.35rem 0.75rem", cursor:"pointer", fontFamily:"inherit", width:"100%" }}>
+        <button onClick={()=>setShowForm(true)} style={{ fontSize:"0.73rem", color:"var(--city-kyoto)", background:"transparent", border:"1px dashed var(--city-kyoto)", borderRadius:"6px", padding:"0.35rem 0.75rem", cursor:"pointer", fontFamily:"inherit", width:"100%" }}>
           + Ajouter un rappel manuellement
         </button>
       ) : (
@@ -5130,7 +5130,7 @@ function NotificationsSection() {
           </div>
           <input type="text" placeholder="Description du rappel..." value={newRem.text} onChange={e=>setNewRem(p=>({...p,text:e.target.value}))} style={{ width:"100%", padding:"0.35rem 0.5rem", borderRadius:"6px", border:`1px solid ${v("borderLight",dark)}`, background:v("cardBg",dark), color:v("textPrimary",dark), fontSize:"0.73rem", fontFamily:"inherit", marginBottom:"0.4rem", outline:"none", boxSizing:"border-box" }} />
           <div style={{ display:"flex", gap:"0.4rem" }}>
-            <button onClick={addReminder} style={{ flex:1, fontSize:"0.73rem", fontWeight:600, color:"white", background:"#7C3AED", border:"none", borderRadius:"6px", padding:"0.35rem 0", cursor:"pointer", fontFamily:"inherit" }}>Ajouter</button>
+            <button onClick={addReminder} style={{ flex:1, fontSize:"0.73rem", fontWeight:600, color:"var(--header-ink)", background:"var(--city-kyoto)", border:"none", borderRadius:"6px", padding:"0.35rem 0", cursor:"pointer", fontFamily:"inherit" }}>Ajouter</button>
             <button onClick={()=>setShowForm(false)} style={{ fontSize:"0.73rem", color:v("textSec",dark), background:"transparent", border:`1px solid ${v("borderLight",dark)}`, borderRadius:"6px", padding:"0.35rem 0.6rem", cursor:"pointer", fontFamily:"inherit" }}>Annuler</button>
           </div>
         </div>
@@ -5153,29 +5153,29 @@ function TranslateShortcuts() {
       label: "📷 Traduire un menu / un panneau",
       desc: "Ouvre Google Traduction en mode image — vise le japonais, choisis 'Caméra' dans l'app.",
       href: "https://translate.google.com/?sl=ja&tl=fr&op=images",
-      color: "#3B82F6",
+      color: "var(--info)",
     },
     {
       label: "🔤 Traduire un mot saisi",
       desc: "Taper / coller du texte japonais → français. Fonctionne hors-ligne si le pack JP est téléchargé dans l'app.",
       href: "https://translate.google.com/?sl=ja&tl=fr&op=translate",
-      color: "#10B981",
+      color: "var(--success)",
     },
     {
       label: "🎙 Traduire une conversation",
       desc: "Mode dialogue bilingue — un bouton par langue. Idéal pour demander une direction ou commander.",
       href: "https://translate.google.com/?sl=ja&tl=fr&op=conversation",
-      color: "#F59E0B",
+      color: "var(--gold)",
     },
     {
       label: "🔍 Google Lens — identifier un plat",
       desc: "Prends un plat en photo si le menu n'a pas d'image. Ouvre lens.google.com.",
       href: "https://lens.google.com/",
-      color: "#A855F7",
+      color: "var(--city-kyoto)",
     },
   ];
   return (
-    <InfoCard title="🔤 Traduire sur place" color="#3B82F6" headerBg={t("#EFF6FF","#0A1628")}>
+    <InfoCard title="🔤 Traduire sur place" color="var(--info)" headerBg="var(--info-soft)">
       <p style={{ fontSize:"0.72rem", color:v("textMuted",dark), margin:"0 0 0.6rem", lineHeight:1.45 }}>
         💡 <strong style={{ color:v("textSec",dark) }}>Avant de partir</strong> : dans l'app Google Traduction, télécharger le pack <em>japonais</em> pour usage hors-ligne (Paramètres → Traduction hors connexion).
       </p>
@@ -5230,13 +5230,13 @@ function KonbiniHub() {
       desc:"Onigiri (7-Eleven = référence absolue — le thon mayo est le best-seller), tamago sando (FamilyMart), oden en hiver, karaage poulet, bento complet ~500¥, café machine ~150¥. Parfait pour petit-déj à 6h avant Fushimi Inari, ou dîner tardif après une longue journée." },
   ];
   return (
-    <InfoCard title="🏪 Konbini — votre hub de survie" color="#059669" headerBg={t("#ECFDF5","#0A1E12")}>
+    <InfoCard title="🏪 Konbini — votre hub de survie" color="var(--success)" headerBg="var(--success-soft)">
       <p style={{ fontSize:"0.72rem", color:v("textMuted",dark), margin:"0 0 0.65rem", lineHeight:1.45 }}>
         Les <strong style={{ color:v("textSec",dark) }}>7-Eleven, FamilyMart et Lawson</strong> ne sont pas de simples supérettes : ce sont des mini-centres de services qui font gagner un temps fou aux voyageurs.
       </p>
       {items.map((it, i) => (
         <div key={i} style={{ marginBottom: i < items.length-1 ? "0.55rem" : 0, paddingBottom: i < items.length-1 ? "0.55rem" : 0, borderBottom: i < items.length-1 ? `1px solid ${v("borderLight",dark)}` : "none" }}>
-          <p style={{ fontSize:"0.78rem", fontWeight:700, color:"#059669", margin:0 }}>{it.emoji} {it.title}</p>
+          <p style={{ fontSize:"0.78rem", fontWeight:700, color:"var(--success)", margin:0 }}>{it.emoji} {it.title}</p>
           <p style={{ fontSize:"0.72rem", color:v("textSec",dark), margin:"0.15rem 0 0", lineHeight:1.45 }}>{it.desc}</p>
         </div>
       ))}
@@ -5325,7 +5325,7 @@ function DoAndDont() {
       ] },
   ];
   return (
-    <InfoCard title="🚫 Faux-pas à éviter (erreurs classiques françaises)" color="#DC2626" headerBg={t("#FEF2F2","#2D0A0A")}>
+    <InfoCard title="🚫 Faux-pas à éviter (erreurs classiques françaises)" color="var(--danger)" headerBg="var(--danger-soft)">
       <p style={{ fontSize:"0.72rem", color:v("textMuted",dark), margin:"0 0 0.65rem", lineHeight:1.45 }}>
         Les Japonais sont extrêmement tolérants avec les touristes, mais éviter ces pièges classiques montrera votre respect et sera très apprécié.
       </p>
@@ -5334,7 +5334,7 @@ function DoAndDont() {
           <p style={{ fontSize:"0.82rem", fontWeight:700, color:v("textPrimary",dark), margin:"0 0 0.4rem" }}>{g.emoji} {g.titre}</p>
           {g.dos.length > 0 && (
             <div style={{ marginBottom:"0.35rem" }}>
-              <p style={{ fontSize:"0.7rem", fontWeight:700, color:"#059669", margin:"0 0 0.2rem", letterSpacing:"0.05em", textTransform:"uppercase" }}>✓ À faire</p>
+              <p style={{ fontSize:"0.7rem", fontWeight:700, color:"var(--success)", margin:"0 0 0.2rem", letterSpacing:"0.05em", textTransform:"uppercase" }}>✓ À faire</p>
               {g.dos.map((d, i) => (
                 <p key={i} style={{ fontSize:"0.72rem", color:v("textSec",dark), margin:"0 0 0.2rem", lineHeight:1.45, paddingLeft:"0.6rem" }}>• {d}</p>
               ))}
@@ -5342,7 +5342,7 @@ function DoAndDont() {
           )}
           {g.donts.length > 0 && (
             <div>
-              <p style={{ fontSize:"0.7rem", fontWeight:700, color:"#DC2626", margin:"0 0 0.2rem", letterSpacing:"0.05em", textTransform:"uppercase" }}>✗ À ne PAS faire</p>
+              <p style={{ fontSize:"0.7rem", fontWeight:700, color:"var(--danger)", margin:"0 0 0.2rem", letterSpacing:"0.05em", textTransform:"uppercase" }}>✗ À ne PAS faire</p>
               {g.donts.map((d, i) => (
                 <p key={i} style={{ fontSize:"0.72rem", color:v("textSec",dark), margin:"0 0 0.2rem", lineHeight:1.45, paddingLeft:"0.6rem" }}>• {d}</p>
               ))}
@@ -5379,7 +5379,7 @@ function InfoSection() {
       <DepartureChecklist />
       <ShareSection />
       <NotificationsSection />
-      <InfoCard title="🚄 Transports & JR Pass" color="#34D399" headerBg={t("#ECFDF5","#0A1E12")}>
+      <InfoCard title="🚄 Transports & JR Pass" color="var(--success)" headerBg="var(--success-soft)">
         {[
           ["🎫 JR Pass — Ce qui est couvert","Shinkansen HIKARI et KODAMA uniquement (⚠️ PAS le Nozomi ni le Mizuho). JR Locaux dans toutes les villes. Tokyo Monorail Haneda. JR Nara Line (Inari, Nara). JR Yumesaki Line (USJ). JR Sagano Line (Arashiyama). Réserver sièges GRATUITEMENT au guichet Midori no Madoguchi (みどりの窓口) dans toutes les grandes gares — indispensable 3 mai."],
           ["🚇 Suica IC Card","Acheter à la machine bleue 'IC Card' dès Haneda T3 — charger 5000¥. Valide : tous les métros de Tokyo/Osaka/Kyoto, bus Kyoto (230¥ fixe), konbinis 7-Eleven / FamilyMart / Lawson, certains taxis. Recharger aux machines vertes dans chaque station."],
@@ -5388,12 +5388,12 @@ function InfoSection() {
           ["🚄 Shinkansen — Horaires clés","Tokyo→Kyoto (3 mai) : Hikari toutes les 30 min depuis ~6h, durée ~2h40. Siège côté gauche pour le Fuji.\n\nKyoto→Shin-Osaka (7 mai) : Hikari ou Kodama, ~15 min.\n\nShin-Osaka→Tokyo (10 mai) : Hikari ~2h30. Réserver tous les sièges le J1 au guichet JR."],
         ].map(([t2,d],i)=>(
           <div key={i} style={{ marginBottom:i<4?"0.65rem":0 }}>
-            <p style={{ fontSize:"0.8rem", fontWeight:600, color:"#34D399", margin:0 }}>{t2}</p>
+            <p style={{ fontSize:"0.8rem", fontWeight:600, color:"var(--success)", margin:0 }}>{t2}</p>
             <p style={{ fontSize:"0.75rem", color:v("textSec",dark), marginTop:"0.1rem", lineHeight:1.5 }}>{d}</p>
           </div>
         ))}
       </InfoCard>
-      <InfoCard title="🍶 Boissons — Sans bière !" color="#A855F7" headerBg={t("#F5F3FF","#231840")}>
+      <InfoCard title="🍶 Boissons — Sans bière !" color="var(--city-kyoto)" headerBg="var(--city-kyoto-wash)">
         {[
           ["🥃 Highball Whisky (ハイボール)","Le standard de toutes les izakayas. Suntory Kakubin (角) + soda = définition du haiboru. Toki ou Hibiki pour les versions premium. Commander : 'Kakubin haiboru hitotsu onegaishimasu'. ~400-700¥."],
           ["🍶 Saké (日本酒)","Junmai (純米) = riz pur, body rond. Ginjo (吟醸) = fermentation basse température, floral. Daiginjo (大吟醸) = arômes complexes de fruit. Nigori (にごり) = trouble, légèrement sucré. Hiyaoroshi (ひやおろし) = saké saisonnier automnal. Commander : 'osusume no junmai ginjo kudasai' (recommandez-moi un junmai ginjo). 80-180ml selon le verre."],
@@ -5402,13 +5402,13 @@ function InfoSection() {
           ["🍵 Matcha & Hojicha","Matcha latte (抹茶ラテ) : partout depuis 300¥. Hojicha (ほうじ茶) : thé torréfié, caramel doux, peu de caféine. Amazake (甘酒) : saké doux chauffé, 0% alcool, fermenté de riz — goûter au moins une fois, ~200¥."],
           ["🍬 Ramune (ラムネ)","Soda pétillant en bouteille en verre avec bille. Pour ouvrir : insérer le poussoir plastique fourni dans le goulot et appuyer d'un coup sec. La bille tombe dans la bouteille. Saveurs : citron, melon, fraise, cola. ~150-200¥ en supermarché, ~300¥ touristique."],
         ].map(([t2,d],i)=>(
-          <div key={i} style={{ marginBottom:i<5?"0.55rem":0, paddingBottom:i<5?"0.55rem":0, borderBottom:i<5?`1px solid ${dark?"#3B1F5E":"#EDE9FE"}`:"none" }}>
-            <p style={{ fontSize:"0.8rem", fontWeight:600, color:"#A855F7", margin:0 }}>{t2}</p>
+          <div key={i} style={{ marginBottom:i<5?"0.55rem":0, paddingBottom:i<5?"0.55rem":0, borderBottom:i<5?`1px solid var(--city-kyoto-border)`:"none" }}>
+            <p style={{ fontSize:"0.8rem", fontWeight:600, color:"var(--city-kyoto)", margin:0 }}>{t2}</p>
             <p style={{ fontSize:"0.74rem", color:v("textSec",dark), marginTop:"0.1rem", lineHeight:1.45 }}>{d}</p>
           </div>
         ))}
       </InfoCard>
-      <InfoCard title="🇯🇵 Astuces Japon pratiques" color="#0EA5E9" headerBg={t("#F0F9FF","#0C1F35")}>
+      <InfoCard title="🇯🇵 Astuces Japon pratiques" color="var(--info)" headerBg="var(--info-soft)">
         {[
           ["🛍 TAX-FREE (détaxe immédiate en magasin)","Dès 5 000¥ HT d'achats dans un même magasin estampillé 'Tax Free Shop' (environ 7% de réduction immédiate en caisse sur les produits éligibles). Présenter le passeport — obligatoire, pas de photocopie acceptée. Les articles sont scellés dans un sac transparent avec reçu agrafé : NE PAS OUVRIR avant de quitter le Japon. Magasins majeurs : Don Quijote, BicCamera, Yodobashi, grands magasins Isetan/Takashimaya. Ne s'applique pas aux cafés et restaurants."],
           ["📅 FERMETURES HEBDO — À VÉRIFIER AVANT DE S'Y RENDRE","La plupart des musées ferment le LUNDI (Tokyo National Museum, Nezu, Roppongi Mori Art, Shibuya Parco, Kyoto National Museum). Ghibli Museum : fermé MARDI. Hama-Rikyu Garden : ouvert tous les jours. TeamLab Planets : pas de fermeture hebdo fixe, vérifier sur le site. Temples et sanctuaires shinto : ouverts 7j/7 (certains bâtiments intérieurs peuvent fermer mais l'enceinte reste accessible). Astuce : chercher le site officiel + jour de la semaine avant de se déplacer, surtout en Golden Week où les jours fériés peuvent décaler les fermetures habituelles."],
@@ -5416,13 +5416,13 @@ function InfoSection() {
           ["🏥 HOSPITAL & MÉDECIN — Si besoin sur place","AMDA Helpline (FR/EN/ES 24h/7) : +81-3-6233-9266 — oriente vers les hôpitaux anglophones/francophones les plus proches.\n\nHôpitaux avec services internationaux :\n• Tokyo : St. Luke's International Hospital (Tsukiji), Tokyo Midtown Clinic (Roppongi)\n• Kyoto : Kyoto University Hospital (Sakyo-ku)\n• Osaka : Osaka University Hospital (Suita)\n\nGarder toujours sur soi : passeport + attestation d'assurance voyage (photo dans téléphone) + nom du médicament en nom DCI international (ibuprofène, paracétamol — pas les marques FR). Les pharmacies ne vendent PAS les antibiotiques sans ordonnance : Doliprane ≈ Tylenol japonais (acetaminophène 500mg)."],
           ["🚄 SHINKANSEN — RÉSERVATIONS GOLDEN WEEK","Les sièges réservés (shiteiseki) sont indispensables pendant la Golden Week — les wagons non-réservés (jiyūseki) sont saturés début (27-29 avril) et fin (5-6 mai).\n\nRÉSERVER GRATUITEMENT avec le JR Pass :\n• Guichet Midori no Madoguchi (みどりの窓口) dans toutes les gares JR majeures\n• App EKINET (https://www.eki-net.com) pour les utilisateurs de JR East\n• App SmartEX (https://smart-ex.jp) pour Tokaido Shinkansen\n\nPRIORITÉ J1 à Tokyo : réserver TOUS les Shinkansen du voyage en une fois au guichet JR dès l'activation du pass à Haneda ou à Tokyo Station. Phrases utiles : 'Hikari, Tokyo kara Kyoto, gogatsu mikka, sannin, madogawa onegaishimasu' (Hikari, Tokyo à Kyoto, 3 mai, 3 personnes, côté fenêtre s'il vous plaît).\n\n⚠️ JR Pass ne couvre PAS : Nozomi, Mizuho. Prendre Hikari ou Kodama (plus lents mais gratuits)."],
         ].map(([t2,d],i)=>(
-          <div key={i} style={{ marginBottom:i<4?"0.75rem":0, paddingBottom:i<4?"0.75rem":0, borderBottom:i<4?`1px solid ${dark?"#1D4E8A":"#DBEAFE"}`:"none" }}>
-            <p style={{ fontSize:"0.8rem", fontWeight:600, color:"#0EA5E9", margin:0 }}>{t2}</p>
+          <div key={i} style={{ marginBottom:i<4?"0.75rem":0, paddingBottom:i<4?"0.75rem":0, borderBottom:i<4?`1px solid var(--info-bdr)`:"none" }}>
+            <p style={{ fontSize:"0.8rem", fontWeight:600, color:"var(--info)", margin:0 }}>{t2}</p>
             <p style={{ fontSize:"0.74rem", color:v("textSec",dark), marginTop:"0.15rem", lineHeight:1.5, whiteSpace:"pre-line" }}>{d}</p>
           </div>
         ))}
       </InfoCard>
-      <InfoCard title="🎌 Codes Culturels" color={dark?"#F1F0EE":"#374151"} headerBg={t("#F9FAFB","#1A1A1A")}>
+      <InfoCard title="🎌 Codes Culturels" color="var(--text-primary)" headerBg="var(--bg-card-2)">
         {[
           "💴 CASH : Retirer dans les ATM verts Japan Post Bank ou ATM 7-Eleven (logo rouge). Les distributeurs BNP/Société Générale ne fonctionnent pas. PIN 4 chiffres. Garder 10 000¥ minimum sur soi en permanence.",
           "🍽 RESTAURANTS : Attendre toujours d'être placé (même si c'est vide). 'Itadakimasu' avant de manger. Aucun pourboire — c'est vraiment offensant. Paiement à la caisse en sortant dans 80% des cas. Mettre l'argent dans le plateau (pas en main).",
