@@ -3327,7 +3327,7 @@ function ConverterCard() {
   const reset = () => { setYen(""); setEur(""); };
   const inp = { border:`1px solid ${v("borderLight",dark)}`, borderRadius:"8px", padding:"0.5rem 0.65rem", background:v("cardBg2",dark), color:v("textPrimary",dark), fontSize:"1.1rem", fontWeight:600, width:"100%", outline:"none", fontFamily:"inherit", boxSizing:"border-box" };
   return (
-    <InfoCard title="💴 Convertisseur ¥ / €" color="#F59E0B" headerBg={t("#FFFBEB","#1C1400")}>
+    <InfoCard title="💴 Convertisseur ¥ / €" color="var(--gold)" headerBg="var(--gold-soft)">
       <div style={{ display:"flex", gap:"0.5rem", marginBottom:"0.75rem", alignItems:"center" }}>
         <div style={{ flex:1 }}>
           <label style={{ fontSize:"0.7rem", color:v("textMuted",dark), display:"block", marginBottom:"0.2rem", fontWeight:600, letterSpacing:"0.06em" }}>YEN ¥</label>
@@ -3341,7 +3341,7 @@ function ConverterCard() {
       </div>
       <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", marginBottom:"0.4rem" }}>
         <span style={{ fontSize:"0.72rem", color:v("textSec",dark), whiteSpace:"nowrap" }}>Taux : 1€ =</span>
-        <input type="number" value={rate} onChange={e=>handleRate(e.target.value)} style={{ ...inp, fontSize:"0.85rem", width:"80px", fontWeight:700, color:"#F59E0B" }} />
+        <input type="number" value={rate} onChange={e=>handleRate(e.target.value)} style={{ ...inp, fontSize:"0.85rem", width:"80px", fontWeight:700, color:"var(--gold)" }} />
         <span style={{ fontSize:"0.72rem", color:v("textSec",dark) }}>¥</span>
         <button onClick={reset} style={{ marginLeft:"auto", fontSize:"0.7rem", color:v("textMuted",dark), background:"transparent", border:`1px solid ${v("borderLight",dark)}`, borderRadius:"6px", padding:"0.25rem 0.6rem", cursor:"pointer", fontFamily:"inherit" }}>Réinitialiser</button>
       </div>
@@ -3358,7 +3358,7 @@ function ConverterCard() {
           {refs.map((r,i) => (
             <div key={i} style={{ display:"flex", justifyContent:"space-between", fontSize:"0.72rem", padding:"0.25rem 0.5rem", background:v("cardBg2",dark), borderRadius:"6px" }}>
               <span style={{ color:v("textSec",dark) }}>{r.label}</span>
-              <span style={{ fontWeight:600, color:"#F59E0B" }}>{(r.yen/rate).toFixed(2)}€</span>
+              <span style={{ fontWeight:600, color:"var(--gold)" }}>{(r.yen/rate).toFixed(2)}€</span>
             </div>
           ))}
         </div>
@@ -3419,14 +3419,14 @@ function DepartureChecklist() {
   const done = checked.size;
   const pct = Math.round((done/total)*100);
   return (
-    <InfoCard title="✅ Checklist départ" color="#10B981" headerBg={t("#ECFDF5","#0A1E12")}>
+    <InfoCard title="✅ Checklist départ" color="var(--success)" headerBg="var(--success-soft)">
       <div style={{ marginBottom:"0.75rem" }}>
         <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"0.3rem" }}>
           <span style={{ fontSize:"0.75rem", fontWeight:600, color:v("textPrimary",dark) }}>{done} / {total} tâches</span>
-          <span style={{ fontSize:"0.75rem", color:"#10B981", fontWeight:700 }}>{pct}%</span>
+          <span style={{ fontSize:"0.75rem", color:"var(--success)", fontWeight:700 }}>{pct}%</span>
         </div>
         <div style={{ height:"6px", borderRadius:"3px", background:v("borderLight",dark), overflow:"hidden" }}>
-          <div style={{ height:"100%", width:`${pct}%`, background:"linear-gradient(90deg,#10B981,#34D399)", borderRadius:"3px", transition:"width 0.3s ease" }} />
+          <div style={{ height:"100%", width:`${pct}%`, background:"linear-gradient(90deg, var(--success), var(--success))", borderRadius:"3px", transition:"width 0.3s ease" }} />
         </div>
       </div>
       {ITEMS.map((cat, ci) => (
@@ -3436,9 +3436,9 @@ function DepartureChecklist() {
             const key = `${ci}-${ii}`;
             const isChecked = checked.has(key);
             return (
-              <div key={ii} onClick={() => toggle(key)} style={{ display:"flex", alignItems:"flex-start", gap:"0.5rem", padding:"0.3rem 0.4rem", borderRadius:"6px", cursor:"pointer", marginBottom:"0.15rem", background: isChecked ? (dark?"rgba(16,185,129,0.1)":"rgba(16,185,129,0.08)") : "transparent", transition:"background 0.15s" }}>
-                <div style={{ flexShrink:0, width:"1rem", height:"1rem", borderRadius:"4px", border:`1.5px solid ${isChecked?"#10B981":v("borderLight",dark)}`, background: isChecked ? "#10B981" : "transparent", display:"flex", alignItems:"center", justifyContent:"center", marginTop:"1px", transition:"all 0.15s" }}>
-                  {isChecked && <span style={{ color:"white", fontSize:"0.7rem", fontWeight:800, lineHeight:1 }}>✓</span>}
+              <div key={ii} onClick={() => toggle(key)} style={{ display:"flex", alignItems:"flex-start", gap:"0.5rem", padding:"0.3rem 0.4rem", borderRadius:"6px", cursor:"pointer", marginBottom:"0.15rem", background: isChecked ? "var(--success-soft)" : "transparent", transition:"background 0.15s" }}>
+                <div style={{ flexShrink:0, width:"1rem", height:"1rem", borderRadius:"4px", border:`1.5px solid ${isChecked?"var(--success)":"var(--border-light)"}`, background: isChecked ? "var(--success)" : "transparent", display:"flex", alignItems:"center", justifyContent:"center", marginTop:"1px", transition:"all 0.15s" }}>
+                  {isChecked && <span style={{ color:"var(--header-ink)", fontSize:"0.7rem", fontWeight:800, lineHeight:1 }}>✓</span>}
                 </div>
                 <span style={{ fontSize:"0.74rem", color: isChecked ? v("textMuted",dark) : v("textSec",dark), textDecoration: isChecked ? "line-through" : "none", lineHeight:1.4, transition:"all 0.15s" }}>{item}</span>
               </div>
@@ -3530,7 +3530,7 @@ function LiveWeatherCard() {
   const staleCache = error && data?.fetchedAt && (Date.now() - data.fetchedAt) > 24 * 3600 * 1000;
 
   return (
-    <InfoCard title="🌐 Météo live (7 prochains jours)" color="#0EA5E9" headerBg={t("#F0F9FF","#0C1F35")}>
+    <InfoCard title="🌐 Météo live (7 prochains jours)" color="var(--info)" headerBg="var(--info-soft)">
       <p style={{ fontSize:"0.7rem", color:v("textMuted",dark), margin:"0 0 0.6rem" }}>
         Source : Open-Meteo (gratuit, sans clé) • {loading && !data ? "chargement…" : ageText ? `MAJ ${ageText}` : ""}
         {error && data ? " • hors-ligne (cache)" : ""}
@@ -3539,9 +3539,9 @@ function LiveWeatherCard() {
       {staleCache && (
         <p style={{
           fontSize:"0.72rem",
-          color: dark ? "#FCD34D" : "#92400E",
-          background: dark ? "#1C1400" : "#FFFBEB",
-          border: `1px solid ${dark ? "#78350F" : "#FDE68A"}`,
+          color:"var(--warning)",
+          background:"var(--warning-soft)",
+          border:"1px solid var(--warning-bdr)",
           borderRadius: "6px",
           padding: "0.4rem 0.55rem",
           margin: "0 0 0.6rem",
@@ -3554,7 +3554,7 @@ function LiveWeatherCard() {
         <p style={{ fontSize:"0.75rem", color:v("textSec",dark) }}>Chargement des prévisions…</p>
       )}
       {!data && !loading && error && (
-        <p style={{ fontSize:"0.75rem", color:"#DC2626" }}>
+        <p style={{ fontSize:"0.75rem", color:"var(--danger)" }}>
           Impossible de charger la météo ({error}). Vérifiez la connexion — les prévisions seront affichées ici.
         </p>
       )}
@@ -3579,7 +3579,7 @@ function LiveWeatherCard() {
                     title={wmo.lbl}
                     style={{
                       textAlign:"center",
-                      background: dark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)",
+                      background:"var(--section-bg)",
                       borderRadius:"6px",
                       padding:"0.35rem 0.15rem",
                     }}
@@ -3591,7 +3591,7 @@ function LiveWeatherCard() {
                     <div style={{ fontSize:"0.66rem", fontWeight:700, color:v("textPrimary",dark) }}>
                       {tmax}°<span style={{ color:v("textMuted",dark), fontWeight:500 }}>/{tmin}°</span>
                     </div>
-                    <div style={{ fontSize:"0.58rem", color: rain >= 50 ? "#3B7EFF" : v("textMuted",dark) }}>
+                    <div style={{ fontSize:"0.58rem", color: rain >= 50 ? "var(--info)" : v("textMuted",dark) }}>
                       💧{rain}%
                     </div>
                   </div>
@@ -3608,26 +3608,26 @@ function LiveWeatherCard() {
 function MeteoSection() {
   const dark = useDark();
   const METEO = [
-    { city:"Tokyo 🗼", color:"#3B7EFF", bg: t("#EEF2FF","#1A2340"), border: t("#93C5FD","#2D4A7A"),
+    { city:"Tokyo 🗼", color:"var(--city-tokyo)", bg:"var(--city-tokyo-wash)", border:"var(--city-tokyo-border)",
       weeks:[
         { label:"27 avr — 3 mai (Golden Week)", icon:"🌤", tmin:15, tmax:22, pluie:25, humidite:60, soleil:"7h/j", note:"Douceur printanière. Possible averses courtes. Veste légère le matin." },
         { label:"4 — 10 mai", icon:"☀️", tmin:17, tmax:24, pluie:15, humidite:55, soleil:"8h/j", note:"Plein printemps. Le meilleur moment de l'année à Tokyo. Journées parfaites." },
       ]
     },
-    { city:"Kyoto ⛩", color:"#A855F7", bg: t("#F5F3FF","#231840"), border: t("#C4B5FD","#4A3070"),
+    { city:"Kyoto ⛩", color:"var(--city-kyoto)", bg:"var(--city-kyoto-wash)", border:"var(--city-kyoto-border)",
       weeks:[
         { label:"4 — 7 mai (Golden Week fin)", icon:"🌤", tmin:14, tmax:23, pluie:30, humidite:65, soleil:"6h/j", note:"Printemps tardif plus humide. Un imperméable léger reste utile." },
         { label:"7 — 10 mai", icon:"⛅", tmin:16, tmax:25, pluie:20, humidite:58, soleil:"7h/j", note:"Temperatures en hausse. Idéal pour les balades tôt le matin." },
       ]
     },
-    { city:"Osaka 🎡", color:"#F97316", bg: t("#FFF7ED","#251200"), border: t("#FCA572","#5C2D00"),
+    { city:"Osaka 🎡", color:"var(--city-osaka)", bg:"var(--city-osaka-wash)", border:"var(--city-osaka-border)",
       weeks:[
         { label:"7 — 11 mai", icon:"☀️", tmin:17, tmax:26, pluie:18, humidite:57, soleil:"8h/j", note:"Chaud et ensoleillé. Crème solaire obligatoire. Parfait pour l'extérieur." },
       ]
     },
   ];
   const VALISE = [
-    { cat:"👗 Vêtements", color:"#3B7EFF", items:[
+    { cat:"👗 Vêtements", color:"var(--city-tokyo)", items:[
       "🧥 Veste légère imperméable — obligatoire (averses courtes imprévisibles)",
       "🧣 Pull ou cardigan pour les matins frais (15°C à l'aube)",
       "👕 T-shirts légers × 5-6 (chaleur de 22-26°C l'après-midi)",
@@ -3636,7 +3636,7 @@ function MeteoSection() {
       "👟 Chaussures ultra-confortables (15 000-20 000 pas/jour minimum)",
       "🩴 Sandales ou slip-ons faciles à enlever (temples multiples/jour)",
     ]},
-    { cat:"🎒 Accessoires voyage", color:"#10B981", items:[
+    { cat:"🎒 Accessoires voyage", color:"var(--success)", items:[
       "🔌 Adaptateur prise japonaise Type A (2 fiches plates, comme USA — 100V. iPhone/MacBook compatibles, sèche-cheveux français = non)",
       "🔋 Batterie externe 20 000 mAh (journées de 12h sans recharge, GPS drain la batterie)",
       "☂️ Parapluie compact pliant (indispensable, vente partout à 600¥ si oublié — distributeurs dans les konbinis)",
@@ -3646,7 +3646,7 @@ function MeteoSection() {
       "🧻 Petite serviette / tenugui — les toilettes publiques japonaises n'ont ni sèche-main ni essuie-tout",
       "🧦 Chaussettes sans trous — inspectées visuellement dans temples et ryokan",
     ]},
-    { cat:"💊 Santé & Pharmacie", color:"#F59E0B", items:[
+    { cat:"💊 Santé & Pharmacie", color:"var(--gold)", items:[
       "🌞 Crème solaire SPF 50+ — UV forts en mai au Japon (indice UV 8-9, + fort qu'en France)",
       "💊 Anti-diarrhéiques (changement alimentaire radical)",
       "🤢 Médicaments mal des transports si shinkansen à haute vitesse",
@@ -3659,7 +3659,7 @@ function MeteoSection() {
       "🧴 Déodorant : très peu vendu au Japon et formulations douces — apporter de France si sensible",
       "🪥 Brosse à dents + dentifrice : l'hôtel en fournit systématiquement (kit à côté de l'évier), à utiliser",
     ]},
-    { cat:"📄 Documents essentiels", color:"#DC2626", items:[
+    { cat:"📄 Documents essentiels", color:"var(--danger)", items:[
       "🛂 Passeports valables 6 mois minimum après la date de retour",
       "📋 Assurance voyage avec numéro d'urgence accessible offline",
       "🎫 JR Pass physique ou QR Code — jamais dans la valise en soute",
@@ -3667,7 +3667,7 @@ function MeteoSection() {
       "🏦 Numéro d'opposition carte bancaire noté séparément du portefeuille",
       "📞 Numéro ambassade de France Tokyo : +81-3-5798-6000",
     ]},
-    { cat:"📱 Applications à installer avant le départ", color:"#7C3AED", items:[
+    { cat:"📱 Applications à installer avant le départ", color:"var(--city-kyoto)", items:[
       "Google Maps — télécharger cartes offline Tokyo, Kyoto, Osaka, Nara (Menu → Cartes hors connexion)",
       "Google Translate — télécharger pack japonais pour utilisation offline (Paramètres → Traduction hors connexion)",
       "Navitime Japan Travel — le meilleur pour les transports voyageurs (métro + JR + bus), interface FR, comparaison JR Pass",
@@ -3737,12 +3737,12 @@ function MeteoSection() {
       {/* MÉTÉO LIVE 7 JOURS (Lot 8) */}
       <LiveWeatherCard />
       {/* MÉTÉO CARTES */}
-      <InfoCard title="🌡 Météo semaine par semaine" color="#0EA5E9" headerBg={t("#F0F9FF","#0C1F35")}>
+      <InfoCard title="🌡 Météo semaine par semaine" color="var(--info)" headerBg="var(--info-soft)">
         {METEO.map((city, ci) => (
           <div key={ci} style={{ marginBottom: ci < METEO.length-1 ? "1rem" : 0 }}>
             <p style={{ fontSize:"0.82rem", fontWeight:700, color:city.color, margin:"0 0 0.5rem" }}>{city.city}</p>
             {city.weeks.map((w, wi) => (
-              <div key={wi} style={{ background:city.bg[dark?"dark":"light"], border:`1px solid ${city.border[dark?"dark":"light"]}`, borderRadius:"8px", padding:"0.6rem 0.75rem", marginBottom: wi < city.weeks.length-1 ? "0.4rem" : 0 }}>
+              <div key={wi} style={{ background:city.bg, border:`1px solid ${city.border}`, borderRadius:"8px", padding:"0.6rem 0.75rem", marginBottom: wi < city.weeks.length-1 ? "0.4rem" : 0 }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"0.4rem", flexWrap:"wrap", gap:"0.25rem" }}>
                   <span style={{ fontSize:"0.72rem", fontWeight:600, color:v("textPrimary",dark) }}>{w.label}</span>
                   <span style={{ fontSize:"1.2rem" }}>{w.icon}</span>
@@ -3754,7 +3754,7 @@ function MeteoSection() {
                     { ico:"💧", val:`${w.humidite}%`, lbl:"Humidité" },
                     { ico:"☀️", val:w.soleil, lbl:"Soleil" },
                   ].map((s,si) => (
-                    <div key={si} style={{ textAlign:"center", background:"rgba(0,0,0,0.06)", borderRadius:"6px", padding:"0.3rem 0.2rem" }}>
+                    <div key={si} style={{ textAlign:"center", background:"var(--section-bg)", borderRadius:"6px", padding:"0.3rem 0.2rem" }}>
                       <div style={{ fontSize:"0.85rem" }}>{s.ico}</div>
                       <div style={{ fontSize:"0.68rem", fontWeight:700, color:v("textPrimary",dark) }}>{s.val}</div>
                       <div style={{ fontSize:"0.68rem", color:v("textMuted",dark) }}>{s.lbl}</div>
@@ -3768,7 +3768,7 @@ function MeteoSection() {
         ))}
       </InfoCard>
       {/* VALISE */}
-      <InfoCard title="🧳 Que mettre dans sa valise ?" color="#7C3AED" headerBg={t("#F5F3FF","#1C0F2E")}>
+      <InfoCard title="🧳 Que mettre dans sa valise ?" color="var(--city-kyoto)" headerBg="var(--city-kyoto-wash)">
         {VALISE.map((cat, ci) => (
           <div key={ci} style={{ marginBottom: ci < VALISE.length-1 ? "0.85rem" : 0 }}>
             <p style={{ fontSize:"0.75rem", fontWeight:700, color:cat.color, margin:"0 0 0.35rem" }}>{cat.cat}</p>
@@ -3781,13 +3781,13 @@ function MeteoSection() {
         ))}
       </InfoCard>
       {/* URGENCES */}
-      <InfoCard title="🚨 Imprévus & Urgences" color="#DC2626" headerBg={t("#FEF2F2","#2D0A0A")}>
+      <InfoCard title="🚨 Imprévus & Urgences" color="var(--danger)" headerBg="var(--danger-soft)">
         {URGENCES.map((section, si) => (
           <div key={si} style={{ marginBottom: si < URGENCES.length-1 ? "0.9rem" : 0, paddingBottom: si < URGENCES.length-1 ? "0.9rem" : 0, borderBottom: si < URGENCES.length-1 ? `1px solid ${v("borderLight",dark)}` : "none" }}>
             <p style={{ fontSize:"0.78rem", fontWeight:700, color:v("textPrimary",dark), margin:"0 0 0.4rem" }}>{section.emoji} {section.titre}</p>
             {section.items.map((item, ii) => (
               <div key={ii} style={{ marginBottom:"0.3rem" }}>
-                <span style={{ fontSize:"0.72rem", fontWeight:600, color:"#DC2626" }}>{item.label} : </span>
+                <span style={{ fontSize:"0.72rem", fontWeight:600, color:"var(--danger)" }}>{item.label} : </span>
                 <span style={{ fontSize:"0.72rem", color:v("textSec",dark) }}>{item.val}</span>
                 {item.note && <span style={{ fontSize:"0.68rem", color:v("textMuted",dark), display:"block", marginLeft:"0.5rem" }}>→ {item.note}</span>}
               </div>
@@ -5356,10 +5356,12 @@ function DoAndDont() {
 
 function InfoCard({ title, color, headerBg, children }) {
   const dark = useDark();
+  // headerBg may be a plain string (CSS var) or legacy {light,dark} object.
+  const bg = typeof headerBg === "string" ? headerBg : headerBg?.[dark?"dark":"light"];
   return (
-    <div style={{ background:v("cardBg",dark), borderRadius:"12px", overflow:"hidden", boxShadow:dark?"0 1px 4px rgba(0,0,0,0.4)":"0 1px 4px rgba(0,0,0,0.07)", border:`1px solid ${v("border",dark)}`, transition:"background 0.3s" }}>
-      <div style={{ padding:"0.75rem 1rem", borderBottom:`1px solid ${v("borderLight",dark)}`, background:headerBg[dark?"dark":"light"] }}>
-        <h2 style={{ fontSize:"0.9rem", fontWeight:700, color, margin:0 }}>{title}</h2>
+    <div style={{ background:v("cardBg",dark), borderRadius:"12px", overflow:"hidden", boxShadow:"var(--shadow-card)", border:`1px solid ${v("border",dark)}`, transition:"background 0.3s" }}>
+      <div style={{ padding:"0.75rem 1rem", borderBottom:`1px solid ${v("borderLight",dark)}`, background:bg }}>
+        <h2 style={{ fontFamily:"var(--font-serif)", fontSize:"1rem", fontWeight:600, color, margin:0, letterSpacing:"-0.01em" }}>{title}</h2>
       </div>
       <div style={{ padding:"0.875rem 1rem" }}>{children}</div>
     </div>
