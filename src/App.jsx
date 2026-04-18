@@ -3820,9 +3820,9 @@ function OfflineBanner() {
   }, []);
   if (!offline) return null;
   return (
-    <div style={{ background:dark?"#14301E":"#DCFCE7", padding:"0.35rem 1rem", display:"flex", alignItems:"center", gap:"0.5rem", borderBottom:`1px solid ${dark?"#166534":"#BBF7D0"}` }}>
+    <div style={{ background:"var(--success-soft)", padding:"0.35rem 1rem", display:"flex", alignItems:"center", gap:"0.5rem", borderBottom:`1px solid var(--success-bdr)` }}>
       <span style={{ fontSize:"0.7rem" }}>🟢</span>
-      <span style={{ fontSize:"0.72rem", fontWeight:600, color:dark?"#4ADE80":"#166534" }}>Mode hors-ligne — toutes les données sont disponibles</span>
+      <span style={{ fontSize:"0.72rem", fontWeight:600, color:"var(--success)" }}>Mode hors-ligne — toutes les données sont disponibles</span>
     </div>
   );
 }
@@ -3874,14 +3874,14 @@ function InstallBanner() {
   // iOS manual tutorial
   if (showIOS && !prompt) {
     return (
-      <div style={{ background:dark?"#1A2340":"#EEF2FF", padding:"0.65rem 1rem", borderBottom:`1px solid ${dark?"#2D4A7A":"#93C5FD"}` }}>
+      <div style={{ background:"var(--info-soft)", padding:"0.65rem 1rem", borderBottom:`1px solid var(--info-bdr)` }}>
         <div style={{ display:"flex", alignItems:"center", gap:"0.5rem" }}>
           <span style={{ fontSize:"1rem" }}>🗾</span>
-          <div style={{ flex:1, fontSize:"0.75rem", fontWeight:600, color:dark?"#93C5FD":"#1E40AF", lineHeight:1.4 }}>
+          <div style={{ flex:1, fontSize:"0.75rem", fontWeight:600, color:"var(--info)", lineHeight:1.4 }}>
             Installer l'app : touchez <span style={{
               display:"inline-flex", alignItems:"center", justifyContent:"center",
               width:"1.2rem", height:"1.2rem", borderRadius:"4px",
-              background:dark?"#2D4A7A":"#BFDBFE", color:dark?"#BFDBFE":"#1E40AF",
+              background:"var(--info-bdr)", color:"var(--info)",
               fontSize:"0.7rem", verticalAlign:"middle", margin:"0 2px",
             }}>⎋</span> puis <strong>« Sur l'écran d'accueil »</strong>
           </div>
@@ -3904,15 +3904,15 @@ function InstallBanner() {
 
   // Android/Chrome prompt
   return (
-    <div style={{ background:dark?"#1A2340":"#EEF2FF", padding:"0.5rem 1rem", display:"flex", alignItems:"center", gap:"0.5rem", borderBottom:`1px solid ${dark?"#2D4A7A":"#93C5FD"}`, flexWrap:"wrap" }}>
+    <div style={{ background:"var(--info-soft)", padding:"0.5rem 1rem", display:"flex", alignItems:"center", gap:"0.5rem", borderBottom:`1px solid var(--info-bdr)`, flexWrap:"wrap" }}>
       <span style={{ fontSize:"0.9rem" }}>🗾</span>
-      <span style={{ fontSize:"0.75rem", fontWeight:600, color:dark?"#93C5FD":"#1E40AF", flex:1 }}>Installer l'app pour l'utiliser hors-ligne</span>
+      <span style={{ fontSize:"0.75rem", fontWeight:600, color:"var(--info)", flex:1 }}>Installer l'app pour l'utiliser hors-ligne</span>
       <button
         onClick={installAndroid}
         data-tap="action"
         style={{
-          fontSize:"0.82rem", fontWeight:700, color:"white",
-          background:"#1D4ED8", border:"none", borderRadius:"8px",
+          fontSize:"0.82rem", fontWeight:700, color:"var(--header-ink)",
+          background:"var(--info)", border:"none", borderRadius:"8px",
           cursor:"pointer", fontFamily:"inherit",
         }}
       >Installer</button>
@@ -4089,11 +4089,11 @@ function EmergencyFAB() {
         style={{
           position:"fixed", right:"1.1rem", zIndex:900,
           width:"3.5rem", height:"3.5rem", borderRadius:"50%",
-          background:"linear-gradient(135deg,#DC2626 0%,#991B1B 100%)",
+          background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)",
           border:"none", cursor:"pointer",
-          boxShadow:"0 4px 14px rgba(220,38,38,0.5), 0 2px 6px rgba(0,0,0,0.2)",
+          boxShadow:"0 4px 14px var(--accent-soft), 0 2px 6px rgba(0,0,0,0.2)",
           display:"flex", alignItems:"center", justifyContent:"center",
-          fontSize:"1.5rem", color:"white", fontFamily:"inherit",
+          fontSize:"1.5rem", color:"var(--header-ink)", fontFamily:"inherit",
           transition:"transform 0.15s",
         }}
         onTouchStart={e => { e.currentTarget.style.transform = "scale(0.92)"; }}
@@ -4123,7 +4123,7 @@ function EmergencyFAB() {
           }}>
             {/* HEADER */}
             <div style={{
-              background:"linear-gradient(135deg,#DC2626 0%,#991B1B 100%)",
+              background:"linear-gradient(135deg, var(--accent) 0%, var(--accent-deep) 100%)",
               padding:"1rem 1.1rem",
               display:"flex", alignItems:"center", gap:"0.75rem",
               position:"sticky", top:0, zIndex:10,
@@ -4131,16 +4131,16 @@ function EmergencyFAB() {
             }}>
               <span style={{ fontSize:"1.6rem" }}>🚨</span>
               <div style={{ flex:1 }}>
-                <h2 style={{ fontSize:"1.1rem", fontWeight:700, color:"white", margin:0 }}>Mode urgence</h2>
-                <p style={{ fontSize:"0.68rem", color:"rgba(255,255,255,0.85)", margin:"0.1rem 0 0" }}>Numéros, hôpitaux, phrases vitales</p>
+                <h2 style={{ fontFamily:"var(--font-serif)", fontSize:"1.1rem", fontWeight:600, color:"var(--header-ink)", margin:0, letterSpacing:"-0.01em" }}>Mode urgence</h2>
+                <p style={{ fontSize:"0.68rem", color:"rgba(243,238,224,0.85)", margin:"0.1rem 0 0" }}>Numéros, hôpitaux, phrases vitales</p>
               </div>
               <button
                 onClick={() => setOpen(false)}
                 aria-label="Fermer"
                 style={{
-                  background:"rgba(255,255,255,0.15)", border:"none",
+                  background:"rgba(243,238,224,0.18)", border:"none",
                   width:"2.4rem", height:"2.4rem", borderRadius:"50%",
-                  color:"white", fontSize:"1rem", cursor:"pointer",
+                  color:"var(--header-ink)", fontSize:"1rem", cursor:"pointer",
                   fontFamily:"inherit",
                 }}
               >✕</button>
@@ -4150,9 +4150,9 @@ function EmergencyFAB() {
             <div style={{ padding:"0.875rem", display:"flex", flexDirection:"column", gap:"0.875rem" }}>
 
               {/* NUMBERS — biggest, top */}
-              <div style={{ background:v("cardBg",dark), borderRadius:"12px", border:`2px solid #DC2626`, overflow:"hidden" }}>
-                <div style={{ padding:"0.65rem 0.875rem", background:dark?"#2D0A0A":"#FEE2E2", borderBottom:`1px solid ${dark?"#7F1D1D":"#FECACA"}` }}>
-                  <p style={{ fontSize:"0.78rem", fontWeight:700, color:dark?"#F87171":"#991B1B", margin:0 }}>📞 Numéros d'urgence (Japon)</p>
+              <div style={{ background:v("cardBg",dark), borderRadius:"12px", border:`2px solid var(--accent)`, overflow:"hidden" }}>
+                <div style={{ padding:"0.65rem 0.875rem", background:"var(--danger-soft)", borderBottom:`1px solid var(--danger-bdr)` }}>
+                  <p style={{ fontFamily:"var(--font-serif)", fontSize:"0.88rem", fontWeight:600, color:"var(--danger)", margin:0, letterSpacing:"-0.01em" }}>📞 Numéros d'urgence (Japon)</p>
                 </div>
                 {EMERGENCY_NUMBERS.map((n, i) => (
                   <a
@@ -4166,7 +4166,7 @@ function EmergencyFAB() {
                   >
                     <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:"0.5rem", marginBottom:"0.15rem" }}>
                       <span style={{ fontSize:"0.88rem", fontWeight:700, color:v("textPrimary",dark) }}>{n.label}</span>
-                      <span style={{ fontSize:"1.25rem", fontWeight:800, color:"#DC2626" }}>{n.tel}</span>
+                      <span style={{ fontFamily:"var(--font-serif)", fontSize:"1.3rem", fontWeight:700, color:"var(--danger)" }}>{n.tel}</span>
                     </div>
                     <p style={{ fontSize:"0.68rem", color:v("textSec",dark), margin:0, lineHeight:1.4 }}>{n.note}</p>
                   </a>
@@ -4176,10 +4176,10 @@ function EmergencyFAB() {
               {/* PERSONAL INFO CARD — to show to staff / paramedics */}
               <div style={{ background:v("cardBg",dark), borderRadius:"12px", border:`1px solid ${v("border",dark)}`, overflow:"hidden" }}>
                 <div style={{ padding:"0.65rem 0.875rem", background:v("sectionBg",dark), borderBottom:`1px solid ${v("borderLight",dark)}`, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-                  <p style={{ fontSize:"0.78rem", fontWeight:700, color:v("textPrimary",dark), margin:0 }}>🆔 Mes infos (à montrer)</p>
+                  <p style={{ fontFamily:"var(--font-serif)", fontSize:"0.88rem", fontWeight:600, color:v("textPrimary",dark), margin:0, letterSpacing:"-0.01em" }}>🆔 Mes infos (à montrer)</p>
                   <button
                     onClick={() => setEditing(e => !e)}
-                    style={{ fontSize:"0.7rem", color:"#0369A1", background:"transparent", border:`1px solid #0369A1`, borderRadius:"6px", padding:"0.2rem 0.55rem", cursor:"pointer", fontFamily:"inherit" }}
+                    style={{ fontSize:"0.7rem", color:"var(--info)", background:"transparent", border:`1px solid var(--info)`, borderRadius:"6px", padding:"0.2rem 0.55rem", cursor:"pointer", fontFamily:"inherit" }}
                   >{editing ? "✓ Enregistrer" : "✏️ Modifier"}</button>
                 </div>
                 <div style={{ padding:"0.875rem", display:"flex", flexDirection:"column", gap:"0.6rem" }}>
@@ -4233,14 +4233,14 @@ function EmergencyFAB() {
                         <p style={{ fontSize:"0.72rem", color:v("textSec",dark), margin:"0.1rem 0 0" }}>{personal.hotelAddressFR}</p>
                         <button
                           onClick={() => copyText(personal.hotelAddressJP, "hotel-jp")}
-                          style={{ marginTop:"0.4rem", fontSize:"0.7rem", color:copied==="hotel-jp"?"#10B981":"#0369A1", background:"transparent", border:`1px solid ${copied==="hotel-jp"?"#10B981":"#0369A1"}`, borderRadius:"6px", padding:"0.25rem 0.55rem", cursor:"pointer", fontFamily:"inherit" }}
+                          style={{ marginTop:"0.4rem", fontSize:"0.7rem", color:copied==="hotel-jp"?"var(--success)":"var(--info)", background:"transparent", border:`1px solid ${copied==="hotel-jp"?"var(--success)":"var(--info)"}`, borderRadius:"6px", padding:"0.25rem 0.55rem", cursor:"pointer", fontFamily:"inherit" }}
                         >{copied==="hotel-jp" ? "✓ Copié" : "📋 Copier adresse JP"}</button>
                       </div>
                       {(personal.allergies || personal.bloodType) && (
                         <div style={{ paddingTop:"0.5rem", borderTop:`1px solid ${v("borderLight",dark)}` }}>
                           {personal.allergies && (
                             <p style={{ fontSize:"0.78rem", margin:"0 0 0.25rem", color:v("textPrimary",dark) }}>
-                              <span style={{ fontWeight:700, color:"#DC2626" }}>⚠️ Allergies :</span> {personal.allergies}
+                              <span style={{ fontWeight:700, color:"var(--danger)" }}>⚠️ Allergies :</span> {personal.allergies}
                             </p>
                           )}
                           {personal.bloodType && (
@@ -4255,7 +4255,7 @@ function EmergencyFAB() {
                           <p style={{ fontSize:"0.7rem", color:v("textMuted",dark), margin:0, textTransform:"uppercase", letterSpacing:"0.04em", fontWeight:600 }}>Contact d'urgence</p>
                           <p style={{ fontSize:"0.82rem", fontWeight:600, color:v("textPrimary",dark), margin:"0.1rem 0 0" }}>{personal.emergencyContactName}</p>
                           {personal.emergencyContactTel && (
-                            <a href={telLink(personal.emergencyContactTel)} style={{ fontSize:"0.88rem", fontWeight:700, color:"#0369A1", textDecoration:"none" }}>{personal.emergencyContactTel}</a>
+                            <a href={telLink(personal.emergencyContactTel)} style={{ fontSize:"0.88rem", fontWeight:700, color:"var(--info)", textDecoration:"none" }}>{personal.emergencyContactTel}</a>
                           )}
                         </div>
                       )}
@@ -4277,7 +4277,7 @@ function EmergencyFAB() {
               {/* CRITICAL PHRASES with audio */}
               <div style={{ background:v("cardBg",dark), borderRadius:"12px", border:`1px solid ${v("border",dark)}`, overflow:"hidden" }}>
                 <div style={{ padding:"0.65rem 0.875rem", background:v("sectionBg",dark), borderBottom:`1px solid ${v("borderLight",dark)}` }}>
-                  <p style={{ fontSize:"0.78rem", fontWeight:700, color:v("textPrimary",dark), margin:0 }}>🗣 Phrases vitales</p>
+                  <p style={{ fontFamily:"var(--font-serif)", fontSize:"0.88rem", fontWeight:600, color:v("textPrimary",dark), margin:0, letterSpacing:"-0.01em" }}>🗣 Phrases vitales</p>
                   <p style={{ fontSize:"0.7rem", color:v("textMuted",dark), margin:"0.15rem 0 0" }}>Appuyer sur 🔊 pour que votre téléphone les prononce en japonais</p>
                 </div>
                 {EMERGENCY_PHRASES.map((p, i) => (
@@ -4290,11 +4290,11 @@ function EmergencyFAB() {
                         <button
                           onClick={() => speakJapanese(p.jp)}
                           aria-label={`Prononcer ${p.fr}`}
-                          style={{ fontSize:"0.7rem", padding:"0.28rem 0.55rem", borderRadius:"6px", border:`1px solid #0369A1`, background:"transparent", color:"#0369A1", cursor:"pointer", fontFamily:"inherit" }}
+                          style={{ fontSize:"0.7rem", padding:"0.28rem 0.55rem", borderRadius:"6px", border:`1px solid var(--info)`, background:"transparent", color:"var(--info)", cursor:"pointer", fontFamily:"inherit" }}
                         >🔊 Lire</button>
                         <button
                           onClick={() => copyText(p.jp, `phrase-${i}`)}
-                          style={{ fontSize:"0.7rem", padding:"0.28rem 0.55rem", borderRadius:"6px", border:`1px solid ${copied===`phrase-${i}`?"#10B981":v("borderLight",dark)}`, background:"transparent", color:copied===`phrase-${i}`?"#10B981":v("textMuted",dark), cursor:"pointer", fontFamily:"inherit" }}
+                          style={{ fontSize:"0.7rem", padding:"0.28rem 0.55rem", borderRadius:"6px", border:`1px solid ${copied===`phrase-${i}`?"var(--success)":v("borderLight",dark)}`, background:"transparent", color:copied===`phrase-${i}`?"var(--success)":v("textMuted",dark), cursor:"pointer", fontFamily:"inherit" }}
                         >{copied===`phrase-${i}` ? "✓" : "📋"}</button>
                       </div>
                     </div>
@@ -4305,12 +4305,12 @@ function EmergencyFAB() {
               {/* CONSULATES */}
               <div style={{ background:v("cardBg",dark), borderRadius:"12px", border:`1px solid ${v("border",dark)}`, overflow:"hidden" }}>
                 <div style={{ padding:"0.65rem 0.875rem", background:v("sectionBg",dark), borderBottom:`1px solid ${v("borderLight",dark)}` }}>
-                  <p style={{ fontSize:"0.78rem", fontWeight:700, color:v("textPrimary",dark), margin:0 }}>🇫🇷 Représentations françaises</p>
+                  <p style={{ fontFamily:"var(--font-serif)", fontSize:"0.88rem", fontWeight:600, color:v("textPrimary",dark), margin:0, letterSpacing:"-0.01em" }}>🇫🇷 Représentations françaises</p>
                 </div>
                 {EMERGENCY_CONSULATES.map((c, i) => (
                   <div key={i} style={{ padding:"0.8rem 0.875rem", borderBottom: i < EMERGENCY_CONSULATES.length - 1 ? `1px solid ${v("borderLight",dark)}` : "none" }}>
                     <p style={{ fontSize:"0.8rem", fontWeight:700, color:v("textPrimary",dark), margin:"0 0 0.2rem" }}>{c.label}</p>
-                    <a href={telLink(c.tel)} style={{ fontSize:"0.92rem", fontWeight:700, color:"#0369A1", textDecoration:"none", display:"block", marginBottom:"0.15rem" }}>📞 {c.tel}</a>
+                    <a href={telLink(c.tel)} style={{ fontSize:"0.92rem", fontWeight:700, color:"var(--info)", textDecoration:"none", display:"block", marginBottom:"0.15rem" }}>📞 {c.tel}</a>
                     <p style={{ fontSize:"0.7rem", color:v("textSec",dark), margin:"0 0 0.25rem", lineHeight:1.4 }}>{c.addr}</p>
                     <p style={{ fontSize:"0.68rem", color:v("textMuted",dark), margin:0, lineHeight:1.4, fontStyle:"italic" }}>{c.note}</p>
                   </div>
@@ -4320,7 +4320,7 @@ function EmergencyFAB() {
               {/* HOSPITALS */}
               <div style={{ background:v("cardBg",dark), borderRadius:"12px", border:`1px solid ${v("border",dark)}`, overflow:"hidden" }}>
                 <div style={{ padding:"0.65rem 0.875rem", background:v("sectionBg",dark), borderBottom:`1px solid ${v("borderLight",dark)}` }}>
-                  <p style={{ fontSize:"0.78rem", fontWeight:700, color:v("textPrimary",dark), margin:0 }}>🏥 Hôpitaux english-friendly</p>
+                  <p style={{ fontFamily:"var(--font-serif)", fontSize:"0.88rem", fontWeight:600, color:v("textPrimary",dark), margin:0, letterSpacing:"-0.01em" }}>🏥 Hôpitaux english-friendly</p>
                 </div>
                 {["Tokyo","Kyoto","Osaka"].map((city) => (
                   <div key={city} style={{ borderBottom:`1px solid ${v("borderLight",dark)}` }}>
@@ -4328,7 +4328,7 @@ function EmergencyFAB() {
                     {EMERGENCY_HOSPITALS.filter(h => h.city === city).map((h, i) => (
                       <div key={i} style={{ padding:"0.5rem 0.875rem 0.75rem" }}>
                         <p style={{ fontSize:"0.78rem", fontWeight:600, color:v("textPrimary",dark), margin:"0 0 0.15rem" }}>{h.name}</p>
-                        <a href={telLink(h.tel)} style={{ fontSize:"0.85rem", fontWeight:700, color:"#0369A1", textDecoration:"none", display:"block", marginBottom:"0.1rem" }}>📞 {h.tel}</a>
+                        <a href={telLink(h.tel)} style={{ fontSize:"0.85rem", fontWeight:700, color:"var(--info)", textDecoration:"none", display:"block", marginBottom:"0.1rem" }}>📞 {h.tel}</a>
                         <p style={{ fontSize:"0.68rem", color:v("textSec",dark), margin:"0 0 0.2rem", lineHeight:1.4 }}>{h.addr}</p>
                         <p style={{ fontSize:"0.7rem", color:v("textMuted",dark), margin:0, lineHeight:1.35, fontStyle:"italic" }}>{h.note}</p>
                       </div>
