@@ -465,37 +465,37 @@ const DAYS = [
 
 // ─── CHECKLIST ──────────────────────────────────────────────────
 const CHECKLIST = [
-  { cat:"🎟 Activités — Déjà confirmées", color:"#22C55E", items:[
+  { cat:"🎟 Activités — Déjà confirmées", color:"var(--success)", items:[
     { name:"Tokyo Skytree", date:"28 avril — 18h00", platform:"tokyo-skytree.jp", status:"ok", note:"" },
     { name:"TeamLab Planets Tokyo (Toyosu)", date:"30 avril — 15h00", platform:"teamlab.art", status:"ok", note:"" },
     { name:"Universal Studios Japan", date:"8 mai — journée", platform:"usj.co.jp", status:"ok", note:"" },
   ]},
-  { cat:"🔴 Urgence absolue — Réserver maintenant", color:"#F87171", items:[
+  { cat:"🔴 Urgence absolue — Réserver maintenant", color:"var(--danger)", items:[
     { name:"Shibuya Sky (Scramble Square)", date:"30 avril — 19h00", platform:"shibuya-scramble-square.com", status:"ok", note:"✅ Réservation confirmée (3 adultes)" },
     { name:"Kittan Hibiki — Wagyu Yakiniku Osaka", date:"Soir du 9 mai (J13)", platform:"Tablecheck.com ou Tableall.com — chercher Kittan Hibiki Osaka", status:"book", note:"Réserver plusieurs semaines à l'avance" },
     { name:"Gion Tanto — Cuisine kyotoïte machiya", date:"Soir du 4 ou 6 mai", platform:"Tablecheck ou contact direct", status:"book", note:"Délai minimum 2-3 semaines — urgent" },
     { name:"Kichi Kichi Omurice — Chef Yukimura", date:"Soir du 5 mai", platform:"kichikichi.co.jp ou DM Instagram @kichikichi_yukimura", status:"book", note:"6 places seulement — tenter tous les canaux" },
     { name:"Hôtel nuit du 10 mai (proche Haneda)", date:"10 → 11 mai", platform:"Booking.com / Agoda / hotel direct", status:"book", note:"Haneda Excel Hotel Tokyu ou Keikyu EX Inn Haneda" },
   ]},
-  { cat:"🟠 Important — Faire dès l'arrivée au Japon", color:"#FB923C", items:[
+  { cat:"🟠 Important — Faire dès l'arrivée au Japon", color:"var(--accent)", items:[
     { name:"Sièges Shinkansen Tokyo→Kyoto (3 mai)", date:"Dès activation JR Pass — PRIORITÉ J1", platform:"Guichet 'みどりの窓口' (Midori no Madoguchi)", status:"book", note:"Dire: Hikari, Tokyo kara Kyoto, san-gatsu, sannin, madogawa onegaishimasu" },
     { name:"Sièges Shinkansen Kyoto→Osaka (7 mai) + Osaka→Tokyo (10 mai)", date:"Idem — J1 ou J2", platform:"Guichet JR en gare", status:"book", note:"" },
     { name:"Compte USJ App + Entry Pass Nintendo World", date:"Compte à créer AVANT le départ", platform:"usj.co.jp", status:"book", note:"Entry Pass se réserve sur place dans le parc dès l'ouverture" },
   ]},
-  { cat:"🟡 Optionnel — Réserver si intérêt", color:"#FBBF24", items:[
+  { cat:"🟡 Optionnel — Réserver si intérêt", color:"var(--warning)", items:[
     { name:"DAWN Avatar Robot Café (OriHime Diner)", date:"1 mai — Après-midi (16h)", platform:"dawn2021.orylab.com — réserver le OriHime Diner", status:"book", note:"5500¥/pers. Réservation obligatoire en ligne, pas de réservation le jour même. Fermé le jeudi." },
     { name:"Hozugawa Boat Ride (Arashiyama)", date:"4 mai après-midi", platform:"hozugawa.co.jp", status:"free", note:"~4000¥/pers, ~2h descente gorges" },
     { name:"Sagano Scenic Railway (Arashiyama)", date:"4 mai", platform:"sagano-kanko.co.jp", status:"free", note:"880¥/pers, réservation recommandée" },
     { name:"Location kimono (Ninenzaka, Kyoto)", date:"6 mai matin", platform:"Yumeyakata.com ou wargo.jp", status:"free", note:"~3000-5000¥ avec coiffure et accessoires" },
     { name:"Daikoku Parking Area (Yokohama)", date:"Soir du 2 mai — vendredi nuit", platform:"Aucune réservation — taxi depuis Yokohama Station", status:"free", note:"Gratuit. Taxi Yokohama → Daikoku Futo ~2000¥" },
   ]},
-  { cat:"🗺️ Excursions — À planifier", color:"#34D399", items:[
+  { cat:"🗺️ Excursions — À planifier", color:"var(--success)", items:[
     { name:"Excursion Nikko — Tosho-gu & Futarasan", date:"29 avril (J3b) — départ 6h30", platform:"JR Pass ✅ OU Tobu Nikko All Area Pass (~4500¥) sur tobuline.co.jp", status:"free", note:"Partir avant 7h impérativement — sanctuaires ferment à 17h" },
     { name:"Hakone Free Pass (optionnel)", date:"2 mai (J6b) — si pas JR Pass", platform:"odakyu.jp — Hakone Free Pass ~6000¥/2 jours", status:"free", note:"Couvre Romancecar + tous transports internes Hakone" },
     { name:"Route Fuji Subaru 5e Station — Vérifier ouverture", date:"2 mai si ouvert (mi-avril selon année)", platform:"fujisan-climb.jp pour dates d'ouverture", status:"free", note:"⚠️ Peut être fermée jusqu'à fin avril — toujours vérifier avant" },
     { name:"Onsen Hakone — Réserver si tatouages", date:"2 mai après-midi", platform:"tenzan.jp ou yumoto-fujiya.co.jp", status:"free", note:"Tenzan Tohji-kyo = plus tolérant aux tatouages" },
   ]},
-  { cat:"📱 À faire avant le départ (France)", color:"#60A5FA", items:[
+  { cat:"📱 À faire avant le départ (France)", color:"var(--info)", items:[
     { name:"Google Maps offline (Tokyo/Kyoto/Osaka/Nara)", date:"Avant départ", platform:"Google Maps app > Télécharger la zone hors ligne", status:"book", note:"Indispensable — connexion data pas toujours disponible" },
     { name:"Google Translate japonais offline + mode caméra", date:"Avant départ", platform:"Google Translate", status:"book", note:"Mode caméra = scanner les menus en temps réel" },
     { name:"Navitime Japan", date:"Avant départ", platform:"App Store / Google Play", status:"book", note:"Meilleur pour itinéraires JR + transferts complexes" },
@@ -504,7 +504,7 @@ const CHECKLIST = [
     { name:"Créer compte USJ", date:"Avant départ", platform:"usj.co.jp", status:"book", note:"Obligatoire pour Entry Pass Nintendo World le 8 mai" },
     { name:"Pocket Concierge ou Tablecheck (compte)", date:"Avant départ", platform:"pocketconcierge.jp / tablecheck.com", status:"book", note:"Pour tenter réservations restaurants depuis la France" },
   ]},
-  { cat:"⏰ Cette semaine (J-7 → J-3)", color:"#8B5CF6", items:[
+  { cat:"⏰ Cette semaine (J-7 → J-3)", color:"var(--city-kyoto)", items:[
     { name:"Vérifier validité passeport (>6 mois après retour)", date:"J-7", platform:"Contrôle visuel", status:"book", note:"🔥 Si <6 mois de validité au-delà du 11 mai, immigration japonaise peut refuser l'entrée. Demande express préfecture si besoin." },
     { name:"Prévenir la banque du voyage au Japon", date:"J-5", platform:"App bancaire ou agence", status:"book", note:"Évite le blocage anti-fraude lors du 1er retrait/paiement au Japon. Mentionner toutes les cartes utilisées." },
     { name:"Vérifier l'assurance voyage (CB premium ou option)", date:"J-5", platform:"Contrat CB ou assureur", status:"book", note:"Plafond minimum recommandé : 100 000€ frais médicaux + rapatriement. Noter numéro contrat + téléphone 24h/7." },
@@ -515,7 +515,7 @@ const CHECKLIST = [
     { name:"Enregistrer numéros d'urgence dans les contacts", date:"J-3", platform:"Contacts téléphone", status:"book", note:"AMDA (aide médicale FR/EN) : +81-3-6233-9266. Ambassade France Tokyo : +81-3-5798-6000. SOS Help Japan (FR) : +81-3-5774-0992. Assurance voyage 24h/7." },
     { name:"Ajouter Suica sur iPhone Wallet (iOS)", date:"J-3", platform:"Wallet app > +", status:"book", note:"⚡ iPhone seulement : ajouter directement une Suica dans Wallet, recharger avec Apple Pay. Gain de temps énorme à Haneda. Android : acheter carte physique à l'arrivée." },
   ]},
-  { cat:"⏰ La veille (J-1 = 26 avril)", color:"#EC4899", items:[
+  { cat:"⏰ La veille (J-1 = 26 avril)", color:"var(--city-osaka)", items:[
     { name:"Check-in en ligne ANA/JAL", date:"J-1", platform:"App compagnie aérienne", status:"book", note:"Ouvre 24h avant vol. Choisir siège, enregistrer bagages si possible. Réduit temps à Roissy le jour J." },
     { name:"Recharger batteries : téléphone, batterie externe, appareil photo", date:"J-1 soir", platform:"Chargeurs", status:"book", note:"Batterie externe minimum 20 000 mAh recommandée. Vol 13h + transferts = beaucoup d'utilisation." },
     { name:"Préparer sac cabine : passeports, billets, tenue chaude, masque, chaussons", date:"J-1 soir", platform:"-", status:"book", note:"Sac à main = passeport + billets + adresse hôtel + yens + téléphone. Sac cabine = change vêtements, brosse à dents, chargeur." },
@@ -523,7 +523,7 @@ const CHECKLIST = [
     { name:"Confirmer trajet maison → aéroport Paris", date:"J-1 soir", platform:"RATP/SNCF/taxi", status:"book", note:"Arriver 3h avant vol long-courrier. Si RER B : vérifier pas de grève/travaux." },
     { name:"Poser compteurs eau/élec, prévenir voisins/gardien", date:"J-1", platform:"-", status:"book", note:"Si absence >2 semaines. Courrier : procuration La Poste ou demander à un proche." },
   ]},
-  { cat:"🎌 Jour J (27 avril)", color:"#F59E0B", items:[
+  { cat:"🎌 Jour J (27 avril)", color:"var(--gold)", items:[
     { name:"Passeports + billets d'avion (sac à main)", date:"27 avril matin", platform:"-", status:"book", note:"🔥 Jamais en soute. Vérifier 3 fois avant de fermer la porte de l'appart." },
     { name:"Adresse 1er hôtel en japonais (dans téléphone + papier)", date:"27 avril matin", platform:"Copier depuis confirmation", status:"book", note:"Douane Haneda peut demander l'adresse exacte en japonais. Asakusa Tobu Hotel = 〒111-0032 東京都台東区雷門1-1-13." },
     { name:"Yens cash à portée de main", date:"27 avril matin", platform:"-", status:"book", note:"~30 000¥ minimum dans le portefeuille au passage de la douane Haneda. Acheter Suica dès la sortie douane." },
@@ -2379,12 +2379,12 @@ function UrgentReservationsBanner() {
         <span style={{ fontSize:"0.7rem", color:v("urgentTxt",dark), opacity:0.7, flexShrink:0 }}>Voir →</span>
       </div>
       {/* Progress bar */}
-      <div style={{ height:"5px", borderRadius:"3px", background: dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)", overflow:"hidden" }}>
+      <div style={{ height:"5px", borderRadius:"3px", background:"var(--border-light)", overflow:"hidden" }}>
         <div style={{
           height:"100%", width:`${pct}%`,
           background: allDone
-            ? "linear-gradient(90deg,#10B981,#34D399)"
-            : "linear-gradient(90deg,#DC2626,#F59E0B)",
+            ? "linear-gradient(90deg, var(--success), var(--success))"
+            : "linear-gradient(90deg, var(--danger), var(--warning))",
           borderRadius:"3px", transition:"width 0.3s ease",
         }} />
       </div>
@@ -2410,14 +2410,14 @@ function ChecklistSection() {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:"0.875rem" }}>
       <div style={{ background:v("cardBg",dark), borderRadius:"12px", overflow:"hidden", border:`1px solid ${v("border",dark)}`, transition:"background 0.3s" }}>
-        <div style={{ padding:"0.875rem 1rem", background:dark?"#1C1400":"#FEF9C3", borderBottom:`2px solid ${dark?"#713F12":"#FDE68A"}` }}>
-          <h2 style={{ fontSize:"0.95rem", fontWeight:700, color:dark?"#FCD34D":"#78350F", margin:"0 0 0.4rem" }}>📋 Checklist des Réservations</h2>
+        <div style={{ padding:"0.875rem 1rem", background:"var(--warning-soft)", borderBottom:"2px solid var(--warning-bdr)" }}>
+          <h2 style={{ fontFamily:"var(--font-serif)", fontSize:"1.02rem", fontWeight:600, color:"var(--warning)", margin:"0 0 0.4rem", letterSpacing:"-0.01em" }}>📋 Checklist des Réservations</h2>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"0.25rem" }}>
-            <span style={{ fontSize:"0.7rem", fontWeight:600, color:dark?"#FCD34D":"#92400E" }}>Progression : {doneBook} / {totalBook}</span>
-            <span style={{ fontSize:"0.7rem", fontWeight:700, color:dark?"#FCD34D":"#92400E" }}>{pctBook}%</span>
+            <span style={{ fontSize:"0.7rem", fontWeight:600, color:"var(--warning)" }}>Progression : {doneBook} / {totalBook}</span>
+            <span style={{ fontSize:"0.7rem", fontWeight:700, color:"var(--warning)" }}>{pctBook}%</span>
           </div>
-          <div style={{ height:"5px", borderRadius:"3px", background: dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)", overflow:"hidden" }}>
-            <div style={{ height:"100%", width:`${pctBook}%`, background:"linear-gradient(90deg,#F59E0B,#10B981)", borderRadius:"3px", transition:"width 0.3s ease" }} />
+          <div style={{ height:"5px", borderRadius:"3px", background:"var(--border-light)", overflow:"hidden" }}>
+            <div style={{ height:"100%", width:`${pctBook}%`, background:"linear-gradient(90deg, var(--warning), var(--success))", borderRadius:"3px", transition:"width 0.3s ease" }} />
           </div>
         </div>
         {CHECKLIST.map((cat, ci) => (
@@ -2440,7 +2440,7 @@ function ChecklistSection() {
                     borderBottom: ii < cat.items.length - 1 ? `1px solid ${v("borderMid",dark)}` : "none",
                     display:"flex", alignItems:"flex-start", gap:"0.75rem",
                     cursor: isBookable ? "pointer" : "default",
-                    background: isDone ? (dark?"rgba(16,185,129,0.08)":"rgba(16,185,129,0.06)") : "transparent",
+                    background: isDone ? "var(--success-soft)" : "transparent",
                     transition:"background 0.15s",
                   }}
                 >
@@ -2448,12 +2448,12 @@ function ChecklistSection() {
                   {isBookable ? (
                     <div style={{
                       flexShrink:0, width:"1.2rem", height:"1.2rem", borderRadius:"5px",
-                      border:`2px solid ${isDone?"#10B981":(dark?"#713F12":"#D97706")}`,
-                      background: isDone ? "#10B981" : "transparent",
+                      border:`2px solid ${isDone ? "var(--success)" : "var(--warning-bdr)"}`,
+                      background: isDone ? "var(--success)" : "transparent",
                       display:"flex", alignItems:"center", justifyContent:"center",
                       marginTop:"1px", transition:"all 0.15s",
                     }}>
-                      {isDone && <span style={{ color:"white", fontSize:"0.78rem", fontWeight:800, lineHeight:1 }}>✓</span>}
+                      {isDone && <span style={{ color:"var(--paper-bg)", fontSize:"0.78rem", fontWeight:800, lineHeight:1 }}>✓</span>}
                     </div>
                   ) : (
                     <span style={{ fontSize:"1rem", flexShrink:0, marginTop:"1px" }}>
@@ -2467,7 +2467,7 @@ function ChecklistSection() {
                     </div>
                     <p style={{ fontSize:"0.73rem", color:v("textPrimary",dark), margin:"0.15rem 0 0", opacity: isDone ? 0.6 : 1 }}>📅 {item.date}</p>
                     <p style={{ fontSize:"0.73rem", color:v("textSec",dark), margin:"0.05rem 0 0", opacity: isDone ? 0.6 : 1 }}>🔗 {item.platform}</p>
-                    {item.note && <p style={{ fontSize:"0.71rem", color:"#F87171", margin:"0.15rem 0 0", opacity: isDone ? 0.5 : 1 }}>⚡ {item.note}</p>}
+                    {item.note && <p style={{ fontSize:"0.71rem", color:"var(--danger)", margin:"0.15rem 0 0", opacity: isDone ? 0.5 : 1 }}>⚡ {item.note}</p>}
                   </div>
                 </div>
               );
