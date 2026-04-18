@@ -7,55 +7,67 @@ const DarkCtx = createContext(false);
 const useDark = () => useContext(DarkCtx);
 const NavCtx = createContext({ goTo: () => {} });
 const useNav = () => useContext(NavCtx);
-const t = (light, dark) => ({ light, dark });
+// Indigo Ukiyo-e palette — Hokusai waves, prussian blue, vermillion, kozo paper.
+// Design reference: voyage-japon bundle, "Indigo Ukiyo-e" theme in themes.js.
+// All semantic tokens resolve to CSS variables declared on :root (light) and
+// :root[data-theme="dark"]. The light/dark swap happens in CSS, not in JS —
+// which means every inline style that reads from these tokens retunes
+// automatically when the user toggles the theme.
+const cssv = name => `var(--${name})`;
+// Shape preserved so existing call sites `v("key", dark)` keep working.
+// Both branches resolve to the same `var(--…)` string; CSS picks the value.
+const t = name => ({ light: cssv(name), dark: cssv(name) });
+
 const THEME = {
-  pageBg:      t("#F7F4EF","#0D0D0D"),
-  cardBg:      t("white","#1A1A1A"),
-  cardBg2:     t("#FAFAF8","#222222"),
-  navBg:       t("white","#141414"),
-  navBorder:   t("#E5E7EB","#2A2A2A"),
-  border:      t("#F0EDE8","#2A2A2A"),
-  borderLight: t("#F3F4F6","#2D2D2D"),
-  borderMid:   t("#F9F6F0","#242424"),
-  textPrimary: t("#1F2937","#F1F0EE"),
-  textSec:     t("#6B7280","#9CA3AF"),
-  textMuted:   t("#6B7280","#9CA3AF"),
-  alertBg:     t("#FFFBEB","#1C1400"),
-  alertBdr:    t("#FDE68A","#78350F"),
-  alertTxt:    t("#92400E","#FDE68A"),
-  urgentBg:    t("#FEF9C3","#1C1400"),
-  urgentBdr:   t("#FDE68A","#713F12"),
-  urgentTxt:   t("#92400E","#FCD34D"),
-  tipsBg:      t("#F0F9FF","#0C1F35"),
-  tipsBdr:     t("#38BDF8","#1D4E8A"),
-  tipsHead:    t("#0369A1","#60A5FA"),
-  tipsTxt:     t("#0C4A6E","#93C5FD"),
-  optBg:       t("#FDF4FF","#1C0F2E"),
-  optBdr:      t("#E9D5FF","#3B1F5E"),
-  optTxt:      t("#7C3AED","#C4B5FD"),
-  sectionBg:   t("#FAFAF8","#1E1E1E"),
+  pageBg:      t("bg-page"),
+  cardBg:      t("bg-card"),
+  cardBg2:     t("bg-card-2"),
+  navBg:       t("bg-nav"),
+  navBorder:   t("border-nav"),
+  border:      t("border"),
+  borderLight: t("border-light"),
+  borderMid:   t("border-mid"),
+  textPrimary: t("text-primary"),
+  textSec:     t("text-sec"),
+  textMuted:   t("text-muted"),
+  alertBg:     t("alert-bg"),
+  alertBdr:    t("alert-bdr"),
+  alertTxt:    t("alert-txt"),
+  urgentBg:    t("urgent-bg"),
+  urgentBdr:   t("urgent-bdr"),
+  urgentTxt:   t("urgent-txt"),
+  tipsBg:      t("tips-bg"),
+  tipsBdr:     t("tips-bdr"),
+  tipsHead:    t("tips-head"),
+  tipsTxt:     t("tips-txt"),
+  optBg:       t("opt-bg"),
+  optBdr:      t("opt-bdr"),
+  optTxt:      t("opt-txt"),
+  sectionBg:   t("section-bg"),
 };
-const v = (key, dark) => THEME[key][dark ? "dark" : "light"];
+// Legacy signature — dark arg is ignored (CSS handles the swap). Kept so existing
+// v("key", dark) call sites continue to work without a codemod.
+const v = (key) => THEME[key].light;
 
 const CITY = {
-  tokyo:   { color:"#3B7EFF", light:t("#EEF2FF","#1A2340"), border:t("#93C5FD","#2D4A7A") },
-  kyoto:   { color:"#A855F7", light:t("#F5F3FF","#231840"), border:t("#C4B5FD","#4A3070") },
-  osaka:   { color:"#F97316", light:t("#FFF7ED","#251200"), border:t("#FCA572","#5C2D00") },
-  transit: { color:"#94A3B8", light:t("#F1F5F9","#1A1E26"), border:t("#94A3B8","#374151") },
-  depart:  { color:"#34D399", light:t("#ECFDF5","#0A1E12"), border:t("#6EE7B7","#1A4030") },
+  tokyo:   { color: cssv("city-tokyo"),   light: t("city-tokyo-wash"),   border: t("city-tokyo-border")   },
+  kyoto:   { color: cssv("city-kyoto"),   light: t("city-kyoto-wash"),   border: t("city-kyoto-border")   },
+  osaka:   { color: cssv("city-osaka"),   light: t("city-osaka-wash"),   border: t("city-osaka-border")   },
+  transit: { color: cssv("city-transit"), light: t("city-transit-wash"), border: t("city-transit-border") },
+  depart:  { color: cssv("city-depart"),  light: t("city-depart-wash"),  border: t("city-depart-border")  },
 };
 const PERIOD = {
-  matin: { label:"☀️ Matin",        color:t("#92400E","#FCD34D"), bg:t("#FFFBEB","#1C1200"), line:t("#FDE68A","#5C3800") },
-  aprem: { label:"🌤 Après-midi",   color:t("#1E40AF","#60A5FA"), bg:t("#EFF6FF","#0A1628"), line:t("#BFDBFE","#1E3A6E") },
-  soir:  { label:"🌙 Soir",         color:t("#4C1D95","#C4B5FD"), bg:t("#F5F3FF","#160D2E"), line:t("#DDD6FE","#3B1F6E") },
-  nuit:  { label:"🌃 Nuit tardive", color:t("#374151","#CBD5E1"), bg:t("#F1F5F9","#0D1117"), line:t("#CBD5E1","#2D3748") },
+  matin: { label:"☀️ Matin",        color:t("period-matin"), bg:t("period-matin-bg"), line:t("period-matin-line") },
+  aprem: { label:"🌤 Après-midi",   color:t("period-aprem"), bg:t("period-aprem-bg"), line:t("period-aprem-line") },
+  soir:  { label:"🌙 Soir",         color:t("period-soir"),  bg:t("period-soir-bg"),  line:t("period-soir-line")  },
+  nuit:  { label:"🌃 Nuit tardive", color:t("period-nuit"),  bg:t("period-nuit-bg"),  line:t("period-nuit-line")  },
 };
 const ST = {
-  ok:   { label:"✅ Réservé",     bg:t("#DCFCE7","#14301E"), color:t("#166534","#4ADE80"), bdr:t("#BBF7D0","#1A5C30") },
-  book: { label:"⚠️ À réserver", bg:t("#FEF9C3","#1C1400"), color:t("#854D0E","#FCD34D"), bdr:t("#FDE68A","#713F12") },
-  free: { label:"🔓 Flexible",    bg:t("#F3F4F6","#252525"), color:t("#6B7280","#9CA3AF"), bdr:t("#E5E7EB","#3A3A3A") },
-  note: { label:"ℹ️ Info",        bg:t("#EFF6FF","#0A1628"), color:t("#1D4ED8","#60A5FA"), bdr:t("#BFDBFE","#1E3A6E") },
-  opt:  { label:"✨ Option bonus", bg:t("#FDF4FF","#1C0F2E"), color:t("#7E22CE","#C4B5FD"), bdr:t("#E9D5FF","#3B1F5E") },
+  ok:   { label:"✅ Réservé",     bg:t("st-ok-bg"),   color:t("st-ok-txt"),   bdr:t("st-ok-bdr")   },
+  book: { label:"⚠️ À réserver", bg:t("st-book-bg"), color:t("st-book-txt"), bdr:t("st-book-bdr") },
+  free: { label:"🔓 Flexible",    bg:t("st-free-bg"), color:t("st-free-txt"), bdr:t("st-free-bdr") },
+  note: { label:"ℹ️ Info",        bg:t("st-note-bg"), color:t("st-note-txt"), bdr:t("st-note-bdr") },
+  opt:  { label:"✨ Option bonus", bg:t("st-opt-bg"),  color:t("st-opt-txt"),  bdr:t("st-opt-bdr")  },
 };
 
 const DAYS = [
@@ -563,6 +575,14 @@ export default function App() {
   });
   useEffect(() => {
     try { localStorage.setItem("dark-mode", dark ? "1" : "0"); } catch {}
+    // Sync the `data-theme` attribute so the CSS variables on :root and
+    // :root[data-theme="dark"] resolve to the right palette. Every inline
+    // style that reads `var(--…)` retunes automatically on toggle.
+    try { document.documentElement.dataset.theme = dark ? "dark" : "light"; } catch {}
+    try {
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute("content", dark ? "#070D1C" : "#0A1428");
+    } catch {}
   }, [dark]);
 
   // Large-text mode — pour les parents (ou lecture a bout de bras).
@@ -753,13 +773,260 @@ export default function App() {
         }, 120);
       }}}>
     <DarkCtx.Provider value={dark}>
-      <div className="min-h-screen" style={{ fontFamily:"'DM Sans',system-ui,sans-serif", background:v("pageBg",dark), transition:"background 0.3s" }}>
+      <div className="min-h-screen" style={{ background:"var(--bg-page)", color:"var(--text-primary)", transition:"background 0.3s, color 0.3s" }}>
         <style>{`
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,500;1,9..144,600;1,9..144,700;1,9..144,900&family=Inter+Tight:wght@400;500;600;700&family=Shippori+Mincho:wght@400;500;700&display=swap');
+
+/* ═══════════════════════════════════════════════════════════════════════
+   INDIGO UKIYO-E — Design tokens (CSS variables)
+   Light = kozo paper / sumi ink. Dark = night sea / moonlight.
+   Every inline style reads these through the v() / CITY / PERIOD / ST
+   accessors, so toggling [data-theme="dark"] retunes the whole app.
+   ═══════════════════════════════════════════════════════════════════════ */
+:root {
+  /* Typography */
+  --font-display: "Fraunces", "Shippori Mincho", Georgia, serif;
+  --font-body:    "Inter Tight", "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-kanji:   "Shippori Mincho", "Noto Serif JP", serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+
+  /* ─── LIGHT MODE ─── */
+  /* Paper grounds */
+  --bg-page:      #E8E3D6;  /* kozo paper */
+  --bg-card:      #F3EEE0;  /* inner paper (cards) */
+  --bg-card-2:    #EEE7D4;  /* nested inside card */
+  --bg-nav:       rgba(243, 238, 224, 0.92);
+  --section-bg:   #F3EEE0;
+
+  /* Ink & borders */
+  --text-primary: #0D1B3F;  /* prussian indigo */
+  --text-sec:     #24345E;
+  --text-muted:   #5A6A87;
+  --text-faint:   #A8B1C2;
+  --border:       #D3CDBC;
+  --border-light: #DFD9C6;
+  --border-mid:   #C6BFA9;
+  --border-nav:   rgba(13, 27, 63, 0.10);
+
+  /* Accents (vermillion + gold — ukiyo-e hanko) */
+  --accent:       #C73E3A;
+  --accent-deep:  #9B2A27;
+  --accent-soft:  rgba(199, 62, 58, 0.12);
+  --gold:         #CA9A3C;
+  --gold-soft:    rgba(202, 154, 60, 0.14);
+
+  /* City hues */
+  --city-tokyo:          #1B3A68;
+  --city-tokyo-wash:     rgba(27, 58, 104, 0.10);
+  --city-tokyo-border:   rgba(27, 58, 104, 0.35);
+  --city-kyoto:          #5E3070;
+  --city-kyoto-wash:     rgba(94, 48, 112, 0.10);
+  --city-kyoto-border:   rgba(94, 48, 112, 0.35);
+  --city-osaka:          #D45A2C;
+  --city-osaka-wash:     rgba(212, 90, 44, 0.10);
+  --city-osaka-border:   rgba(212, 90, 44, 0.40);
+  --city-transit:        #6B7285;
+  --city-transit-wash:   rgba(107, 114, 133, 0.10);
+  --city-transit-border: rgba(107, 114, 133, 0.35);
+  --city-depart:         #9B2A27;
+  --city-depart-wash:    rgba(155, 42, 39, 0.10);
+  --city-depart-border:  rgba(155, 42, 39, 0.40);
+
+  /* Periods (moments of the day) */
+  --period-matin:      #CA9A3C;
+  --period-matin-bg:   rgba(202, 154, 60, 0.10);
+  --period-matin-line: rgba(202, 154, 60, 0.35);
+  --period-aprem:      #1B3A68;
+  --period-aprem-bg:   rgba(27, 58, 104, 0.08);
+  --period-aprem-line: rgba(27, 58, 104, 0.30);
+  --period-soir:       #5E3070;
+  --period-soir-bg:    rgba(94, 48, 112, 0.08);
+  --period-soir-line:  rgba(94, 48, 112, 0.30);
+  --period-nuit:       #0D1B3F;
+  --period-nuit-bg:    rgba(13, 27, 63, 0.08);
+  --period-nuit-line:  rgba(13, 27, 63, 0.25);
+
+  /* Alerts / callouts */
+  --alert-bg:   rgba(202, 154, 60, 0.14);
+  --alert-bdr:  rgba(202, 154, 60, 0.45);
+  --alert-txt:  #7A5A1A;
+  --urgent-bg:  rgba(199, 62, 58, 0.12);
+  --urgent-bdr: rgba(199, 62, 58, 0.45);
+  --urgent-txt: #7A1A17;
+  --tips-bg:    rgba(27, 58, 104, 0.07);
+  --tips-bdr:   rgba(27, 58, 104, 0.25);
+  --tips-head:  #1B3A68;
+  --tips-txt:   #24345E;
+  --opt-bg:     rgba(94, 48, 112, 0.09);
+  --opt-bdr:    rgba(94, 48, 112, 0.32);
+  --opt-txt:    #4A215A;
+
+  /* Status pills (réservé / à réserver / etc.) */
+  --st-ok-bg:   rgba(48, 120, 85, 0.14);
+  --st-ok-bdr:  rgba(48, 120, 85, 0.45);
+  --st-ok-txt:  #1F5A3F;
+  --st-book-bg: rgba(202, 154, 60, 0.18);
+  --st-book-bdr: rgba(202, 154, 60, 0.50);
+  --st-book-txt: #7A5A1A;
+  --st-free-bg: rgba(107, 114, 133, 0.14);
+  --st-free-bdr: rgba(107, 114, 133, 0.40);
+  --st-free-txt: #4A5268;
+  --st-note-bg: rgba(27, 58, 104, 0.10);
+  --st-note-bdr: rgba(27, 58, 104, 0.35);
+  --st-note-txt: #1B3A68;
+  --st-opt-bg:  rgba(94, 48, 112, 0.12);
+  --st-opt-bdr: rgba(94, 48, 112, 0.42);
+  --st-opt-txt: #4A215A;
+
+  /* Semantic status (done/urgent/warning/info) — legible on paper */
+  --success:       #30785C;
+  --success-soft:  rgba(48, 120, 92, 0.14);
+  --success-bdr:   rgba(48, 120, 92, 0.40);
+  --warning:       #B07818;
+  --warning-soft:  rgba(176, 120, 24, 0.14);
+  --warning-bdr:   rgba(176, 120, 24, 0.40);
+  --danger:        #9B2A27;
+  --danger-soft:   rgba(155, 42, 39, 0.12);
+  --danger-bdr:    rgba(155, 42, 39, 0.40);
+  --info:          #1B3A68;
+  --info-soft:     rgba(27, 58, 104, 0.10);
+  --info-bdr:      rgba(27, 58, 104, 0.35);
+
+  /* Utility */
+  --shadow-card:     0 1px 2px rgba(13, 27, 63, 0.06), 0 4px 16px rgba(13, 27, 63, 0.06);
+  --shadow-card-hov: 0 2px 4px rgba(13, 27, 63, 0.08), 0 8px 24px rgba(13, 27, 63, 0.10);
+  --nav-fade:        #E8E3D6;
+  --header-from:     #0A1428;
+  --header-mid:      #0D1B3F;
+  --header-to:       #1B3A68;
+  --header-ink:      #F3EEE0;
+  --header-accent:   #E85D58;
+}
+
+:root[data-theme="dark"] {
+  /* Night sea / moonlight */
+  --bg-page:      #0B1428;
+  --bg-card:      #121C36;
+  --bg-card-2:    #0E1730;
+  --bg-nav:       rgba(11, 20, 40, 0.92);
+  --section-bg:   #121C36;
+
+  --text-primary: #E8E3D6;
+  --text-sec:     #C8C3B1;
+  --text-muted:   #8693B2;
+  --text-faint:   #3A4668;
+  --border:       #1E2A48;
+  --border-light: #17213B;
+  --border-mid:   #2A385C;
+  --border-nav:   rgba(232, 227, 214, 0.10);
+
+  --accent:       #E85D58;
+  --accent-deep:  #C73E3A;
+  --accent-soft:  rgba(232, 93, 88, 0.18);
+  --gold:         #E0B85C;
+  --gold-soft:    rgba(224, 184, 92, 0.16);
+
+  --city-tokyo:          #6FA8DC;
+  --city-tokyo-wash:     rgba(111, 168, 220, 0.14);
+  --city-tokyo-border:   rgba(111, 168, 220, 0.45);
+  --city-kyoto:          #B078C2;
+  --city-kyoto-wash:     rgba(176, 120, 194, 0.14);
+  --city-kyoto-border:   rgba(176, 120, 194, 0.45);
+  --city-osaka:          #F28860;
+  --city-osaka-wash:     rgba(242, 136, 96, 0.14);
+  --city-osaka-border:   rgba(242, 136, 96, 0.45);
+  --city-transit:        #9CA3B8;
+  --city-transit-wash:   rgba(156, 163, 184, 0.14);
+  --city-transit-border: rgba(156, 163, 184, 0.40);
+  --city-depart:         #E85D58;
+  --city-depart-wash:    rgba(232, 93, 88, 0.14);
+  --city-depart-border:  rgba(232, 93, 88, 0.45);
+
+  --period-matin:      #E0B85C;
+  --period-matin-bg:   rgba(224, 184, 92, 0.12);
+  --period-matin-line: rgba(224, 184, 92, 0.35);
+  --period-aprem:      #6FA8DC;
+  --period-aprem-bg:   rgba(111, 168, 220, 0.12);
+  --period-aprem-line: rgba(111, 168, 220, 0.30);
+  --period-soir:       #B078C2;
+  --period-soir-bg:    rgba(176, 120, 194, 0.12);
+  --period-soir-line:  rgba(176, 120, 194, 0.30);
+  --period-nuit:       #8693B2;
+  --period-nuit-bg:    rgba(134, 147, 178, 0.10);
+  --period-nuit-line:  rgba(134, 147, 178, 0.30);
+
+  --alert-bg:   rgba(224, 184, 92, 0.15);
+  --alert-bdr:  rgba(224, 184, 92, 0.40);
+  --alert-txt:  #E0B85C;
+  --urgent-bg:  rgba(232, 93, 88, 0.16);
+  --urgent-bdr: rgba(232, 93, 88, 0.45);
+  --urgent-txt: #F2928E;
+  --tips-bg:    rgba(111, 168, 220, 0.10);
+  --tips-bdr:   rgba(111, 168, 220, 0.35);
+  --tips-head:  #6FA8DC;
+  --tips-txt:   #C8D3E8;
+  --opt-bg:     rgba(176, 120, 194, 0.12);
+  --opt-bdr:    rgba(176, 120, 194, 0.38);
+  --opt-txt:    #E0BFEB;
+
+  --st-ok-bg:   rgba(86, 184, 133, 0.16);
+  --st-ok-bdr:  rgba(86, 184, 133, 0.45);
+  --st-ok-txt:  #8FD6B1;
+  --st-book-bg: rgba(224, 184, 92, 0.20);
+  --st-book-bdr: rgba(224, 184, 92, 0.50);
+  --st-book-txt: #F0D388;
+  --st-free-bg: rgba(156, 163, 184, 0.14);
+  --st-free-bdr: rgba(156, 163, 184, 0.40);
+  --st-free-txt: #C8CFDE;
+  --st-note-bg: rgba(111, 168, 220, 0.15);
+  --st-note-bdr: rgba(111, 168, 220, 0.40);
+  --st-note-txt: #A8C4E0;
+  --st-opt-bg:  rgba(176, 120, 194, 0.15);
+  --st-opt-bdr: rgba(176, 120, 194, 0.42);
+  --st-opt-txt: #E0BFEB;
+
+  --success:       #8FD6B1;
+  --success-soft:  rgba(86, 184, 133, 0.14);
+  --success-bdr:   rgba(86, 184, 133, 0.45);
+  --warning:       #E0B85C;
+  --warning-soft:  rgba(224, 184, 92, 0.14);
+  --warning-bdr:   rgba(224, 184, 92, 0.45);
+  --danger:        #F2928E;
+  --danger-soft:   rgba(232, 93, 88, 0.16);
+  --danger-bdr:    rgba(232, 93, 88, 0.45);
+  --info:          #6FA8DC;
+  --info-soft:     rgba(111, 168, 220, 0.12);
+  --info-bdr:      rgba(111, 168, 220, 0.40);
+
+  --shadow-card:     0 1px 2px rgba(0,0,0,0.40), 0 4px 16px rgba(0,0,0,0.35);
+  --shadow-card-hov: 0 2px 4px rgba(0,0,0,0.50), 0 8px 24px rgba(0,0,0,0.45);
+  --nav-fade:        #0B1428;
+  --header-from:     #070D1C;
+  --header-mid:      #0B1428;
+  --header-to:       #142448;
+  --header-ink:      #F3EEE0;
+  --header-accent:   #E85D58;
+}
+
+/* Global typography — everything inherits from body. Components that want
+   to differ (display heading, kanji watermark) opt in explicitly. */
+html, body {
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background: var(--bg-page);
+  font-feature-settings: "cv11", "ss01", "ss03";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.01em; }
+.font-display { font-family: var(--font-display); }
+.font-kanji   { font-family: var(--font-kanji); }
+.font-body    { font-family: var(--font-body); }
+
 *{box-sizing:border-box;}
 html, body { margin:0; padding:0; }
-button{font-family:inherit; -webkit-tap-highlight-color: transparent; }
-a { -webkit-tap-highlight-color: transparent; }
+button{font-family:inherit; color: inherit; -webkit-tap-highlight-color: transparent; }
+a { -webkit-tap-highlight-color: transparent; color: inherit; }
 
 /* Prevent text selection on UI chrome, allow it on content/inputs */
 *, *::before, *::after { -webkit-user-select: none; user-select: none; }
@@ -773,7 +1040,7 @@ input, textarea, select { font-size: 16px !important; }
 /* Focus-visible ring for keyboard users */
 :focus { outline: none; }
 :focus-visible {
-  outline: 2px solid #B0000A;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -831,9 +1098,8 @@ button[data-tap="action"] {
   right: 0; top: 0; bottom: 0;
   width: 28px;
   pointer-events: none;
-  background: linear-gradient(to right, transparent, var(--nav-fade-color, white));
+  background: linear-gradient(to right, transparent, var(--nav-fade));
 }
-.nav-scroll-wrap[data-dark="true"]::after { --nav-fade-color: #141414; }
 
 /* Hide scrollbar on the horizontal tabs nav (Chrome Android shows it by default) */
 .nav-scroll-wrap > div { scrollbar-width: none; -ms-overflow-style: none; }
@@ -878,7 +1144,7 @@ body { overflow-x: hidden; max-width: 100vw; }
     z-index: 5;
   }
   .desk-toc::-webkit-scrollbar { width: 6px; }
-  .desk-toc::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.35); border-radius: 3px; }
+  .desk-toc::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 }
 .desk-toc-btn {
   display: block;
@@ -894,9 +1160,9 @@ body { overflow-x: hidden; max-width: 100vw; }
   line-height: 1.3;
   transition: background 0.12s, color 0.12s;
 }
-.desk-toc-btn:hover { background: rgba(176, 0, 10, 0.08); }
+.desk-toc-btn:hover { background: var(--accent-soft); }
 .desk-toc-btn[data-active="true"] {
-  background: rgba(176, 0, 10, 0.14);
+  background: var(--accent-soft);
   font-weight: 600;
 }
 
@@ -912,15 +1178,32 @@ body { overflow-x: hidden; max-width: 100vw; }
         <OfflineBanner />
         <InstallBanner />
         <EmergencyFAB />
-        <header className="safe-top" style={{ background:"linear-gradient(135deg,#7B0000 0%,#B0000A 60%,#CC2020 100%)", padding:"0.9rem 1.25rem 0.75rem", position:"relative", overflow:"hidden" }}>
-          {/* Decorative circle — pointerEvents:none so it never intercepts
-              clicks on the dark mode toggle button that sits behind it in
-              the flex layout. */}
-          <div style={{ position:"absolute", right:"-40px", top:"-40px", width:"200px", height:"200px", borderRadius:"50%", background:"rgba(255,255,255,0.05)", pointerEvents:"none" }}/>
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+        <header className="safe-top" style={{ background:"linear-gradient(135deg, var(--header-from) 0%, var(--header-mid) 45%, var(--header-to) 100%)", padding:"0.9rem 1.25rem 0.75rem", position:"relative", overflow:"hidden" }}>
+          {/* Seigaiha (wave) pattern — subtle cream waves on prussian indigo,
+              masked to fade toward the bottom so it doesn't compete with the
+              header content below. pointerEvents:none to stay inert. */}
+          <div style={{
+            position:"absolute", inset:0,
+            backgroundImage:"url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='30' viewBox='0 0 60 30'><g fill='none' stroke='%23E8E3D6' stroke-width='1' opacity='0.28'><circle cx='30' cy='30' r='28'/><circle cx='30' cy='30' r='20'/><circle cx='30' cy='30' r='12'/><circle cx='30' cy='30' r='4'/><circle cx='0' cy='30' r='28'/><circle cx='0' cy='30' r='20'/><circle cx='0' cy='30' r='12'/><circle cx='0' cy='30' r='4'/><circle cx='60' cy='30' r='28'/><circle cx='60' cy='30' r='20'/><circle cx='60' cy='30' r='12'/><circle cx='60' cy='30' r='4'/></g></svg>\")",
+            backgroundSize:"60px 30px",
+            maskImage:"linear-gradient(180deg,#000 0%,#000 55%,transparent 100%)",
+            WebkitMaskImage:"linear-gradient(180deg,#000 0%,#000 55%,transparent 100%)",
+            pointerEvents:"none",
+          }}/>
+          {/* Kanji watermark 旅 (voyage) — top right, very soft. */}
+          <div style={{
+            position:"absolute", right:"-8px", top:"-14px",
+            fontFamily:"var(--font-kanji)", fontWeight:700,
+            fontSize:"170px", lineHeight:0.85,
+            color:"var(--header-ink)", opacity:0.08,
+            pointerEvents:"none", userSelect:"none",
+          }}>旅</div>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", position:"relative" }}>
             <div style={{ flex:1 }}>
-              <p style={{ fontFamily:"'Cormorant Garamond',serif", color:"rgba(255,255,255,0.55)", fontSize:"0.78rem", letterSpacing:"0.22em", textTransform:"uppercase", marginBottom:"0.35rem" }}>Voyage Japon · 3 adultes · 27 avril – 11 mai 2026</p>
-              <h1 style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1.85rem", fontWeight:600, lineHeight:1.2, marginBottom:"0.4rem" }}>Itinéraire Complet</h1>
+              <p style={{ fontFamily:"var(--font-body)", color:"rgba(232,227,214,0.62)", fontSize:"0.72rem", letterSpacing:"0.24em", textTransform:"uppercase", marginBottom:"0.35rem", fontWeight:500 }}>Vol. 01 · 3 adultes · 27 avr – 11 mai 2026</p>
+              <h1 style={{ fontFamily:"var(--font-display)", color:"var(--header-ink)", fontSize:"1.95rem", fontWeight:600, lineHeight:1.05, marginBottom:"0.4rem", letterSpacing:"-0.025em", fontVariationSettings:'"opsz" 144' }}>
+                Itinéraire <span style={{ fontStyle:"italic", fontWeight:700, color:"var(--header-accent)" }}>Complet</span>
+              </h1>
             </div>
             <div style={{ display:"flex", gap:"0.4rem", flexShrink:0, marginLeft:"0.75rem" }}>
               <button
@@ -931,10 +1214,10 @@ body { overflow-x: hidden; max-width: 100vw; }
                 style={{
                   width:"44px", height:"44px",
                   borderRadius:"12px", border:"none", cursor:"pointer",
-                  background: largeText ? "rgba(96,165,250,0.35)" : "rgba(255,255,255,0.18)",
+                  background: largeText ? "rgba(232,227,214,0.28)" : "rgba(232,227,214,0.14)",
                   display:"flex", alignItems:"center", justifyContent:"center",
                   fontSize:"0.95rem", fontFamily:"inherit", fontWeight:700,
-                  color:"white", letterSpacing:"0.02em",
+                  color:"var(--header-ink)", letterSpacing:"0.02em",
                   transition:"background 0.2s",
                 }}
               >
@@ -948,7 +1231,7 @@ body { overflow-x: hidden; max-width: 100vw; }
                 style={{
                   width:"44px", height:"44px",
                   borderRadius:"12px", border:"none", cursor:"pointer",
-                  background: dark ? "rgba(250,204,21,0.25)" : "rgba(255,255,255,0.18)",
+                  background: dark ? "rgba(224,184,92,0.24)" : "rgba(232,227,214,0.14)",
                   display:"flex", alignItems:"center", justifyContent:"center",
                   fontSize:"1.1rem",
                   transition:"background 0.2s",
@@ -986,17 +1269,17 @@ body { overflow-x: hidden; max-width: 100vw; }
         </div>
         {/* ── MODE VOYAGE ── */}
         {voyageMode && (
-          <div style={{ background: inTrip ? (dark?"#0A2010":"#DCFCE7") : afterTrip ? (dark?"#1A1A2E":"#EEF2FF") : (dark?"#1C1400":"#FEF9C3"), padding:"0.5rem 1rem", display:"flex", alignItems:"center", gap:"0.5rem", borderBottom:`1px solid ${inTrip?(dark?"#14301E":"#BBF7D0"):afterTrip?(dark?"#2D4A7A":"#BFDBFE"):(dark?"#713F12":"#FDE68A")}`, flexWrap:"wrap" }}>
+          <div style={{ background: inTrip ? "var(--success-soft)" : afterTrip ? "var(--info-soft)" : "var(--warning-soft)", padding:"0.5rem 1rem", display:"flex", alignItems:"center", gap:"0.5rem", borderBottom:`1px solid ${inTrip?"var(--success-bdr)":afterTrip?"var(--info-bdr)":"var(--warning-bdr)"}`, flexWrap:"wrap" }}>
             {!inTrip && !afterTrip && daysToStart > 0 && (
               <>
                 <span style={{ fontSize:"1rem" }}>⏳</span>
-                <span style={{ fontSize:"0.75rem", fontWeight:600, color: dark?"#FCD34D":"#92400E", flex:1 }}>Départ dans <strong>{daysToStart}</strong> jour{daysToStart>1?"s":""} — 27 avril 2026</span>
+                <span style={{ fontSize:"0.75rem", fontWeight:600, color:"var(--warning)", flex:1 }}>Départ dans <strong>{daysToStart}</strong> jour{daysToStart>1?"s":""} — 27 avril 2026</span>
               </>
             )}
             {inTrip && currentDayObj && (
               <>
                 <span style={{ fontSize:"1rem" }}>🗾</span>
-                <span style={{ fontSize:"0.75rem", fontWeight:600, color:dark?"#4ADE80":"#166534", flex:1 }}>Jour {currentDayN} de votre voyage — {currentDayObj.title}</span>
+                <span style={{ fontSize:"0.75rem", fontWeight:600, color:"var(--success)", flex:1 }}>Jour {currentDayN} de votre voyage — {currentDayObj.title}</span>
                 <button
                   onClick={() => {
                     const tabForDay = findTabForDay(currentDayN);
@@ -1013,21 +1296,21 @@ body { overflow-x: hidden; max-width: 100vw; }
                   data-tap="action"
                   style={{
                     fontSize:"0.7rem", fontWeight:700,
-                    background: dark ? "#14301E" : "#166534",
-                    color: "white",
+                    background: "var(--success)",
+                    color: "var(--bg-page)",
                     border:"none", borderRadius:"8px",
                     padding:"0.35rem 0.7rem",
                     cursor:"pointer", fontFamily:"inherit", flexShrink:0,
                   }}
                   aria-label="Aller à ma journée actuelle"
                 >📍 Maintenant</button>
-                <span style={{ fontSize:"0.7rem", color:dark?"#4ADE80":"#166534" }}>🕐 Tokyo {timeStr}</span>
+                <span style={{ fontSize:"0.7rem", color:"var(--success)" }}>🕐 Tokyo {timeStr}</span>
               </>
             )}
             {afterTrip && (
               <>
                 <span style={{ fontSize:"1rem" }}>🎌</span>
-                <span style={{ fontSize:"0.75rem", fontWeight:600, color:dark?"#93C5FD":"#1E40AF", flex:1 }}>Voyage terminé — Sayōnara Nihon ! 15 jours · 3 villes · des souvenirs pour toujours</span>
+                <span style={{ fontSize:"0.75rem", fontWeight:600, color:"var(--info)", flex:1 }}>Voyage terminé — Sayōnara Nihon ! 15 jours · 3 villes · des souvenirs pour toujours</span>
               </>
             )}
             <button
@@ -1036,7 +1319,7 @@ body { overflow-x: hidden; max-width: 100vw; }
               data-tap="icon"
               style={{
                 fontSize:"0.9rem",
-                color:dark?"rgba(255,255,255,0.45)":"rgba(0,0,0,0.4)",
+                color:"var(--text-muted)",
                 background:"transparent", border:"none", cursor:"pointer",
                 display:"flex", alignItems:"center", justifyContent:"center",
                 borderRadius:"8px",
@@ -1083,7 +1366,7 @@ body { overflow-x: hidden; max-width: 100vw; }
                 }}
                 style={{
                   fontSize:"0.75rem", fontWeight:600,
-                  color: dark ? "#60A5FA" : "#1D4ED8",
+                  color: "var(--accent)",
                   background:"transparent", border:"none", cursor:"pointer",
                   padding:"0.4rem 0.35rem", fontFamily:"inherit", flexShrink:0,
                 }}
@@ -1139,9 +1422,9 @@ body { overflow-x: hidden; max-width: 100vw; }
                   <button key={tb.id}
                     onClick={() => { setActiveTab(tb.id); setShowMore(false); }}
                     role="tab" aria-selected={active}
-                    style={{ padding:"0.5rem 0.35rem", border:`1px solid ${active ? "#B0000A" : v("borderLight",dark)}`, background: active ? (dark ? "rgba(176,0,10,0.18)" : "rgba(176,0,10,0.07)") : v("cardBg2",dark), cursor:"pointer", borderRadius:"8px", transition:"all 0.15s", outline:"none", textAlign:"center" }}>
-                    <div style={{ fontSize:"0.75rem", fontWeight:600, color:active ? "#B0000A" : v("textPrimary",dark) }}>{tb.label}</div>
-                    <div style={{ fontSize:"0.63rem", color:v("textMuted",dark), marginTop:"2px" }}>{tb.sub}</div>
+                    style={{ padding:"0.5rem 0.35rem", border:`1px solid ${active ? "var(--accent)" : "var(--border-light)"}`, background: active ? "var(--accent-soft)" : "var(--bg-card-2)", cursor:"pointer", borderRadius:"8px", transition:"all 0.15s", outline:"none", textAlign:"center" }}>
+                    <div style={{ fontSize:"0.75rem", fontWeight:600, color: active ? "var(--accent)" : "var(--text-primary)" }}>{tb.label}</div>
+                    <div style={{ fontSize:"0.63rem", color:"var(--text-muted)", marginTop:"2px" }}>{tb.sub}</div>
                   </button>
                 );
               })}
@@ -1154,7 +1437,7 @@ body { overflow-x: hidden; max-width: 100vw; }
             days={days}
             openDays={openDays}
             setOpenDays={setOpenDays}
-            tabColor={CITY[tab.city]?.color || "#B0000A"}
+            tabColor={CITY[tab.city]?.color || "var(--accent)"}
           />
         )}
         <main style={{ padding:"0.875rem 0.875rem calc(6rem + env(safe-area-inset-bottom, 0px))", maxWidth:"760px", margin:"0 auto" }}>
@@ -1264,18 +1547,19 @@ function DesktopTOC({ days, openDays, setOpenDays, tabColor }) {
       className="desk-toc"
       aria-label="Table des matières — jours"
       style={{
-        background: v("cardBg", dark),
-        border: `1px solid ${v("border", dark)}`,
-        color: v("textPrimary", dark),
-        boxShadow: dark ? "0 2px 8px rgba(0,0,0,0.5)" : "0 2px 8px rgba(0,0,0,0.08)",
+        background: "var(--bg-card)",
+        border: "1px solid var(--border)",
+        color: "var(--text-primary)",
+        boxShadow: "var(--shadow-card)",
       }}
     >
       <div style={{
+        fontFamily: "var(--font-body)",
         fontSize: "0.68rem",
         textTransform: "uppercase",
-        letterSpacing: "0.08em",
-        fontWeight: 600,
-        color: v("textMuted", dark),
+        letterSpacing: "0.18em",
+        fontWeight: 700,
+        color: "var(--text-muted)",
         padding: "0.25rem 0.5rem 0.5rem",
       }}>
         Jours ({days.length})
@@ -1311,6 +1595,8 @@ function DesktopTOC({ days, openDays, setOpenDays, tabColor }) {
   );
 }
 
+// Kanji ideograms by city — vertical accent on the right of the day card.
+const CITY_KANJI = { tokyo:"東京", kyoto:"京都", osaka:"大阪", transit:"移動", depart:"発" };
 const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query, matchCount = 0 }, ref) {
   const dark = useDark();
   const [viewMode, setViewMode] = useState(() => {
@@ -1322,41 +1608,176 @@ const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query, matc
     try { localStorage.setItem("viewMode", next); } catch {}
   };
   const cc = CITY[day.city]||CITY.transit;
-  const cityNames = { tokyo:"Tokyo", kyoto:"Kyoto", osaka:"Osaka", transit:"Transit", depart:"Départ" };
+  const cityNames = { tokyo:"TOKYO", kyoto:"KYOTO", osaka:"OSAKA", transit:"TRANSIT", depart:"DÉPART" };
+  const kanji = CITY_KANJI[day.city] || "";
+  const nLabel = day.nLabel || String(day.n).padStart(2, "0");
   return (
-    <article ref={ref} id={"day-" + day.n} style={{ background:v("cardBg",dark), borderRadius:"12px", overflow:"hidden", boxShadow:dark?"0 1px 4px rgba(0,0,0,0.4)":"0 1px 4px rgba(0,0,0,0.07)", border:`1px solid ${v("border",dark)}`, transition:"background 0.3s, border 0.3s" }}>
-      <button onClick={onToggle} aria-expanded={isOpen} aria-controls={"day-" + day.n + "-content"} style={{ width:"100%", display:"flex", alignItems:"center", gap:"0.85rem", padding:"0.85rem 1rem", background:"transparent", border:"none", cursor:"pointer", textAlign:"left", outline:"none" }}>
-        <div style={{ flexShrink:0, width:"2.5rem", height:"2.5rem", borderRadius:"50%", background:cc.light[dark?"dark":"light"], border:`2px solid ${cc.border[dark?"dark":"light"]}`, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
-          <span style={{ fontSize:"0.68rem", color:cc.color, fontWeight:700, lineHeight:1 }}>J</span>
-          <span style={{ fontSize:day.nLabel?"0.85rem":"0.95rem", color:cc.color, fontWeight:700, lineHeight:1 }}>{day.nLabel||day.n}</span>
+    <article
+      ref={ref}
+      id={"day-" + day.n}
+      style={{
+        background: "var(--bg-card)",
+        borderRadius: "14px",
+        overflow: "hidden",
+        boxShadow: "var(--shadow-card)",
+        border: "1px solid var(--border)",
+        borderLeft: `4px solid ${cc.color}`,
+        transition: "background 0.3s, border 0.3s, box-shadow 0.2s",
+      }}
+    >
+      <button
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        aria-controls={"day-" + day.n + "-content"}
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "0.9rem",
+          padding: "1rem 1rem 0.9rem 1.05rem",
+          background: "transparent",
+          border: "none",
+          cursor: "pointer",
+          textAlign: "left",
+          outline: "none",
+          fontFamily: "inherit",
+          color: "inherit",
+        }}
+      >
+        {/* Left: big editorial day number + date line */}
+        <div style={{ minWidth: "3rem", display: "flex", flexDirection: "column", alignItems: "flex-start", flexShrink: 0, paddingTop: "0.1rem" }}>
+          <div style={{
+            fontFamily: "var(--font-display)",
+            fontStyle: "italic",
+            fontWeight: 900,
+            fontSize: "2.4rem",
+            lineHeight: 0.9,
+            letterSpacing: "-0.04em",
+            color: "var(--text-primary)",
+            fontVariationSettings: '"opsz" 144',
+          }}>{nLabel}</div>
+          <div style={{
+            fontFamily: "var(--font-mono, ui-monospace, monospace)",
+            fontSize: "0.62rem",
+            fontWeight: 600,
+            color: "var(--text-muted)",
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            marginTop: "0.4rem",
+          }}>{day.day} · {day.date}</div>
         </div>
-        <div style={{ flex:1, minWidth:0 }}>
-          <div style={{ display:"flex", alignItems:"center", gap:"0.4rem", flexWrap:"wrap", marginBottom:"0.2rem" }}>
-            <span style={{ fontSize:"0.72rem", fontWeight:600, color:cc.color, background:cc.light[dark?"dark":"light"], padding:"0.1rem 0.45rem", borderRadius:"10px", flexShrink:0 }}>{cityNames[day.city]||day.city}</span>
-            <span style={{ fontSize:"0.68rem", color:v("textMuted",dark), flexShrink:0 }}>{day.day} {day.date}</span>
-            {day.alert && <span style={{ fontSize:"0.7rem", background:dark?"#2A1800":"#FEF3C7", color:dark?"#FCD34D":"#92400E", padding:"0.1rem 0.4rem", borderRadius:"8px" }}>🎌 Jour férié</span>}
+
+        {/* Middle: city chip + badges + title */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.45rem", flexWrap: "wrap", marginBottom: "0.45rem" }}>
+            <span style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "0.6rem",
+              fontWeight: 700,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "var(--bg-page)",
+              background: cc.color,
+              padding: "0.18rem 0.5rem",
+              borderRadius: "2px",
+              flexShrink: 0,
+              lineHeight: 1.1,
+            }}>{cityNames[day.city]||day.city}</span>
+            {day.alert && (
+              <span style={{
+                fontSize: "0.65rem",
+                fontWeight: 700,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                background: "var(--alert-bg)",
+                color: "var(--alert-txt)",
+                border: "1px solid var(--alert-bdr)",
+                padding: "0.12rem 0.45rem",
+                borderRadius: "3px",
+              }}>🎌 Férié</span>
+            )}
             {query && matchCount > 0 && (
               <span
                 title={`${matchCount} activité${matchCount>1?"s":""} correspond${matchCount>1?"ent":""} à « ${query} »`}
-                style={{ fontSize:"0.68rem", fontWeight:700, color:dark?"#FEF08A":"#78350F", background:dark?"#854D0E":"#FEF08A", padding:"0.1rem 0.4rem", borderRadius:"8px", flexShrink:0 }}
+                style={{
+                  fontSize: "0.65rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  color: "var(--accent)",
+                  background: "var(--accent-soft)",
+                  border: "1px solid var(--accent)",
+                  padding: "0.12rem 0.45rem",
+                  borderRadius: "3px",
+                  flexShrink: 0,
+                }}
               >
                 🔍 {matchCount}
               </span>
             )}
           </div>
-          <div style={{ fontSize:"0.9rem", fontWeight:600, color:v("textPrimary",dark), lineHeight:1.3, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden", wordBreak:"break-word" }}>{day.title}</div>
+          <div style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "1.05rem",
+            fontWeight: 600,
+            letterSpacing: "-0.01em",
+            color: "var(--text-primary)",
+            lineHeight: 1.25,
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            wordBreak: "break-word",
+          }}>{day.title}</div>
         </div>
-        <span style={{ color:v("textMuted",dark), fontSize:"0.8rem", flexShrink:0, display:"inline-block", transform:isOpen?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▼</span>
+
+        {/* Right: kanji column + chevron */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.65rem", flexShrink: 0, paddingTop: "0.1rem" }}>
+          {kanji && (
+            <span aria-hidden="true" style={{
+              fontFamily: "var(--font-kanji)",
+              fontSize: "1.15rem",
+              fontWeight: 700,
+              color: cc.color,
+              writingMode: "vertical-rl",
+              letterSpacing: "0.08em",
+              opacity: 0.9,
+              lineHeight: 1,
+            }}>{kanji}</span>
+          )}
+          <span style={{
+            color: "var(--text-muted)",
+            fontSize: "0.75rem",
+            display: "inline-block",
+            transform: isOpen ? "rotate(180deg)" : "none",
+            transition: "transform 0.2s",
+          }}>▼</span>
+        </div>
       </button>
       {day.alert && (
-        <div style={{ margin:"0 0.875rem 0.75rem", padding:"0.5rem 0.75rem", background:v("alertBg",dark), borderRadius:"8px", borderLeft:`3px solid ${v("alertBdr",dark)}` }}>
-          <p style={{ fontSize:"0.74rem", color:v("alertTxt",dark), lineHeight:1.45, margin:0 }}>{day.alert}</p>
+        <div style={{ margin:"0 0.9rem 0.75rem", padding:"0.55rem 0.75rem", background:"var(--alert-bg)", borderRadius:"6px", borderLeft:"3px solid var(--alert-bdr)" }}>
+          <p style={{ fontSize:"0.74rem", color:"var(--alert-txt)", lineHeight:1.45, margin:0 }}>{day.alert}</p>
         </div>
       )}
       {isOpen && (
-        <div id={"day-" + day.n + "-content"} style={{ padding:"0 0.875rem 0.875rem" }}>
+        <div id={"day-" + day.n + "-content"} style={{ padding:"0 0.9rem 0.9rem" }}>
           <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:"0.5rem" }}>
-            <button onClick={e=>{e.stopPropagation();toggleView();}} data-tap="action" style={{ fontSize:"0.75rem", borderRadius:"8px", border:`1px solid ${v("borderLight",dark)}`, background:viewMode==="timeline"?(dark?"#1A2340":"#EEF2FF"):"transparent", color:viewMode==="timeline"?"#3B7EFF":v("textMuted",dark), cursor:"pointer", fontFamily:"inherit" }}>
+            <button
+              onClick={e=>{e.stopPropagation();toggleView();}}
+              data-tap="action"
+              style={{
+                fontSize:"0.7rem",
+                fontWeight: 600,
+                letterSpacing: "0.05em",
+                textTransform: "uppercase",
+                borderRadius:"6px",
+                border: viewMode==="timeline" ? "1px solid var(--accent)" : "1px solid var(--border-light)",
+                background: viewMode==="timeline" ? "var(--accent-soft)" : "transparent",
+                color: viewMode==="timeline" ? "var(--accent)" : "var(--text-muted)",
+                cursor:"pointer", fontFamily:"inherit",
+                padding: "0.35rem 0.7rem",
+              }}
+            >
               {viewMode==="timeline"?"📋 Cartes":"⏱ Timeline"}
             </button>
           </div>
@@ -2623,9 +3044,9 @@ function GastroSection() {
 
       {/* ── TOP 10 SECTION ── */}
       <div style={{ background:v("cardBg",dark), borderRadius:"12px", overflow:"hidden", border:`1px solid ${v("border",dark)}`, boxShadow:dark?"0 2px 8px rgba(0,0,0,0.4)":"0 2px 8px rgba(0,0,0,0.1)" }}>
-        <div style={{ background:"linear-gradient(135deg,#7B0000 0%,#B0000A 60%,#CC2020 100%)", padding:"0.9rem 1rem" }}>
+        <div style={{ background:"linear-gradient(135deg,#0A1428 0%,#0D1B3F 45%,#1B3A68 100%)", padding:"0.9rem 1rem" }}>
           <p style={{ fontSize:"0.7rem", color:"rgba(255,255,255,0.6)", letterSpacing:"0.15em", textTransform:"uppercase", margin:"0 0 0.2rem" }}>Sélection éditoriale</p>
-          <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"1.25rem", fontWeight:600, color:"white", margin:"0 0 0.5rem" }}>Top 10 — Les incontournables culinaires</h2>
+          <h2 style={{ fontFamily:"'Fraunces',serif", fontSize:"1.25rem", fontWeight:600, color:"white", margin:"0 0 0.5rem" }}>Top 10 — Les incontournables culinaires</h2>
           <p style={{ fontSize:"0.72rem", color:"rgba(255,255,255,0.75)", margin:0, lineHeight:1.5 }}>
             Ces 10 expériences définissent la gastronomie japonaise. Un premier voyage sans elles est incomplet. Le classement s'établit sur trois critères : unicité culturelle (faisable seulement au Japon), accessibilité (sans budget illimité), et densité d'émotion gustative. Du plus universel au plus mémorable.
           </p>

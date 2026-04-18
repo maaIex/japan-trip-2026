@@ -8,8 +8,8 @@
   "orientation": "portrait",
   "lang": "fr",
   "dir": "ltr",
-  "background_color": "#7B0000",
-  "theme_color": "#7B0000",
+  "background_color": "#0D1B3F",
+  "theme_color": "#0D1B3F",
   "categories": ["travel", "lifestyle"],
   "icons": [
     {
