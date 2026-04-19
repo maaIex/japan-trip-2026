@@ -4,6 +4,29 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ---
 
+## Session 7 — 2026-04-19 (audit fixes — suite)
+
+### Stabilisation des listes filtrables
+
+- `PhrasebookSection` : `key={pi}` remplacé par `phraseKey = ${cat.id}-${p.jp}` (stable à travers le filtre de recherche). L'état `copied` utilise la même clé. Le badge "✓ Copié" ne saute plus d'une phrase à l'autre quand l'utilisateur tape dans la barre de recherche.
+- `GastroSection` : `key={idx}` remplacé par `itemKey = cat.id::item.name` dans l'accordéon filtrable (ville + priorité). Évite la perte d'état lors des changements de filtre.
+- `PhrasebookSection.copyPhrase` + `GastroSection.goToGastroItem` : `setTimeout` trackés dans un ref, `clearTimeout` au démontage.
+
+### Quota localStorage — alerte utilisateur
+
+- Wrapper `safeSetItem(key, value)` qui détecte `QuotaExceededError` (codes 22/1014, names `QuotaExceededError` / `NS_ERROR_DOM_QUOTA_REACHED`). Alerte une fois par session avec un message qui pointe vers Infos → Sauvegarde pour exporter et faire de la place.
+- Appliqué aux 3 écritures critiques : `DONE_ITEMS_KEY` (cases cochées), `DAY_NOTES_KEY` (notes), et à `BackupSection` pendant l'import.
+
+### A11y — checklist des réservations
+
+- Les items bookables de `ChecklistSection` ont maintenant `tabIndex={0}`, gèrent `Space`/`Enter` via `onKeyDown`, et un `aria-label` dynamique ("Cocher …" / "Décocher …"). Navigation clavier possible sur tous les items de réservation.
+
+### QRCode CDN — intégrité renforcée
+
+- `<script>` QRCode.js inclut désormais `integrity` (SHA-512), `crossOrigin="anonymous"` et `referrerPolicy="no-referrer"`. Si le CDN est compromis ou le fichier modifié, le script est rejeté par le navigateur.
+
+---
+
 ## Session 7 — 2026-04-19 (audit fixes)
 
 ### Correctifs issus de l'audit

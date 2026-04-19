@@ -2343,6 +2343,29 @@ function formatEur(v) {
 const DONE_ITEMS_KEY = "japan-done-items-v1";
 const DONE_ITEMS_EVENT = "japan-done-items-changed";
 
+// Wrapper localStorage.setItem qui détecte QuotaExceededError et alerte une
+// fois par session (évite la perte silencieuse de notes/réservations quand
+// le quota est atteint). Retourne true en cas de succès.
+let __quotaWarned = false;
+function safeSetItem(key, value) {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (e) {
+    const isQuota = e && (
+      e.code === 22 || e.code === 1014 ||
+      e.name === "QuotaExceededError" || e.name === "NS_ERROR_DOM_QUOTA_REACHED"
+    );
+    if (isQuota && !__quotaWarned) {
+      __quotaWarned = true;
+      try {
+        alert("⚠️ Espace de stockage local saturé. Exportez vos données (Infos → Sauvegarde) et supprimez des notes longues pour continuer à enregistrer.");
+      } catch {}
+    }
+    return false;
+  }
+}
+
 function useDoneItems() {
   const [done, setDone] = useState(() => {
     try {
@@ -2368,10 +2391,9 @@ function useDoneItems() {
     setDone(prev => {
       const next = new Set(prev);
       next.has(key) ? next.delete(key) : next.add(key);
-      try {
-        localStorage.setItem(DONE_ITEMS_KEY, JSON.stringify([...next]));
+      if (safeSetItem(DONE_ITEMS_KEY, JSON.stringify([...next]))) {
         window.dispatchEvent(new Event(DONE_ITEMS_EVENT));
-      } catch {}
+      }
       if (navigator.vibrate) navigator.vibrate(8);
       return next;
     });
@@ -2397,7 +2419,7 @@ function useDayNote(dayN) {
       const all = raw ? JSON.parse(raw) : {};
       if (val) all[dayN] = val;
       else delete all[dayN];
-      localStorage.setItem(DAY_NOTES_KEY, JSON.stringify(all));
+      safeSetItem(DAY_NOTES_KEY, JSON.stringify(all));
     } catch {}
   };
   return [note, update];
@@ -2736,8 +2758,13 @@ function ChecklistSection() {
                 <div
                   key={ii}
                   onClick={() => isBookable && toggle(key)}
+                  onKeyDown={isBookable ? (e) => {
+                    if (e.key === " " || e.key === "Enter") { e.preventDefault(); toggle(key); }
+                  } : undefined}
                   role={isBookable ? "button" : undefined}
+                  tabIndex={isBookable ? 0 : undefined}
                   aria-pressed={isBookable ? isDone : undefined}
+                  aria-label={isBookable ? `${isDone ? "Décocher" : "Cocher"} ${item.name}` : undefined}
                   style={{
                     padding:"0.75rem 0",
                     borderBottom: ii < cat.items.length - 1 ? `0.5px solid var(--border-light)` : "none",
@@ -3326,20 +3353,21 @@ function GastroSection() {
   const [cityFilter, setCityFilter] = useState("all"); // C17: all | tokyo | kyoto | osaka
   const [highlightedItem, setHighlightedItem] = useState(null); // "catId::itemName"
 
+  const gastroTimersRef = useRef([]);
+  useEffect(() => () => { gastroTimersRef.current.forEach(clearTimeout); gastroTimersRef.current = []; }, []);
   const goToGastroItem = (catId, itemName) => {
-    // 1. Open the accordion
     setOpenSections(p => { const s = new Set(p); s.add(catId); return s; });
-    // 2. Reset filter to show all (so item is visible)
     setFilter(0);
-    // 3. Highlight + scroll after render
     const key = catId + "::" + itemName;
     setHighlightedItem(key);
-    setTimeout(() => {
-      const el = document.getElementById("gastro-item-" + key.replace(/[^a-zA-Z0-9]/g, "-"));
-      if (el) el.scrollIntoView({ behavior:"smooth", block:"center" });
-    }, 80);
-    // 4. Remove highlight after 2.2s
-    setTimeout(() => setHighlightedItem(null), 2200);
+    gastroTimersRef.current.forEach(clearTimeout);
+    gastroTimersRef.current = [
+      setTimeout(() => {
+        const el = document.getElementById("gastro-item-" + key.replace(/[^a-zA-Z0-9]/g, "-"));
+        if (el) el.scrollIntoView({ behavior:"smooth", block:"center" });
+      }, 80),
+      setTimeout(() => setHighlightedItem(null), 2200),
+    ];
   };
 
   const toggleSection = id => setOpenSections(p => {
@@ -3518,7 +3546,7 @@ function GastroSection() {
                   const itemId = "gastro-item-" + itemKey.replace(/[^a-zA-Z0-9]/g, "-");
                   const isHighlighted = highlightedItem === itemKey;
                   return (
-                    <div key={idx} id={itemId} style={{ padding:"0.95rem 0", borderBottom:idx<cat.items.length-1?`0.5px solid var(--border-light)`:"none", transition:"background 0.5s ease", background: isHighlighted ? "var(--accent-wash)" : "transparent" }}>
+                    <div key={itemKey} id={itemId} style={{ padding:"0.95rem 0", borderBottom:idx<cat.items.length-1?`0.5px solid var(--border-light)`:"none", transition:"background 0.5s ease", background: isHighlighted ? "var(--accent-wash)" : "transparent" }}>
                       <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:"0.4rem", marginBottom:"0.4rem", flexWrap:"wrap" }}>
                         <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", flex:1, minWidth:0 }}>
                           <span style={{ fontSize:"0.95rem", flexShrink:0, opacity:0.8 }}>{item.emoji}</span>
@@ -5164,11 +5192,14 @@ function PhrasebookSection() {
   const [open, setOpen] = useState(new Set(["resto"]));
   const [q, setQ] = useState("");
   const [copied, setCopied] = useState(null);
+  const copiedTimerRef = useRef(null);
+  useEffect(() => () => { if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current); }, []);
   const toggle = id => setOpen(p => { const s=new Set(p); s.has(id)?s.delete(id):s.add(id); return s; });
   const copyPhrase = (txt, idx) => {
     try { navigator.clipboard.writeText(txt); } catch {}
     setCopied(idx);
-    setTimeout(() => setCopied(null), 1500);
+    if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current);
+    copiedTimerRef.current = setTimeout(() => setCopied(null), 1500);
   };
   const DIFF = {
     "🟢":{ bg:"var(--success-soft)", color:"var(--success)" },
@@ -5285,9 +5316,10 @@ function PhrasebookSection() {
               <div style={{ borderTop:"0.5px solid var(--border-light)" }}>
                 {cat.phrases.map((p, pi) => {
                   const dc = DIFF[p.diff];
-                  const isCopied = copied === `${cat.id}-${pi}`;
+                  const phraseKey = `${cat.id}-${p.jp}`;
+                  const isCopied = copied === phraseKey;
                   return (
-                    <div key={pi} style={{ padding:"0.85rem 0", borderBottom: pi<cat.phrases.length-1?"0.5px solid var(--border-light)":"none" }}>
+                    <div key={phraseKey} style={{ padding:"0.85rem 0", borderBottom: pi<cat.phrases.length-1?"0.5px solid var(--border-light)":"none" }}>
                       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:"0.5rem", marginBottom:"0.3rem" }}>
                         <p style={{ fontFamily:"var(--font-body)", fontSize:"0.8rem", color:"var(--text-sec)", margin:0, lineHeight:1.5 }}>{p.fr}</p>
                         <span style={{ fontFamily:"var(--font-body)", fontSize:"0.6rem", fontWeight:700, padding:"0.15rem 0.4rem", whiteSpace:"nowrap", flexShrink:0, background:dc.bg, color:dc.color, border:`1px solid ${dc.color}`, letterSpacing:"0.18em", textTransform:"uppercase" }}>{p.diff}</span>
@@ -5303,7 +5335,7 @@ function PhrasebookSection() {
                           >
                             🔊 Lire
                           </button>
-                          <button onClick={()=>copyPhrase(p.jp, `${cat.id}-${pi}`)} style={{ fontFamily:"var(--font-body)", fontSize:"0.6rem", fontWeight:700, padding:"0.28rem 0.55rem", border:`1px solid ${isCopied ? "var(--success)" : "var(--border-light)"}`, background: isCopied ? "var(--success)" : "transparent", color: isCopied ? "var(--bg-page)" : "var(--text-muted)", cursor:"pointer", transition:"all 0.2s", whiteSpace:"nowrap", letterSpacing:"0.18em", textTransform:"uppercase" }}>
+                          <button onClick={()=>copyPhrase(p.jp, phraseKey)} style={{ fontFamily:"var(--font-body)", fontSize:"0.6rem", fontWeight:700, padding:"0.28rem 0.55rem", border:`1px solid ${isCopied ? "var(--success)" : "var(--border-light)"}`, background: isCopied ? "var(--success)" : "transparent", color: isCopied ? "var(--bg-page)" : "var(--text-muted)", cursor:"pointer", transition:"all 0.2s", whiteSpace:"nowrap", letterSpacing:"0.18em", textTransform:"uppercase" }}>
                             {isCopied ? "✓ Copié" : "Copier"}
                           </button>
                         </div>
@@ -5345,6 +5377,9 @@ function ShareSection() {
     const s = document.createElement("script");
     s.id = QR_SCRIPT_ID;
     s.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
+    s.integrity = "sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==";
+    s.crossOrigin = "anonymous";
+    s.referrerPolicy = "no-referrer";
     s.onload = () => { setQrReady(true); setQrVisible(true); };
     s.onerror = () => {
       s.remove();
@@ -5498,8 +5533,7 @@ function BackupSection() {
         let count = 0;
         Object.entries(payload).forEach(([k, v]) => {
           if (BACKUP_KEYS.includes(k) && typeof v === "string") {
-            localStorage.setItem(k, v);
-            count++;
+            if (safeSetItem(k, v)) count++;
           }
         });
         window.dispatchEvent(new Event(DONE_ITEMS_EVENT));
