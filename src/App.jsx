@@ -1203,11 +1203,15 @@ body { overflow-x: hidden; max-width: 100vw; }
         <InstallBanner />
         <EmergencyFAB />
         <header className="safe-top" style={{ background:"var(--bg-page)", color:"var(--text-primary)", padding:"1.75rem 1.25rem 0", position:"relative", overflow:"hidden" }}>
-          {/* Seigaiha wave band — inked strokes on paper, fades to the
-              bottom so the editorial block below reads cleanly. */}
+          {/* Seigaiha wave band — inked strokes, fades toward the bottom so
+              the editorial block below reads cleanly. Stroke color adapts
+              to light (prussian %230D1B3F) / dark (kozo %23E8E3D6), otherwise
+              the pattern disappears on the deep-indigo night background. */}
           <div aria-hidden="true" style={{
             position:"absolute", top:0, left:0, right:0, height:"240px",
-            backgroundImage:"url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='30' viewBox='0 0 60 30'><g fill='none' stroke='%230D1B3F' stroke-width='1' opacity='0.22'><circle cx='30' cy='30' r='28'/><circle cx='30' cy='30' r='20'/><circle cx='30' cy='30' r='12'/><circle cx='30' cy='30' r='4'/><circle cx='0' cy='30' r='28'/><circle cx='0' cy='30' r='20'/><circle cx='0' cy='30' r='12'/><circle cx='0' cy='30' r='4'/><circle cx='60' cy='30' r='28'/><circle cx='60' cy='30' r='20'/><circle cx='60' cy='30' r='12'/><circle cx='60' cy='30' r='4'/></g></svg>\")",
+            backgroundImage: dark
+              ? "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='30' viewBox='0 0 60 30'><g fill='none' stroke='%23E8E3D6' stroke-width='1' opacity='0.22'><circle cx='30' cy='30' r='28'/><circle cx='30' cy='30' r='20'/><circle cx='30' cy='30' r='12'/><circle cx='30' cy='30' r='4'/><circle cx='0' cy='30' r='28'/><circle cx='0' cy='30' r='20'/><circle cx='0' cy='30' r='12'/><circle cx='0' cy='30' r='4'/><circle cx='60' cy='30' r='28'/><circle cx='60' cy='30' r='20'/><circle cx='60' cy='30' r='12'/><circle cx='60' cy='30' r='4'/></g></svg>\")"
+              : "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='60' height='30' viewBox='0 0 60 30'><g fill='none' stroke='%230D1B3F' stroke-width='1' opacity='0.22'><circle cx='30' cy='30' r='28'/><circle cx='30' cy='30' r='20'/><circle cx='30' cy='30' r='12'/><circle cx='30' cy='30' r='4'/><circle cx='0' cy='30' r='28'/><circle cx='0' cy='30' r='20'/><circle cx='0' cy='30' r='12'/><circle cx='0' cy='30' r='4'/><circle cx='60' cy='30' r='28'/><circle cx='60' cy='30' r='20'/><circle cx='60' cy='30' r='12'/><circle cx='60' cy='30' r='4'/></g></svg>\")",
             backgroundSize:"60px 30px",
             maskImage:"linear-gradient(180deg,#000 0%,#000 40%,transparent 100%)",
             WebkitMaskImage:"linear-gradient(180deg,#000 0%,#000 40%,transparent 100%)",
@@ -1438,11 +1442,13 @@ body { overflow-x: hidden; max-width: 100vw; }
                   </button>
                 );
               })}
-              {/* Bouton d'accès au Groupe B — style éditorial discret */}
+              {/* Bouton d'accès au Groupe B — le label reste toujours
+                  « Ressources » (pas de swap avec l'onglet actif) pour
+                  qu'on comprenne que c'est un disclosure, pas un lien
+                  direct. Le panneau reste ouvert tant qu'un B est actif. */}
               {(() => {
                 const activeBTab = TABS.find(t => t.group === "B" && t.id === activeTab);
                 const bHighlit = !!activeBTab || showMore;
-                const cleanBLabel = activeBTab ? activeBTab.label.replace(/^\S+\s+/, "") : "Ressources";
                 return (
                   <button
                     onClick={() => setShowMore(s => !s)}
@@ -1466,7 +1472,7 @@ body { overflow-x: hidden; max-width: 100vw; }
                         fontWeight: bHighlit ? 700 : 500,
                         color: bHighlit ? "var(--text-primary)" : "var(--text-sec)",
                         letterSpacing:"-0.01em", whiteSpace:"nowrap", lineHeight:1,
-                      }}>{cleanBLabel}</span>
+                      }}>Ressources</span>
                     </div>
                     <div style={{
                       fontFamily:"var(--font-mono)",
@@ -1474,7 +1480,7 @@ body { overflow-x: hidden; max-width: 100vw; }
                       letterSpacing:"0.16em", textTransform:"uppercase",
                       color:"var(--text-muted)",
                       marginTop:"0.3rem", whiteSpace:"nowrap",
-                    }}>{activeBTab ? activeBTab.sub : "Pratiques"}</div>
+                    }}>Pratiques</div>
                   </button>
                 );
               })()}
@@ -1488,7 +1494,7 @@ body { overflow-x: hidden; max-width: 100vw; }
                 const cleanLabel = tb.label.replace(/^\S+\s+/, "");
                 return (
                   <button key={tb.id}
-                    onClick={() => { setActiveTab(tb.id); setShowMore(false); }}
+                    onClick={() => setActiveTab(tb.id)}
                     role="tab" aria-selected={active}
                     style={{
                       padding:"0.5rem 0.4rem 0.55rem",
@@ -2074,7 +2080,42 @@ function TimelineView({ sections, city }) {
   const START_H = 7, END_H = 24;
   const TOTAL_H = END_H - START_H;
   const PX_PER_H = 52;
+  const BLOCK_PX = 52;          // collapsed card height — overlap detection window
   const totalHeight = TOTAL_H * PX_PER_H;
+
+  // Collision resolution : regroupe en clusters les items dont les fenêtres
+  // de 52 px se chevauchent, puis assigne à chacun une colonne dans ce cluster.
+  // Deux activités à 8h30 / 9h ou 14h / 14h passent ainsi côte-à-côte au lieu
+  // de se superposer. Chaque item porte { col, colsCount, topPx }.
+  const placedItems = (() => {
+    const out = [];
+    let clusterCols = [];       // bottomPx de l'item au bas de chaque colonne
+    let clusterStart = 0;       // index de début du cluster courant dans `out`
+    let clusterMaxBottom = 0;
+    for (let i = 0; i < allItems.length; i++) {
+      const it = allItems[i];
+      const topPx = Math.max(0, (it.hour - START_H) * PX_PER_H);
+      const bottomPx = topPx + BLOCK_PX;
+      if (clusterCols.length === 0 || topPx >= clusterMaxBottom) {
+        // Ferme le cluster précédent → pose son colsCount sur chaque item.
+        const count = Math.max(1, clusterCols.length);
+        for (let j = clusterStart; j < out.length; j++) out[j].colsCount = count;
+        clusterCols = [];
+        clusterStart = out.length;
+        clusterMaxBottom = 0;
+      }
+      // Trouve la première colonne dont le bas est déjà passé.
+      let col = 0;
+      while (col < clusterCols.length && clusterCols[col] > topPx) col++;
+      clusterCols[col] = bottomPx;
+      clusterMaxBottom = Math.max(clusterMaxBottom, bottomPx);
+      out.push({ ...it, topPx, col, colsCount: 1 });
+    }
+    // Ferme le dernier cluster.
+    const count = Math.max(1, clusterCols.length);
+    for (let j = clusterStart; j < out.length; j++) out[j].colsCount = count;
+    return out;
+  })();
 
   // Period pills — resolved as CSS-variable strings so light/dark retune
   // automatically. Kept here as inline strings (not `var(...)`) inside style
@@ -2107,16 +2148,23 @@ function TimelineView({ sections, city }) {
         </div>
         {/* Activity blocks */}
         <div style={{ flex:1, position:"relative", height:totalHeight }}>
-          {allItems.map((item, i) => {
-            const top = Math.max(0, (item.hour - START_H) * PX_PER_H);
+          {placedItems.map((item) => {
             const sc = sectionColors[item.sectionId] || sectionColors.aprem;
             const isExp = expandedItem === item.key;
             const isOpt = item.s === "opt";
+            // Split horizontal en colonnes à l'intérieur d'un cluster ; quand le
+            // bloc est déplié, il prend toute la largeur et passe au-dessus.
+            const colW = 100 / item.colsCount;
+            const leftPct = item.col * colW;
+            const rightPct = 100 - (item.col + 1) * colW;
+            const cleanTitle = item.t.replace(/^[🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚🕛🕜🕝🕞🕟🕠🕡🕢🕣🕤🕥🕦🕧]\s*\d{1,2}h\d{0,2}\s*—\s*/u, "");
             return (
               <div key={item.key}
                 onClick={() => setExpandedItem(isExp ? null : item.key)}
                 style={{
-                  position:"absolute", top, left:"4px", right:"4px",
+                  position:"absolute", top: item.topPx,
+                  left: isExp ? "4px" : `calc(${leftPct}% + 3px)`,
+                  right: isExp ? "4px" : `calc(${rightPct}% + 3px)`,
                   borderLeft:`3px solid ${cc.color}`,
                   borderRadius:"0 6px 6px 0",
                   padding:"0.25rem 0.4rem",
@@ -2126,7 +2174,7 @@ function TimelineView({ sections, city }) {
                   border:`1px solid ${isExp ? cc.color : "var(--border-light)"}`,
                   borderLeftWidth:"3px",
                   transition:"all 0.2s",
-                  maxHeight: isExp ? "400px" : "52px",
+                  maxHeight: isExp ? "400px" : `${BLOCK_PX}px`,
                   overflow:"hidden",
                   background: isExp
                     ? "var(--bg-card)"
@@ -2135,13 +2183,22 @@ function TimelineView({ sections, city }) {
                       : "var(--bg-card-2)",
                 }}
               >
-                <div style={{ display:"flex", alignItems:"center", gap:"0.3rem", flexWrap:"wrap" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:"0.3rem", flexWrap:"nowrap", minWidth:0 }}>
                   <span style={{ fontFamily:"var(--font-mono, ui-monospace, monospace)", fontSize:"0.7rem", fontWeight:700, padding:"0.08rem 0.3rem", borderRadius:"4px", background:sc.bg, color:sc.color, flexShrink:0 }}>
                     {item.hour % 1 === 0 ? `${Math.floor(item.hour)}h` : `${Math.floor(item.hour)}h${Math.round((item.hour%1)*60).toString().padStart(2,"0")}`}
                   </span>
-                  <span style={{ fontSize:"0.7rem", flexShrink:0 }}>{statusIcon[item.s]||""}</span>
-                  <span style={{ fontSize:"0.72rem", fontWeight:600, color:"var(--text-primary)", lineHeight:1.2, flex:1 }}>
-                    {item.t.replace(/^[🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚🕛🕜🕝🕞🕟🕠🕡🕢🕣🕤🕥🕦🕧]\s*\d{1,2}h\d{0,2}\s*—\s*/u,"").slice(0,50)}
+                  {statusIcon[item.s] && <span style={{ fontSize:"0.7rem", flexShrink:0 }}>{statusIcon[item.s]}</span>}
+                  <span style={{
+                    fontSize:"0.72rem", fontWeight:600, color:"var(--text-primary)",
+                    lineHeight:1.25, flex:"1 1 auto", minWidth:0,
+                    display:"-webkit-box",
+                    WebkitLineClamp: isExp ? "unset" : 2,
+                    WebkitBoxOrient:"vertical",
+                    overflow:"hidden",
+                    wordBreak:"break-word",
+                    overflowWrap:"anywhere",
+                  }}>
+                    {cleanTitle}
                   </span>
                 </div>
                 {isExp && item.sub && (

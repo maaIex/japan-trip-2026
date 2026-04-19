@@ -39,6 +39,18 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 > Le lecteur ouvre le carnet, le papier est à nu. Avant la table des matières, trois blocs : le volume de l'année, le titre, le compte à rebours. Rien d'autre — pas de panneau d'alerte rouge, pas de gradient tape-à-l'œil. L'encre fait le travail.
 
+### Addendum — finitions
+
+- **Motif seigaiha en dark mode** : les cercles passaient au stroke `#0D1B3F` (prussien ink), invisibles sur le fond `#0B1428` de nuit. Le `backgroundImage` devient conditionnel `dark ? kozo(#E8E3D6) : prussien(#0D1B3F)` pour que la vague reste lisible dans les deux modes.
+- **Onglet Ressources — disclosure persistant** :
+  - Le bouton gardait l'ancien comportement « swap du label vers l'onglet B actif » — ambigu (lien direct ? toggle ?). Le label est maintenant **toujours** « Ressources » avec sub `PRATIQUES`, clairement un disclosure.
+  - Le panneau B se refermait dès qu'on sélectionnait une tuile (`setShowMore(false)` dans le `onClick`). Retiré : on peut maintenant switcher entre Budget, Transport, Checklist, Gastro, Essentiels sans recliquer sur « Ressources » à chaque fois. Le panneau ne se ferme que si on change de **destination** (groupe A) ou qu'on retappe le bouton « Ressources ».
+- **TimelineView — collision resolution + typographie lisible** :
+  - Deux activités proches (ex. 8h30 / 9h, 26 px d'écart) ou simultanées (ex. 14h / 14h) se chevauchaient totalement car chaque bloc fait 52 px de haut en position absolue. Les textes s'empilaient en charabia illisible (« Sagano Sanoto (R... Way) [嵯峨野/トロッコ] d'acteur »).
+  - Nouveau passage de *cluster detection + column assignment* dans `TimelineView` (App.jsx:2082-2113) : après le tri par heure, les items dont les fenêtres de 52 px se chevauchent forment un cluster, chacun reçoit un `col` + `colsCount`. Le rendu calcule `left: col/colsCount %` et `right: (1 - (col+1)/colsCount) %` → deux items simultanés passent côte-à-côte en demi-largeur au lieu de se superposer.
+  - Quand un bloc est déplié, il reprend toute la largeur (`left:4px right:4px z-index:10`) pour que le détail reste lisible sans écraser les voisins.
+  - Remplacement de la troncature sauvage `.slice(0, 50)` par un `-webkit-line-clamp: 2` + `word-break: break-word` : fini les mots coupés en plein milieu, le titre se tronque proprement sur 2 lignes et s'ouvre entier au clic.
+
 ---
 
 ## Session 5 — 2026-04-18
