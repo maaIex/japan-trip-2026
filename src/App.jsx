@@ -600,6 +600,25 @@ export default function App() {
 
   const [query, setQuery] = useState("");
   const searchRef = useRef(null);
+  // Pending setTimeout IDs — cleared on unmount so scrollIntoView callbacks
+  // scheduled just before a tab-swap or remount don't fire on stale DOM.
+  const pendingTimers = useRef(new Set());
+  const scheduleScroll = useCallback((dayN, delay = 120) => {
+    const id = setTimeout(() => {
+      pendingTimers.current.delete(id);
+      const el = document.getElementById("day-" + dayN);
+      if (el) {
+        const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        el.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+      }
+    }, delay);
+    pendingTimers.current.add(id);
+    return id;
+  }, []);
+  useEffect(() => () => {
+    pendingTimers.current.forEach(clearTimeout);
+    pendingTimers.current.clear();
+  }, []);
   // Panneau Groupe B (ressources pratiques) — dépliable via bouton "Plus"
   const [showMore, setShowMore] = useState(false);
 
@@ -742,15 +761,12 @@ export default function App() {
       const target = days[nextIdx];
       e.preventDefault();
       setOpenDays(p => { const s = new Set(p); s.add(target.n); return s; });
-      setTimeout(() => {
-        const node = document.getElementById("day-" + target.n);
-        if (node) node.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 40);
+      scheduleScroll(target.n, 40);
     };
 
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [activeTab, days]);
+  }, [activeTab, days, scheduleScroll]);
 
   useEffect(() => {
     if (!query) return;
@@ -780,14 +796,8 @@ export default function App() {
         }
       } catch {}
     }
-    setTimeout(() => {
-      const el = document.getElementById("day-" + dayN);
-      if (el) {
-        const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        el.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
-      }
-    }, 180);
-  }, []);
+    scheduleScroll(dayN, 180);
+  }, [scheduleScroll]);
 
   // Deep-link: #/jour/N opens that day. Respected on load + hashchange.
   useEffect(() => {
@@ -820,10 +830,7 @@ export default function App() {
           setOpenDays(prev => new Set(prev).add(dayN));
           try { history.replaceState(null, "", `#/jour/${dayN}`); } catch {}
         }
-        setTimeout(() => {
-          const el = document.getElementById("day-" + dayN);
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 120);
+        if (dayN != null) scheduleScroll(dayN, 120);
       },
       jumpToday: () => {
         if (currentDayN != null) openDayDeep(currentDayN);
@@ -1342,10 +1349,7 @@ body { overflow-x: hidden; max-width: 100vw; }
                 if (tabForDay) {
                   setActiveTab(tabForDay.id);
                   setOpenDays(prev => new Set(prev).add(dayN));
-                  setTimeout(() => {
-                    const el = document.getElementById("day-" + dayN);
-                    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-                  }, 120);
+                  scheduleScroll(dayN, 120);
                 }
               }}
             />
@@ -1365,10 +1369,7 @@ body { overflow-x: hidden; max-width: 100vw; }
                     if (tabForDay) {
                       setActiveTab(tabForDay.id);
                       setOpenDays(prev => new Set(prev).add(currentDayN));
-                      setTimeout(() => {
-                        const el = document.getElementById("day-" + currentDayN);
-                        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-                      }, 120);
+                      scheduleScroll(currentDayN, 120);
                     }
                     if (navigator.vibrate) navigator.vibrate(8);
                   }}
@@ -3585,6 +3586,12 @@ function ConverterCard() {
     } catch { return null; }
   });
   const [refreshing, setRefreshing] = useState(false);
+  const abortRef = useRef(null);
+  const mountedRef = useRef(true);
+  useEffect(() => () => {
+    mountedRef.current = false;
+    if (abortRef.current) abortRef.current.abort();
+  }, []);
   const fetchRate = useCallback((force = false) => {
     if (!force) {
       try {
@@ -3593,10 +3600,14 @@ function ConverterCard() {
       } catch {}
     }
     if (!navigator.onLine) return;
+    if (abortRef.current) abortRef.current.abort();
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
     setRefreshing(true);
-    fetch("https://api.frankfurter.app/latest?from=EUR&to=JPY")
+    fetch("https://api.frankfurter.app/latest?from=EUR&to=JPY", { signal: ctrl.signal })
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(data => {
+        if (!mountedRef.current) return;
         const jpy = data && data.rates && data.rates.JPY;
         if (!jpy) return;
         const r = Math.round(jpy * 100) / 100;
@@ -3609,7 +3620,7 @@ function ConverterCard() {
         } catch {}
       })
       .catch(() => {})
-      .finally(() => setRefreshing(false));
+      .finally(() => { if (mountedRef.current) setRefreshing(false); });
   }, []);
   useEffect(() => { fetchRate(false); }, [fetchRate]);
   const [yen, setYen] = useState("");
@@ -3787,6 +3798,12 @@ function LiveWeatherCard() {
 
   const CACHE_KEY = "weather-cache-v1";
   const MAX_AGE = 3 * 60 * 60 * 1000; // 3h
+  const abortRef = useRef(null);
+  const mountedRef = useRef(true);
+  useEffect(() => () => {
+    mountedRef.current = false;
+    if (abortRef.current) abortRef.current.abort();
+  }, []);
 
   const fetchAll = useCallback(async (force = false) => {
     if (!force) {
@@ -3804,23 +3821,28 @@ function LiveWeatherCard() {
         }
       } catch {}
     }
+    if (abortRef.current) abortRef.current.abort();
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
     setLoading(true);
     try {
       const results = await Promise.all(WEATHER_CITIES.map(async c => {
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&timezone=Asia%2FTokyo&forecast_days=7`;
-        const res = await fetch(url);
+        const res = await fetch(url, { signal: ctrl.signal });
         if (!res.ok) throw new Error("HTTP " + res.status);
         const json = await res.json();
         return { id: c.id, daily: json.daily };
       }));
+      if (!mountedRef.current || ctrl.signal.aborted) return;
       const payload = { fetchedAt: Date.now(), cities: Object.fromEntries(results.map(r => [r.id, r.daily])) };
       setData(payload);
       setError(null);
       try { localStorage.setItem(CACHE_KEY, JSON.stringify(payload)); } catch {}
     } catch (err) {
+      if (err.name === "AbortError" || !mountedRef.current) return;
       setError(err.message || "Erreur réseau");
     } finally {
-      setLoading(false);
+      if (mountedRef.current && !ctrl.signal.aborted) setLoading(false);
     }
   }, []);
 
@@ -5309,13 +5331,25 @@ function ShareSection() {
   const [copied, setCopied] = useState(false);
   const [qrReady, setQrReady] = useState(false);
 
-  // Load QR library dynamically
+  // Load QR library dynamically — idempotent : si déjà chargée ou en cours,
+  // on ne ré-injecte pas le <script>.
+  const QR_SCRIPT_ID = "qrcode-js-cdn";
   const loadQR = () => {
     if (window.QRCode) { setQrVisible(true); setQrReady(true); return; }
+    const existing = document.getElementById(QR_SCRIPT_ID);
+    if (existing) {
+      // Un chargement est déjà en cours — s'accrocher au même script.
+      existing.addEventListener("load", () => { setQrReady(true); setQrVisible(true); }, { once: true });
+      return;
+    }
     const s = document.createElement("script");
+    s.id = QR_SCRIPT_ID;
     s.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
     s.onload = () => { setQrReady(true); setQrVisible(true); };
-    s.onerror = () => alert("Impossible de charger la librairie QR Code. Vérifiez votre connexion.");
+    s.onerror = () => {
+      s.remove();
+      alert("Impossible de charger la librairie QR Code. Vérifiez votre connexion.");
+    };
     document.head.appendChild(s);
   };
 

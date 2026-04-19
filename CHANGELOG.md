@@ -4,6 +4,16 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ---
 
+## Session 7 — 2026-04-19 (audit fixes)
+
+### Correctifs issus de l'audit
+
+- **AbortController sur `fetchRate` + `fetchAll`** (`ConverterCard`, `LiveWeatherCard`) : refs `abortRef` + `mountedRef`, cleanup d'unmount qui abort les requêtes en vol. Élimine les warnings React "setState sur composant démonté" et les écritures localStorage tardives.
+- **`loadQR` idempotent** (`ShareSection`) : ID fixe `qrcode-js-cdn` sur le `<script>`, re-attache un `load` listener si un chargement est déjà en cours. Double-clic ne crée plus deux scripts. Cleanup du node DOM en cas d'erreur.
+- **`scheduleScroll` centralisé** (`App`) : ref `pendingTimers` qui track tous les `setTimeout` de scroll-to-day et les `clearTimeout` au démontage. Remplace 4 `setTimeout` ad-hoc (keyboard nav, `openDayDeep`, `goTo`, bouton "Voir aujourd'hui", `TripProgressBar.onJump`).
+
+---
+
 ## Session 7 — 2026-04-19 (améliorations batch)
 
 ### Bouton J{N} — label contextuel + hide quand masthead visible
