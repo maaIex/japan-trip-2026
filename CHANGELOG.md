@@ -4,6 +4,41 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ---
 
+## Session 7 — 2026-04-19
+
+**Contexte :** Après la Session 6 (masthead + listing jours éditoriaux), le contenu *à l'intérieur* d'un jour restait en vieux style (cartes arrondies, pills, période en bandeau coloré), et les six onglets Ressources (Infos, Checklist, Gastro, Météo, Phrases, Calendrier) conservaient des en-têtes en gradient + cartes rondes. Objectif : harmoniser ces zones avec la DA Indigo Ukiyo-e (Fraunces italique, filets ink, "§ N", mono tabular, drapeau vermillon).
+
+### Détail d'un jour — timeline éditoriale
+
+- `SectionBlock` (App.jsx:2307) : fini le bandeau `[── MATIN ──]` coloré par période. En-tête devient **"§ 1" Fraunces 1.9rem italic weight 900 vermillon** + label période en sans 0.22em uppercase, simple filet `--border-light` en dessous.
+- `ActivityItem` (App.jsx:2368) : plus de cartes arrondies empilées. Layout timeline à deux colonnes :
+  - **Colonne heure** (3.4rem, flex column centered) : heure extraite du titre via regex `/^(.*?)(\d{1,2}h\d{0,2})\s*[—–-]\s*(.*)$/`, rendue en JetBrains Mono tabular-nums 0.7rem. Pastille colorée par statut (`ok`→success, `book`→gold, `note`→info, `opt`→kyoto, défaut→muted) avec double ring (2px bg-page + 1px shadow couleur). Fil vertical `--border-light` reliant les pastilles jusqu'à l'item suivant.
+  - **Colonne contenu** : titre nettoyé en Fraunces 1rem weight 700 italique si `s==="ok"`, sous-titre Inter Tight 0.82rem, badge de statut applati (pas de border-radius, uppercase 0.18em). Boutons "Fait" / "Maps" en flat border 1px uppercase 0.1em.
+
+### Six onglets Ressources — refonte DA
+
+Délégué à un agent (restyle massif ~3000 lignes, fonctionnalités préservées). Touches :
+
+- **ChecklistSection** : en-tête pill warning → titre Fraunces italic "§ Checklist des Réservations" + filet ink. Barre de progression : 5px radius gradient → 3px flat `--accent` sur `--border-light`. Catégories en labels uppercase trackés 0.18em. Checkboxes carrées (pas de radius). Dates en mono tabular-nums, notes italique accent.
+- **GastroSection** : bandeau "Top 10" gradient → titre "§ 10" Fraunces italic. Cercles rangs → chiffres italiques sans chrome. Filtres ville en boutons flat uppercase. Accordéons catégories applatis, titres Fraunces italic. Badges prio/difficulté en rectangles flat.
+- **MeteoSection** : alerte Golden Week → filets top/bottom + titre italic. Cartes météo applaties, stats en mono tabular-nums avec séparateurs verticaux, notes italique.
+- **CalendrierSection** : intro carte applatie avec "§", dates en mono. Pills filtres flat uppercase. Timeline fêtes applatie, titres italic serif, tips en quotes italiques avec bordure gauche, overlays festivals en blocs border-left accent.
+- **PhrasebookSection** : intro applatie "§", search box flat 1px. Accordéons applatis, titres italic. JP en Shippori Mincho (`--font-kanji`), romaji en Fraunces italic display. Boutons difficulté + actions en rectangles flat uppercase.
+- **InfoSection** : le shell partagé `InfoCard` (utilisé aussi par Météo/Phrases/Infos internes) perd sa carte arrondie à gradient et devient filets top/bottom + titre "§ …" Fraunces italic + sous-titre sans tracked. Listes internes (Transports, Boissons, Astuces, Codes culturels) avec labels uppercase + filets fins.
+
+### Préservé (intouchés)
+
+- `DayCard`, `TimelineView`, `SectionBlock` day detail (fait dans cette session), masthead, onglets nav, barre de recherche.
+- Composants imbriqués spécifiques (`ConverterCard`, `TranslateShortcuts`, `KonbiniHub`, `DoAndDont`, `DepartureChecklist`, `ShareSection`, `NotificationsSection`, `SpotCard`, `LiveWeatherCard`) : héritent du nouveau shell `InfoCard` mais leur micro-styling interne reste — à voir si besoin d'un passage dédié plus tard.
+- Tous les bindings données, handlers, aria, localStorage intacts.
+
+### Vérifications
+
+- HMR Vite passe cleanly sur toutes les edits (pas d'erreur parse).
+- Dev server réexposé avec `--host` pour test mobile sur `http://192.168.0.19:5173`.
+
+---
+
 ## Session 6 — 2026-04-19
 
 **Contexte :** Les couleurs Ukiyo-e sont en place (Session 5), mais la *disposition* de l'en-tête, des bannières de réservation et du listing des jours ne correspondait pas encore au prototype `voyage-japon/project/Voyage Japon.html`. L'objectif de cette session : aligner la mise en page pixel-près sur le mock éditorial.

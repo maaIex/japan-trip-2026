@@ -1890,7 +1890,7 @@ const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query, matc
           {viewMode==="timeline" ? (
             <TimelineView sections={day.sections} city={day.city} />
           ) : (
-          <>{day.sections.filter(s=>s.items.length>0).map(section=><SectionBlock key={section.id} section={section} query={query} dayN={day.n} dayCity={day.city} />)}</>
+          <>{day.sections.filter(s=>s.items.length>0).map((section, si)=><SectionBlock key={section.id} section={section} query={query} dayN={day.n} dayCity={day.city} idx={si} />)}</>
           )}
           {day.tips?.length>0 && (
             <div style={{
@@ -2304,13 +2304,8 @@ const mapsLink = (query, city) => {
 };
 
 
-function SectionBlock({ section, query, dayN, dayCity }) {
+function SectionBlock({ section, query, dayN, dayCity, idx = 0 }) {
   const cfg = PERIOD[section.id] || PERIOD.aprem;
-  // cfg.* carry {light:var(...), dark:var(...)} — both strings resolve to the
-  // same CSS variable, so we can read either branch.
-  const cfgColor = cfg.color.light;
-  const cfgBg    = cfg.bg.light;
-  const cfgLine  = cfg.line.light;
   // U6: when searching, only render items in this section that actually match.
   const visibleItems = query
     ? section.items
@@ -2325,31 +2320,41 @@ function SectionBlock({ section, query, dayN, dayCity }) {
   if (visibleItems.length === 0) return null;
 
   return (
-    <div>
-      <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", margin:"0.85rem 0 0.5rem" }}>
-        <div style={{ height:"1px", background:cfgLine, flex:1 }}/>
+    <div style={{ marginBottom: "1.5rem" }}>
+      {/* Editorial section header — § N italic serif + uppercase label */}
+      <div style={{
+        display:"flex", alignItems:"baseline", gap:"0.75rem",
+        marginTop: idx === 0 ? "0.25rem" : "1.1rem",
+        marginBottom:"0.9rem",
+        paddingBottom:"0.5rem",
+        borderBottom:"0.5px solid var(--border-light)",
+      }}>
+        <span style={{
+          fontFamily:"var(--font-display)",
+          fontSize:"1.9rem", fontWeight:900, fontStyle:"italic",
+          color:"var(--accent)", lineHeight:1,
+          letterSpacing:"-0.04em",
+          fontVariationSettings: '"opsz" 144',
+        }}>§ {idx + 1}</span>
         <span style={{
           fontFamily:"var(--font-body)",
-          fontSize:"0.68rem", fontWeight:700,
-          letterSpacing:"0.14em", textTransform:"uppercase",
-          color:cfgColor, background:cfgBg,
-          padding:"0.22rem 0.7rem", borderRadius:"2px",
-          whiteSpace:"nowrap",
-          border:`1px solid ${cfgLine}`,
+          fontSize:"0.7rem", fontWeight:700,
+          letterSpacing:"0.22em", textTransform:"uppercase",
+          color:"var(--text-primary)",
         }}>
           {cfg.label}
-          {query && <span style={{ marginLeft:"0.4rem", opacity:0.7 }}>· {visibleItems.length}</span>}
+          {query && <span style={{ marginLeft:"0.4rem", opacity:0.6 }}>· {visibleItems.length}</span>}
         </span>
-        <div style={{ height:"1px", background:cfgLine, flex:1 }}/>
       </div>
-      <div style={{ display:"flex", flexDirection:"column", gap:"0.4rem" }}>
-        {visibleItems.map(({ item, i }) => (
+      <div style={{ display:"flex", flexDirection:"column" }}>
+        {visibleItems.map(({ item, i }, vi) => (
           <ActivityItem
             key={i}
             item={item}
             query={query}
             itemKey={`${dayN}-${section.id}-${i}`}
             dayCity={dayCity}
+            isLast={vi === visibleItems.length - 1}
           />
         ))}
       </div>
@@ -2357,7 +2362,7 @@ function SectionBlock({ section, query, dayN, dayCity }) {
   );
 }
 
-function ActivityItem({ item, query, itemKey, dayCity }) {
+function ActivityItem({ item, query, itemKey, dayCity, isLast = false }) {
   const dark = useDark();
   const { done, toggle } = useDoneItems();
   const st = ST[item.s] || ST.free;
@@ -2365,89 +2370,133 @@ function ActivityItem({ item, query, itemKey, dayCity }) {
   const isDone = itemKey ? done.has(itemKey) : false;
   const cityName = { tokyo:"Tokyo", kyoto:"Kyoto", osaka:"Osaka" }[dayCity] || "";
 
+  // Split "🕘 9h30 — Titre" into time + clean title. Leaves title unchanged if no time prefix.
+  const timeMatch = item.t.match(/^(.*?)(\d{1,2}h\d{0,2})\s*[—–\-]\s*([\s\S]*)$/);
+  const time = timeMatch ? timeMatch[2] : "";
+  const cleanTitle = timeMatch ? timeMatch[3].trim() : item.t;
+
+  // Status dot color mirrors the reference palette.
+  const dotColor =
+    item.s === "ok"   ? "var(--success)" :
+    item.s === "book" ? "var(--gold)"    :
+    item.s === "note" ? "var(--info)"    :
+    item.s === "opt"  ? "var(--city-kyoto)" :
+                        "var(--text-muted)";
+
   return (
     <div style={{
-      padding:"0.7rem 0.85rem",
-      background: isDone
-        ? "var(--success-soft)"
-        : (isOpt ? "var(--opt-bg)" : "var(--bg-card-2)"),
-      borderRadius:"8px",
-      border:`1px solid ${isDone ? "var(--success-bdr)" : (isOpt ? "var(--opt-bdr)" : "var(--border-light)")}`,
-      transition:"background 0.2s, border 0.2s",
+      display:"flex", gap:"0.85rem",
+      paddingBottom: isLast ? 0 : "1.1rem",
+      position:"relative",
     }}>
-      <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:"0.5rem" }}>
-        <p style={{
-          fontFamily:"var(--font-display)",
-          fontSize:"0.88rem", fontWeight:600,
-          color: isDone ? "var(--text-muted)" : (isOpt ? "var(--opt-txt)" : "var(--text-primary)"),
-          lineHeight:1.3, flex:1, margin:0,
-          letterSpacing:"-0.005em",
-          textDecoration: isDone ? "line-through" : "none",
-          opacity: isDone ? 0.75 : 1,
-        }}>{query ? highlight(item.t, query, dark) : item.t}</p>
-        <span style={{
-          fontFamily:"var(--font-body)",
-          fontSize:"0.62rem", fontWeight:700,
-          letterSpacing:"0.08em", textTransform:"uppercase",
-          padding:"0.2rem 0.45rem", borderRadius:"3px",
-          whiteSpace:"nowrap", flexShrink:0, marginTop:"2px",
-          background:st.bg.light, color:st.color.light,
-          border:`1px solid ${st.bdr.light}`,
-        }}>{st.label}</span>
-      </div>
-      {item.sub && (
+      {/* Time column with dot + connecting line (flex-centered) */}
+      <div style={{
+        width:"3.4rem", flexShrink:0,
+        display:"flex", flexDirection:"column", alignItems:"center",
+        paddingTop:"0.15rem",
+      }}>
         <div style={{
-          fontFamily:"var(--font-body)",
-          fontSize:"0.78rem",
-          color: isDone ? "var(--text-muted)" : (isOpt ? "var(--opt-txt)" : "var(--text-sec)"),
-          lineHeight:1.55, margin:"0.4rem 0 0",
-          opacity: isDone ? 0.65 : (isOpt ? 0.92 : 1),
-        }}>
-          {item.sub.split("\n\n").map((para, pi) => (
-            <p key={pi} style={{ margin: pi > 0 ? "0.45rem 0 0" : 0 }}>
-              {query ? highlight(para, query, dark) : para}
-            </p>
-          ))}
+          fontFamily:"var(--font-mono)", fontSize:"0.7rem", fontWeight:700,
+          color:"var(--text-primary)",
+          fontVariantNumeric:"tabular-nums",
+          letterSpacing:"0.02em",
+          opacity: time ? 1 : 0,
+        }}>{time || "·"}</div>
+        <div style={{
+          marginTop:"0.5rem",
+          width:"0.55rem", height:"0.55rem", borderRadius:"50%",
+          background: dotColor,
+          border:"2px solid var(--bg-page)",
+          boxShadow:`0 0 0 1px ${dotColor}`,
+          flexShrink:0,
+        }}/>
+        {!isLast && (
+          <div style={{
+            flex:1, width:"1px",
+            marginTop:"0.3rem", marginBottom:"-1.1rem",
+            background:"var(--border-light)",
+          }}/>
+        )}
+      </div>
+
+      {/* Content column */}
+      <div style={{ flex:1, minWidth:0 }}>
+        <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:"0.5rem" }}>
+          <p style={{
+            fontFamily:"var(--font-display)",
+            fontSize:"1rem", fontWeight:700,
+            fontStyle: item.s === "ok" ? "italic" : "normal",
+            color: isDone ? "var(--text-muted)" : (isOpt ? "var(--opt-txt)" : "var(--text-primary)"),
+            lineHeight:1.25, flex:1, margin:0,
+            letterSpacing:"-0.01em", textWrap:"pretty",
+            textDecoration: isDone ? "line-through" : "none",
+            opacity: isDone ? 0.75 : 1,
+          }}>{query ? highlight(cleanTitle, query, dark) : cleanTitle}</p>
+          <span style={{
+            fontFamily:"var(--font-body)",
+            fontSize:"0.58rem", fontWeight:700,
+            letterSpacing:"0.18em", textTransform:"uppercase",
+            padding:"0.18rem 0.45rem",
+            whiteSpace:"nowrap", flexShrink:0, marginTop:"3px",
+            background:st.bg.light, color:st.color.light,
+            border:`1px solid ${st.bdr.light}`,
+          }}>{st.label}</span>
         </div>
-      )}
-      {/* Action bar: mark as done + open in maps */}
-      {itemKey && (
-        <div style={{ display:"flex", gap:"0.4rem", marginTop:"0.6rem", paddingTop:"0.55rem", borderTop:"1px solid var(--border-light)", flexWrap:"wrap" }}>
-          <button
-            onClick={(e) => { e.stopPropagation(); toggle(itemKey); }}
-            aria-pressed={isDone}
-            style={{
-              fontFamily:"var(--font-body)",
-              fontSize:"0.68rem", fontWeight:700, letterSpacing:"0.05em", textTransform:"uppercase",
-              padding:"0.32rem 0.65rem",
-              borderRadius:"6px", cursor:"pointer",
-              border: `1px solid ${isDone ? "var(--success)" : "var(--border-light)"}`,
-              background: isDone ? "var(--success)" : "transparent",
-              color: isDone ? "var(--bg-page)" : "var(--text-muted)",
-              transition:"all 0.15s",
-            }}
-          >
-            {isDone ? "✓ Fait" : "○ Marquer fait"}
-          </button>
-          <a
-            href={mapsLink(item.t, cityName)}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              fontFamily:"var(--font-body)",
-              fontSize:"0.68rem", fontWeight:700, letterSpacing:"0.05em", textTransform:"uppercase",
-              padding:"0.32rem 0.65rem",
-              borderRadius:"6px", textDecoration:"none",
-              border:"1px solid var(--border-light)",
-              background:"transparent",
-              color:"var(--accent)",
-            }}
-          >
-            🗺 Ouvrir dans Maps
-          </a>
-        </div>
-      )}
+        {item.sub && (
+          <div style={{
+            fontFamily:"var(--font-body)",
+            fontSize:"0.82rem",
+            color: isDone ? "var(--text-muted)" : (isOpt ? "var(--opt-txt)" : "var(--text-sec)"),
+            lineHeight:1.55, margin:"0.4rem 0 0",
+            opacity: isDone ? 0.65 : (isOpt ? 0.92 : 1),
+            textWrap:"pretty",
+          }}>
+            {item.sub.split("\n\n").map((para, pi) => (
+              <p key={pi} style={{ margin: pi > 0 ? "0.45rem 0 0" : 0 }}>
+                {query ? highlight(para, query, dark) : para}
+              </p>
+            ))}
+          </div>
+        )}
+        {/* Action bar: mark as done + open in maps */}
+        {itemKey && (
+          <div style={{ display:"flex", gap:"0.4rem", marginTop:"0.55rem", flexWrap:"wrap" }}>
+            <button
+              onClick={(e) => { e.stopPropagation(); toggle(itemKey); }}
+              aria-pressed={isDone}
+              style={{
+                fontFamily:"var(--font-body)",
+                fontSize:"0.62rem", fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase",
+                padding:"0.28rem 0.6rem",
+                cursor:"pointer",
+                border: `1px solid ${isDone ? "var(--success)" : "var(--border-light)"}`,
+                background: isDone ? "var(--success)" : "transparent",
+                color: isDone ? "var(--bg-page)" : "var(--text-muted)",
+                transition:"all 0.15s",
+              }}
+            >
+              {isDone ? "✓ Fait" : "○ Marquer fait"}
+            </button>
+            <a
+              href={mapsLink(item.t, cityName)}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                fontFamily:"var(--font-body)",
+                fontSize:"0.62rem", fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase",
+                padding:"0.28rem 0.6rem",
+                textDecoration:"none",
+                border:"1px solid var(--border-light)",
+                background:"transparent",
+                color:"var(--accent)",
+              }}
+            >
+              🗺 Maps
+            </a>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -2517,22 +2566,25 @@ function ChecklistSection() {
   const pctBook = totalBook > 0 ? Math.round((doneBook / totalBook) * 100) : 0;
 
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:"0.875rem" }}>
-      <div style={{ background:v("cardBg",dark), borderRadius:"12px", overflow:"hidden", border:`1px solid ${v("border",dark)}`, transition:"background 0.3s" }}>
-        <div style={{ padding:"0.875rem 1rem", background:"var(--warning-soft)", borderBottom:"2px solid var(--warning-bdr)" }}>
-          <h2 style={{ fontFamily:"var(--font-serif)", fontSize:"1.02rem", fontWeight:600, color:"var(--warning)", margin:"0 0 0.4rem", letterSpacing:"-0.01em" }}>📋 Checklist des Réservations</h2>
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"0.25rem" }}>
-            <span style={{ fontSize:"0.7rem", fontWeight:600, color:"var(--warning)" }}>Progression : {doneBook} / {totalBook}</span>
-            <span style={{ fontSize:"0.7rem", fontWeight:700, color:"var(--warning)" }}>{pctBook}%</span>
+    <div style={{ display:"flex", flexDirection:"column", gap:"1.25rem" }}>
+      <div style={{ borderTop:"1px solid var(--border)", borderBottom:"1px solid var(--border)", transition:"background 0.3s" }}>
+        <div style={{ padding:"1rem 0 0.9rem", borderBottom:"0.5px solid var(--border-light)" }}>
+          <div style={{ display:"flex", alignItems:"baseline", gap:"0.75rem", marginBottom:"0.7rem" }}>
+            <span style={{ fontFamily:"var(--font-display)", fontSize:"1.9rem", fontWeight:900, fontStyle:"italic", color:"var(--accent)", lineHeight:1, letterSpacing:"-0.04em" }}>§</span>
+            <h2 style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"1.5rem", fontWeight:600, color:"var(--text-primary)", margin:0, letterSpacing:"-0.01em", lineHeight:1.15 }}>Checklist des Réservations</h2>
           </div>
-          <div style={{ height:"5px", borderRadius:"3px", background:"var(--border-light)", overflow:"hidden" }}>
-            <div style={{ height:"100%", width:`${pctBook}%`, background:"linear-gradient(90deg, var(--warning), var(--success))", borderRadius:"3px", transition:"width 0.3s ease" }} />
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"0.35rem" }}>
+            <span style={{ fontFamily:"var(--font-body)", fontSize:"0.68rem", fontWeight:700, color:"var(--text-primary)", letterSpacing:"0.22em", textTransform:"uppercase" }}>Progression</span>
+            <span style={{ fontFamily:"var(--font-mono)", fontSize:"0.72rem", fontWeight:700, color:"var(--accent)", fontVariantNumeric:"tabular-nums", letterSpacing:"0.05em" }}>{doneBook} / {totalBook} · {pctBook}%</span>
+          </div>
+          <div style={{ height:"3px", background:"var(--border-light)", overflow:"hidden" }}>
+            <div style={{ height:"100%", width:`${pctBook}%`, background:"var(--accent)", transition:"width 0.3s ease" }} />
           </div>
         </div>
         {CHECKLIST.map((cat, ci) => (
-          <div key={ci} style={{ borderBottom:ci<CHECKLIST.length-1?`1px solid ${v("borderLight",dark)}`:"none" }}>
-            <div style={{ padding:"0.6rem 1rem 0.35rem", background:v("sectionBg",dark) }}>
-              <p style={{ fontSize:"0.72rem", fontWeight:700, color:cat.color, margin:0 }}>{cat.cat}</p>
+          <div key={ci} style={{ borderBottom:ci<CHECKLIST.length-1?`1px solid var(--border-light)`:"none" }}>
+            <div style={{ padding:"1rem 0 0.45rem", borderBottom:"0.5px solid var(--border-light)" }}>
+              <p style={{ fontFamily:"var(--font-body)", fontSize:"0.7rem", fontWeight:700, color:"var(--text-primary)", margin:0, letterSpacing:"0.22em", textTransform:"uppercase" }}>{cat.cat}</p>
             </div>
             {cat.items.map((item, ii) => {
               const key = reservationKey(ci, item.name);
@@ -2545,40 +2597,39 @@ function ChecklistSection() {
                   role={isBookable ? "button" : undefined}
                   aria-pressed={isBookable ? isDone : undefined}
                   style={{
-                    padding:"0.65rem 1rem",
-                    borderBottom: ii < cat.items.length - 1 ? `1px solid ${v("borderMid",dark)}` : "none",
+                    padding:"0.75rem 0",
+                    borderBottom: ii < cat.items.length - 1 ? `0.5px solid var(--border-light)` : "none",
                     display:"flex", alignItems:"flex-start", gap:"0.75rem",
                     cursor: isBookable ? "pointer" : "default",
-                    background: isDone ? "var(--success-soft)" : "transparent",
                     transition:"background 0.15s",
                   }}
                 >
                   {/* Checkbox for bookable items, icon otherwise */}
                   {isBookable ? (
                     <div style={{
-                      flexShrink:0, width:"1.2rem", height:"1.2rem", borderRadius:"5px",
-                      border:`2px solid ${isDone ? "var(--success)" : "var(--warning-bdr)"}`,
+                      flexShrink:0, width:"1.1rem", height:"1.1rem",
+                      border:`1px solid ${isDone ? "var(--success)" : "var(--border-mid)"}`,
                       background: isDone ? "var(--success)" : "transparent",
                       display:"flex", alignItems:"center", justifyContent:"center",
-                      marginTop:"1px", transition:"all 0.15s",
+                      marginTop:"2px", transition:"all 0.15s",
                     }}>
-                      {isDone && <span style={{ color:"var(--header-ink)", fontSize:"0.78rem", fontWeight:800, lineHeight:1 }}>✓</span>}
+                      {isDone && <span style={{ color:"var(--bg-page)", fontSize:"0.72rem", fontWeight:800, lineHeight:1 }}>✓</span>}
                     </div>
                   ) : (
-                    <span style={{ fontSize:"1rem", flexShrink:0, marginTop:"1px" }}>
-                      {item.status === "ok" ? "✅" : "🔓"}
+                    <span style={{ fontSize:"0.9rem", flexShrink:0, marginTop:"2px", opacity:0.75 }}>
+                      {item.status === "ok" ? "✓" : "○"}
                     </span>
                   )}
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:"0.5rem", flexWrap:"wrap" }}>
-                      <p style={{ fontSize:"0.84rem", fontWeight:600, color:v("textPrimary",dark), margin:0, textDecoration: isDone ? "line-through" : "none", opacity: isDone ? 0.65 : 1 }}>{item.name}</p>
+                      <p style={{ fontFamily:"var(--font-display)", fontSize:"0.98rem", fontWeight:600, color:"var(--text-primary)", margin:0, textDecoration: isDone ? "line-through" : "none", opacity: isDone ? 0.6 : 1, letterSpacing:"-0.01em" }}>{item.name}</p>
                       {(() => { const s = ST[item.status==="ok"?"ok":item.status==="book"?"book":"free"]; return (
-                      <span style={{ fontSize:"0.7rem", fontWeight:600, padding:"0.15rem 0.5rem", borderRadius:"10px", background:s.bg.light, color:s.color.light, border:`1px solid ${s.bdr.light}`, whiteSpace:"nowrap", flexShrink:0 }}>{isDone ? "✅ Fait" : item.status==="ok"?"✅ Réservé":item.status==="book"?"⚠️ À faire":"🔓 Optionnel"}</span>
+                      <span style={{ fontFamily:"var(--font-body)", fontSize:"0.6rem", fontWeight:700, padding:"0.18rem 0.5rem", letterSpacing:"0.18em", textTransform:"uppercase", background:s.bg.light, color:s.color.light, border:`1px solid ${s.bdr.light}`, whiteSpace:"nowrap", flexShrink:0 }}>{isDone ? "Fait" : item.status==="ok"?"Réservé":item.status==="book"?"À faire":"Optionnel"}</span>
                       ); })()}
                     </div>
-                    <p style={{ fontSize:"0.73rem", color:v("textPrimary",dark), margin:"0.15rem 0 0", opacity: isDone ? 0.6 : 1 }}>📅 {item.date}</p>
-                    <p style={{ fontSize:"0.73rem", color:v("textSec",dark), margin:"0.05rem 0 0", opacity: isDone ? 0.6 : 1 }}>🔗 {item.platform}</p>
-                    {item.note && <p style={{ fontSize:"0.71rem", color:"var(--danger)", margin:"0.15rem 0 0", opacity: isDone ? 0.5 : 1 }}>⚡ {item.note}</p>}
+                    <p style={{ fontFamily:"var(--font-mono)", fontSize:"0.72rem", color:"var(--text-sec)", margin:"0.35rem 0 0", opacity: isDone ? 0.55 : 1, fontVariantNumeric:"tabular-nums", letterSpacing:"0.05em" }}>{item.date}</p>
+                    <p style={{ fontFamily:"var(--font-body)", fontSize:"0.78rem", color:"var(--text-muted)", margin:"0.15rem 0 0", opacity: isDone ? 0.55 : 1, lineHeight:1.5 }}>{item.platform}</p>
+                    {item.note && <p style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"0.78rem", color:"var(--accent)", margin:"0.25rem 0 0", opacity: isDone ? 0.5 : 1, lineHeight:1.5 }}>{item.note}</p>}
                   </div>
                 </div>
               );
@@ -3207,46 +3258,47 @@ function GastroSection() {
     <div style={{ display:"flex", flexDirection:"column", gap:"0.875rem" }}>
 
       {/* ── TOP 10 SECTION ── */}
-      <div style={{ background:v("cardBg",dark), borderRadius:"12px", overflow:"hidden", border:`1px solid ${v("border",dark)}`, boxShadow:"var(--shadow-card)" }}>
-        <div style={{ background:"linear-gradient(135deg, var(--header-from) 0%, var(--header-mid) 45%, var(--header-to) 100%)", padding:"0.9rem 1rem" }}>
-          <p style={{ fontFamily:"var(--font-body)", fontSize:"0.66rem", color:"rgba(243,238,224,0.68)", letterSpacing:"0.18em", textTransform:"uppercase", margin:"0 0 0.35rem", fontWeight:600 }}>Sélection éditoriale</p>
-          <h2 style={{ fontFamily:"var(--font-serif)", fontSize:"1.3rem", fontWeight:600, color:"var(--header-ink)", margin:"0 0 0.5rem", letterSpacing:"-0.01em" }}>Top 10 — Les incontournables culinaires</h2>
-          <p style={{ fontSize:"0.72rem", color:"rgba(243,238,224,0.78)", margin:0, lineHeight:1.5 }}>
+      <div style={{ borderTop:"1px solid var(--border)", borderBottom:"1px solid var(--border)" }}>
+        <div style={{ padding:"1.1rem 0 0.9rem", borderBottom:"0.5px solid var(--border-light)" }}>
+          <p style={{ fontFamily:"var(--font-body)", fontSize:"0.66rem", color:"var(--accent)", letterSpacing:"0.22em", textTransform:"uppercase", margin:"0 0 0.4rem", fontWeight:700 }}>Sélection éditoriale</p>
+          <div style={{ display:"flex", alignItems:"baseline", gap:"0.75rem", marginBottom:"0.55rem" }}>
+            <span style={{ fontFamily:"var(--font-display)", fontSize:"1.9rem", fontWeight:900, fontStyle:"italic", color:"var(--accent)", lineHeight:1, letterSpacing:"-0.04em" }}>§ 10</span>
+            <h2 style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"1.5rem", fontWeight:600, color:"var(--text-primary)", margin:0, letterSpacing:"-0.01em", lineHeight:1.15 }}>Les incontournables culinaires</h2>
+          </div>
+          <p style={{ fontFamily:"var(--font-body)", fontSize:"0.84rem", color:"var(--text-sec)", margin:0, lineHeight:1.6, textWrap:"pretty" }}>
             Ces 10 expériences définissent la gastronomie japonaise. Un premier voyage sans elles est incomplet. Le classement s'établit sur trois critères : unicité culturelle (faisable seulement au Japon), accessibilité (sans budget illimité), et densité d'émotion gustative. Du plus universel au plus mémorable.
           </p>
         </div>
-        <div style={{ padding:"0.75rem" }}>
+        <div style={{ padding:"0.25rem 0" }}>
           {TOP10.map((item, i) => (
-            <div key={i} style={{ display:"flex", gap:"0.75rem", alignItems:"flex-start", padding:"0.6rem 0.25rem", borderBottom: i < 9 ? `1px solid ${v("borderMid",dark)}` : "none" }}>
-              <div style={{ flexShrink:0, width:"2rem", height:"2rem", borderRadius:"50%", background:rankColors[i], display:"flex", alignItems:"center", justifyContent:"center" }}>
-                <span style={{ fontFamily:"var(--font-serif)", fontSize:"0.82rem", fontWeight:700, color:"var(--header-ink)", lineHeight:1 }}>{item.rank}</span>
+            <div key={i} style={{ display:"flex", gap:"0.85rem", alignItems:"flex-start", padding:"0.75rem 0", borderBottom: i < 9 ? `0.5px solid var(--border-light)` : "none" }}>
+              <div style={{ flexShrink:0, width:"2.2rem", textAlign:"center" }}>
+                <span style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"1.4rem", fontWeight:900, color:rankColors[i], lineHeight:1, letterSpacing:"-0.04em" }}>{item.rank}</span>
               </div>
               <div style={{ flex:1, minWidth:0 }}>
-                <div style={{ display:"flex", alignItems:"center", gap:"0.4rem", marginBottom:"0.1rem", flexWrap:"wrap" }}>
-                  <span style={{ fontSize:"0.9rem" }}>{item.emoji}</span>
-                  <span style={{ fontSize:"0.85rem", fontWeight:700, color:v("textPrimary",dark) }}>{item.name}</span>
+                <div style={{ display:"flex", alignItems:"center", gap:"0.4rem", marginBottom:"0.2rem", flexWrap:"wrap" }}>
+                  <span style={{ fontSize:"0.85rem", opacity:0.8 }}>{item.emoji}</span>
+                  <span style={{ fontFamily:"var(--font-display)", fontSize:"1rem", fontWeight:700, color:"var(--text-primary)", letterSpacing:"-0.01em" }}>{item.name}</span>
                 </div>
-                <p style={{ fontSize:"0.72rem", color:v("textSec",dark), margin:"0 0 0.2rem", fontStyle:"italic", lineHeight:1.4 }}>{item.hook}</p>
-                <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", flexWrap:"wrap", marginBottom:"0.35rem" }}>
-                  <span style={{ fontSize:"0.68rem", color:v("textMuted",dark) }}>📍 {item.moment}</span>
+                <p style={{ fontFamily:"var(--font-display)", fontSize:"0.85rem", color:"var(--text-sec)", margin:"0 0 0.3rem", fontStyle:"italic", lineHeight:1.5 }}>{item.hook}</p>
+                <div style={{ display:"flex", alignItems:"center", gap:"0.75rem", flexWrap:"wrap", marginBottom:"0.1rem" }}>
+                  <span style={{ fontFamily:"var(--font-body)", fontSize:"0.72rem", color:"var(--text-muted)", lineHeight:1.5 }}>{item.moment}</span>
                   {item.tabId && (
-                    <button onClick={() => goTo(item.tabId, item.dayN)} style={{ fontSize:"0.68rem", color:"var(--info)", background:"transparent", border:"none", cursor:"pointer", padding:0, fontWeight:600, textDecoration:"underline" }}>
-                      → Planning
+                    <button onClick={() => goTo(item.tabId, item.dayN)} style={{ fontFamily:"var(--font-body)", fontSize:"0.6rem", color:"var(--accent)", background:"transparent", border:"1px solid var(--border-light)", cursor:"pointer", padding:"0.2rem 0.5rem", fontWeight:700, letterSpacing:"0.18em", textTransform:"uppercase" }}>
+                      Planning →
                     </button>
                   )}
-                </div>
-                {item.catId && (
-                  <div style={{ borderTop:`1px solid ${v("borderMid",dark)}`, marginTop:"0.35rem", paddingTop:"0.35rem" }}>
+                  {item.catId && (
                     <button
                       onClick={() => goToGastroItem(item.catId, item.itemName)}
-                      style={{ fontSize:"0.69rem", color:"var(--text-muted)", background:"transparent", border:"none", cursor:"pointer", padding:0, fontFamily:"inherit", transition:"color 0.15s" }}
+                      style={{ fontFamily:"var(--font-body)", fontSize:"0.6rem", color:"var(--text-muted)", background:"transparent", border:"1px solid var(--border-light)", cursor:"pointer", padding:"0.2rem 0.5rem", fontWeight:700, letterSpacing:"0.18em", textTransform:"uppercase", transition:"color 0.15s" }}
                       onMouseEnter={e => e.currentTarget.style.color = "var(--text-primary)"}
                       onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
                     >
-                      → Détails &amp; adresses
+                      Détails →
                     </button>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -3261,12 +3313,13 @@ function GastroSection() {
           { val:2, label:"🔶 Fortement recommandés" },
         ].map(btn => (
           <button key={btn.val} onClick={() => setFilter(btn.val)} style={{
-            padding:"0.35rem 0.75rem", borderRadius:"20px",
-            border:`1.5px solid ${filter===btn.val ? "var(--warning)" : "var(--border)"}`,
-            background: filter===btn.val ? "var(--warning-soft)" : "transparent",
-            color: filter===btn.val ? "var(--warning)" : "var(--text-sec)",
-            fontSize:"0.73rem", fontWeight: filter===btn.val ? 700 : 400,
-            cursor:"pointer", fontFamily:"inherit", transition:"all 0.15s",
+            padding:"0.35rem 0.7rem",
+            border:`1px solid ${filter===btn.val ? "var(--accent)" : "var(--border-light)"}`,
+            background: filter===btn.val ? "var(--accent-wash)" : "transparent",
+            color: filter===btn.val ? "var(--accent)" : "var(--text-muted)",
+            fontFamily:"var(--font-body)", fontSize:"0.62rem", fontWeight:700,
+            letterSpacing:"0.18em", textTransform:"uppercase",
+            cursor:"pointer", transition:"all 0.15s",
           }}>
             {btn.label}
           </button>
@@ -3289,12 +3342,13 @@ function GastroSection() {
           const active = cityFilter === btn.val;
           return (
             <button key={btn.val} onClick={() => setCityFilter(btn.val)} style={{
-              padding:"0.3rem 0.7rem", borderRadius:"20px",
-              border:`1.5px solid ${active ? btn.color : "var(--border)"}`,
+              padding:"0.3rem 0.65rem",
+              border:`1px solid ${active ? btn.color : "var(--border-light)"}`,
               background: active ? btn.wash : "transparent",
-              color: active ? btn.color : "var(--text-sec)",
-              fontSize:"0.7rem", fontWeight: active ? 700 : 400,
-              cursor:"pointer", fontFamily:"inherit", transition:"all 0.15s",
+              color: active ? btn.color : "var(--text-muted)",
+              fontFamily:"var(--font-body)", fontSize:"0.6rem", fontWeight:700,
+              letterSpacing:"0.18em", textTransform:"uppercase",
+              cursor:"pointer", transition:"all 0.15s",
             }}>
               {btn.label}
             </button>
@@ -3306,15 +3360,15 @@ function GastroSection() {
       {filteredGastro.map(cat => {
         const isOpen = filter !== 0 || openSections.has(cat.id);
         return (
-          <div key={cat.id} style={{ background:v("cardBg",dark), borderRadius:"12px", overflow:"hidden", border:`1px solid ${v("border",dark)}`, boxShadow:dark?"0 1px 6px rgba(0,0,0,0.3)":"0 1px 4px rgba(0,0,0,0.07)" }}>
-            <button onClick={() => toggleSection(cat.id)} style={{ width:"100%", display:"flex", alignItems:"center", gap:"0.75rem", padding:"0.85rem 1rem", background:"transparent", border:"none", cursor:"pointer", textAlign:"left", outline:"none" }}>
-              <span style={{ fontSize:"1.4rem", flexShrink:0 }}>{cat.emoji}</span>
-              <span style={{ flex:1, fontFamily:"var(--font-serif)", fontSize:"1.05rem", fontWeight:600, color:cat.color, letterSpacing:"-0.01em" }}>{cat.title}</span>
-              <span style={{ fontSize:"0.68rem", color:v("textMuted",dark), marginRight:"0.5rem" }}>{cat.items.length} plat{cat.items.length>1?"s":""}</span>
-              <span style={{ color:v("textMuted",dark), fontSize:"0.8rem", display:"inline-block", transform:isOpen?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▼</span>
+          <div key={cat.id} style={{ borderTop:"1px solid var(--border)", borderBottom:"1px solid var(--border)" }}>
+            <button onClick={() => toggleSection(cat.id)} style={{ width:"100%", display:"flex", alignItems:"center", gap:"0.75rem", padding:"1rem 0", background:"transparent", border:"none", cursor:"pointer", textAlign:"left", outline:"none" }}>
+              <span style={{ fontSize:"1.1rem", flexShrink:0, opacity:0.75 }}>{cat.emoji}</span>
+              <span style={{ flex:1, fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"1.3rem", fontWeight:600, color:"var(--text-primary)", letterSpacing:"-0.01em" }}>{cat.title}</span>
+              <span style={{ fontFamily:"var(--font-mono)", fontSize:"0.7rem", color:"var(--text-muted)", marginRight:"0.5rem", fontVariantNumeric:"tabular-nums", letterSpacing:"0.05em" }}>{cat.items.length}</span>
+              <span style={{ color:"var(--text-muted)", fontSize:"0.7rem", display:"inline-block", transform:isOpen?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▼</span>
             </button>
             {isOpen && (
-              <div style={{ borderTop:`1px solid ${v("borderLight",dark)}` }}>
+              <div style={{ borderTop:`0.5px solid var(--border-light)` }}>
                 {cat.items.map((item, idx) => {
                   const dc = diffColor[item.diff];
                   const pb = prioBadge[item.prio];
@@ -3322,30 +3376,31 @@ function GastroSection() {
                   const itemId = "gastro-item-" + itemKey.replace(/[^a-zA-Z0-9]/g, "-");
                   const isHighlighted = highlightedItem === itemKey;
                   return (
-                    <div key={idx} id={itemId} style={{ padding:"0.8rem 1rem", borderBottom:idx<cat.items.length-1?`1px solid ${v("borderMid",dark)}`:"none", transition:"background 0.5s ease", background: isHighlighted ? "var(--warning-soft)" : "transparent", borderRadius: isHighlighted ? "6px" : "0" }}>
-                      <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:"0.4rem", marginBottom:"0.35rem", flexWrap:"wrap" }}>
+                    <div key={idx} id={itemId} style={{ padding:"0.95rem 0", borderBottom:idx<cat.items.length-1?`0.5px solid var(--border-light)`:"none", transition:"background 0.5s ease", background: isHighlighted ? "var(--accent-wash)" : "transparent" }}>
+                      <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", gap:"0.4rem", marginBottom:"0.4rem", flexWrap:"wrap" }}>
                         <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", flex:1, minWidth:0 }}>
-                          <span style={{ fontSize:"1.1rem", flexShrink:0 }}>{item.emoji}</span>
-                          <span style={{ fontSize:"0.88rem", fontWeight:700, color:v("textPrimary",dark) }}>{item.name}</span>
+                          <span style={{ fontSize:"0.95rem", flexShrink:0, opacity:0.8 }}>{item.emoji}</span>
+                          <span style={{ fontFamily:"var(--font-display)", fontSize:"1rem", fontWeight:700, color:"var(--text-primary)", letterSpacing:"-0.01em" }}>{item.name}</span>
                         </div>
                         <div style={{ display:"flex", gap:"0.3rem", flexShrink:0, flexWrap:"wrap", justifyContent:"flex-end" }}>
                           {pb && (
-                            <span style={{ fontSize:"0.7rem", fontWeight:700, padding:"0.15rem 0.45rem", borderRadius:"8px", whiteSpace:"nowrap", background:pb.bg, color:pb.color, border:`1px solid ${pb.border}` }}>
+                            <span style={{ fontFamily:"var(--font-body)", fontSize:"0.6rem", fontWeight:700, padding:"0.18rem 0.45rem", letterSpacing:"0.18em", textTransform:"uppercase", whiteSpace:"nowrap", background:pb.bg, color:pb.color, border:`1px solid ${pb.border}` }}>
                               {pb.label}
                             </span>
                           )}
-                          <span style={{ fontSize:"0.7rem", fontWeight:600, padding:"0.15rem 0.45rem", borderRadius:"8px", whiteSpace:"nowrap", background:dc.bg, color:dc.color }}>
+                          <span style={{ fontFamily:"var(--font-body)", fontSize:"0.6rem", fontWeight:700, padding:"0.18rem 0.45rem", letterSpacing:"0.18em", textTransform:"uppercase", whiteSpace:"nowrap", background:dc.bg, color:dc.color, border:`1px solid ${dc.bg}` }}>
                             {item.diff} {diffLabel[item.diff]}
                           </span>
                         </div>
                       </div>
-                      <p style={{ fontSize:"0.75rem", color:v("textSec",dark), lineHeight:1.55, margin:"0 0 0.45rem", paddingLeft:"1.6rem" }}>{item.desc}</p>
-                      <div style={{ paddingLeft:"1.6rem", display:"flex", flexDirection:"column", gap:"0.2rem", marginBottom: item.spots?.length ? "0.65rem" : 0 }}>
-                        <p style={{ fontSize:"0.72rem", color:v("textSec",dark), margin:0 }}>
-                          <span style={{ fontWeight:600, color:v("textPrimary",dark) }}>💴 Prix : </span>{item.prix}
+                      <p style={{ fontFamily:"var(--font-body)", fontSize:"0.84rem", color:"var(--text-sec)", lineHeight:1.55, margin:"0 0 0.55rem", paddingLeft:"1.5rem", textWrap:"pretty" }}>{item.desc}</p>
+                      <div style={{ paddingLeft:"1.5rem", display:"flex", flexDirection:"column", gap:"0.25rem", marginBottom: item.spots?.length ? "0.75rem" : 0 }}>
+                        <p style={{ fontFamily:"var(--font-body)", fontSize:"0.78rem", color:"var(--text-sec)", margin:0, lineHeight:1.5 }}>
+                          <span style={{ fontFamily:"var(--font-body)", fontWeight:700, color:"var(--text-primary)", letterSpacing:"0.18em", textTransform:"uppercase", fontSize:"0.66rem" }}>Prix · </span>
+                          <span style={{ fontFamily:"var(--font-mono)", fontVariantNumeric:"tabular-nums", letterSpacing:"0.03em" }}>{item.prix}</span>
                         </p>
-                        <p style={{ fontSize:"0.72rem", color:v("textSec",dark), margin:0 }}>
-                          <span style={{ fontWeight:600, color:v("textPrimary",dark) }}>📍 Pendant le voyage : </span>{item.ou}
+                        <p style={{ fontFamily:"var(--font-body)", fontSize:"0.78rem", color:"var(--text-sec)", margin:0, lineHeight:1.5 }}>
+                          <span style={{ fontFamily:"var(--font-body)", fontWeight:700, color:"var(--text-primary)", letterSpacing:"0.18em", textTransform:"uppercase", fontSize:"0.66rem" }}>Voyage · </span>{item.ou}
                         </p>
                       </div>
                       {item.spots?.length > 0 && (
@@ -3831,70 +3886,70 @@ function MeteoSection() {
     ]},
   ];
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:"0.875rem" }}>
+    <div style={{ display:"flex", flexDirection:"column", gap:"1.25rem" }}>
       {/* GOLDEN WEEK ALERT */}
-      <div style={{ background:v("urgentBg",dark), border:`2px solid ${v("urgentBdr",dark)}`, borderRadius:"10px", padding:"0.75rem 0.9rem" }}>
-        <p style={{ fontSize:"0.8rem", fontWeight:700, color:v("urgentTxt",dark), margin:"0 0 0.3rem" }}>🎌 Golden Week — 27 avril → 6 mai 2026</p>
-        <p style={{ fontSize:"0.74rem", color:v("urgentTxt",dark), margin:0, lineHeight:1.5 }}>
+      <div style={{ borderTop:"1px solid var(--accent-bdr)", borderBottom:"1px solid var(--accent-bdr)", padding:"0.9rem 0" }}>
+        <p style={{ fontFamily:"var(--font-body)", fontSize:"0.66rem", fontWeight:700, color:"var(--accent)", margin:"0 0 0.35rem", letterSpacing:"0.22em", textTransform:"uppercase" }}>Alerte · Golden Week</p>
+        <p style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"1.15rem", fontWeight:600, color:"var(--text-primary)", margin:"0 0 0.4rem", letterSpacing:"-0.01em" }}>27 avril → 6 mai 2026</p>
+        <p style={{ fontFamily:"var(--font-body)", fontSize:"0.84rem", color:"var(--text-sec)", margin:0, lineHeight:1.6, textWrap:"pretty" }}>
           La plus grande semaine de vacances du Japon. Transports et sites touristiques à capacité maximale. Les Shinkansen sont complets des semaines à l'avance — réserver les sièges dès J1 au guichet JR. Les restaurants populaires affichent complet — toutes vos réservations doivent être faites avant le départ.
         </p>
       </div>
       {/* MÉTÉO LIVE 7 JOURS (Lot 8) */}
       <LiveWeatherCard />
       {/* MÉTÉO CARTES */}
-      <InfoCard title="🌡 Météo semaine par semaine" color="var(--info)" headerBg="var(--info-soft)">
+      <InfoCard title="Météo semaine par semaine" color="var(--info)" headerBg="var(--info-soft)">
         {METEO.map((city, ci) => (
-          <div key={ci} style={{ marginBottom: ci < METEO.length-1 ? "1rem" : 0 }}>
-            <p style={{ fontSize:"0.82rem", fontWeight:700, color:city.color, margin:"0 0 0.5rem" }}>{city.city}</p>
+          <div key={ci} style={{ marginBottom: ci < METEO.length-1 ? "1.1rem" : 0 }}>
+            <p style={{ fontFamily:"var(--font-body)", fontSize:"0.7rem", fontWeight:700, color:city.color, margin:"0 0 0.55rem", paddingBottom:"0.35rem", borderBottom:"0.5px solid var(--border-light)", letterSpacing:"0.22em", textTransform:"uppercase" }}>{city.city}</p>
             {city.weeks.map((w, wi) => (
-              <div key={wi} style={{ background:city.bg, border:`1px solid ${city.border}`, borderRadius:"8px", padding:"0.6rem 0.75rem", marginBottom: wi < city.weeks.length-1 ? "0.4rem" : 0 }}>
-                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"0.4rem", flexWrap:"wrap", gap:"0.25rem" }}>
-                  <span style={{ fontSize:"0.72rem", fontWeight:600, color:v("textPrimary",dark) }}>{w.label}</span>
-                  <span style={{ fontSize:"1.2rem" }}>{w.icon}</span>
+              <div key={wi} style={{ borderBottom: wi < city.weeks.length-1 ? `0.5px solid var(--border-light)` : "none", padding:"0.65rem 0" }}>
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"0.5rem", flexWrap:"wrap", gap:"0.25rem" }}>
+                  <span style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"0.95rem", fontWeight:600, color:"var(--text-primary)" }}>{w.label}</span>
+                  <span style={{ fontSize:"1.1rem", opacity:0.8 }}>{w.icon}</span>
                 </div>
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"0.3rem", marginBottom:"0.4rem" }}>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"0.3rem", marginBottom:"0.45rem" }}>
                   {[
-                    { ico:"🌡", val:`${w.tmin}-${w.tmax}°C`, lbl:"Temp" },
-                    { ico:"🌧", val:`${w.pluie}%`, lbl:"Pluie" },
-                    { ico:"💧", val:`${w.humidite}%`, lbl:"Humidité" },
-                    { ico:"☀️", val:w.soleil, lbl:"Soleil" },
+                    { val:`${w.tmin}–${w.tmax}°`, lbl:"Temp" },
+                    { val:`${w.pluie}%`, lbl:"Pluie" },
+                    { val:`${w.humidite}%`, lbl:"Humidité" },
+                    { val:w.soleil, lbl:"Soleil" },
                   ].map((s,si) => (
-                    <div key={si} style={{ textAlign:"center", background:"var(--section-bg)", borderRadius:"6px", padding:"0.3rem 0.2rem" }}>
-                      <div style={{ fontSize:"0.85rem" }}>{s.ico}</div>
-                      <div style={{ fontSize:"0.68rem", fontWeight:700, color:v("textPrimary",dark) }}>{s.val}</div>
-                      <div style={{ fontSize:"0.68rem", color:v("textMuted",dark) }}>{s.lbl}</div>
+                    <div key={si} style={{ textAlign:"center", borderLeft: si>0 ? "0.5px solid var(--border-light)" : "none", padding:"0.1rem 0.2rem" }}>
+                      <div style={{ fontFamily:"var(--font-mono)", fontSize:"0.82rem", fontWeight:700, color:"var(--text-primary)", fontVariantNumeric:"tabular-nums", letterSpacing:"0.02em" }}>{s.val}</div>
+                      <div style={{ fontFamily:"var(--font-body)", fontSize:"0.58rem", color:"var(--text-muted)", letterSpacing:"0.18em", textTransform:"uppercase", fontWeight:700, marginTop:"0.15rem" }}>{s.lbl}</div>
                     </div>
                   ))}
                 </div>
-                <p style={{ fontSize:"0.7rem", color:v("textSec",dark), margin:0, fontStyle:"italic" }}>💡 {w.note}</p>
+                <p style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"0.82rem", color:"var(--text-sec)", margin:0, lineHeight:1.5, textWrap:"pretty" }}>{w.note}</p>
               </div>
             ))}
           </div>
         ))}
       </InfoCard>
       {/* VALISE */}
-      <InfoCard title="🧳 Que mettre dans sa valise ?" color="var(--city-kyoto)" headerBg="var(--city-kyoto-wash)">
+      <InfoCard title="Que mettre dans sa valise ?" color="var(--city-kyoto)" headerBg="var(--city-kyoto-wash)">
         {VALISE.map((cat, ci) => (
-          <div key={ci} style={{ marginBottom: ci < VALISE.length-1 ? "0.85rem" : 0 }}>
-            <p style={{ fontSize:"0.75rem", fontWeight:700, color:cat.color, margin:"0 0 0.35rem" }}>{cat.cat}</p>
+          <div key={ci} style={{ marginBottom: ci < VALISE.length-1 ? "1rem" : 0 }}>
+            <p style={{ fontFamily:"var(--font-body)", fontSize:"0.7rem", fontWeight:700, color:cat.color, margin:"0 0 0.45rem", paddingBottom:"0.3rem", borderBottom:"0.5px solid var(--border-light)", letterSpacing:"0.22em", textTransform:"uppercase" }}>{cat.cat}</p>
             {cat.items.map((item, ii) => (
-              <div key={ii} style={{ display:"flex", gap:"0.4rem", marginBottom:"0.2rem" }}>
-                <p style={{ fontSize:"0.73rem", color:v("textSec",dark), margin:0, lineHeight:1.45 }}>{item}</p>
+              <div key={ii} style={{ display:"flex", gap:"0.4rem", marginBottom:"0.3rem" }}>
+                <p style={{ fontFamily:"var(--font-body)", fontSize:"0.82rem", color:"var(--text-sec)", margin:0, lineHeight:1.55, textWrap:"pretty" }}>{item}</p>
               </div>
             ))}
           </div>
         ))}
       </InfoCard>
       {/* URGENCES */}
-      <InfoCard title="🚨 Imprévus & Urgences" color="var(--danger)" headerBg="var(--danger-soft)">
+      <InfoCard title="Imprévus & Urgences" color="var(--danger)" headerBg="var(--danger-soft)">
         {URGENCES.map((section, si) => (
-          <div key={si} style={{ marginBottom: si < URGENCES.length-1 ? "0.9rem" : 0, paddingBottom: si < URGENCES.length-1 ? "0.9rem" : 0, borderBottom: si < URGENCES.length-1 ? `1px solid ${v("borderLight",dark)}` : "none" }}>
-            <p style={{ fontSize:"0.78rem", fontWeight:700, color:v("textPrimary",dark), margin:"0 0 0.4rem" }}>{section.emoji} {section.titre}</p>
+          <div key={si} style={{ marginBottom: si < URGENCES.length-1 ? "1rem" : 0, paddingBottom: si < URGENCES.length-1 ? "1rem" : 0, borderBottom: si < URGENCES.length-1 ? `0.5px solid var(--border-light)` : "none" }}>
+            <p style={{ fontFamily:"var(--font-body)", fontSize:"0.7rem", fontWeight:700, color:"var(--text-primary)", margin:"0 0 0.5rem", letterSpacing:"0.22em", textTransform:"uppercase" }}>{section.emoji} {section.titre}</p>
             {section.items.map((item, ii) => (
-              <div key={ii} style={{ marginBottom:"0.3rem" }}>
-                <span style={{ fontSize:"0.72rem", fontWeight:600, color:"var(--danger)" }}>{item.label} : </span>
-                <span style={{ fontSize:"0.72rem", color:v("textSec",dark) }}>{item.val}</span>
-                {item.note && <span style={{ fontSize:"0.68rem", color:v("textMuted",dark), display:"block", marginLeft:"0.5rem" }}>→ {item.note}</span>}
+              <div key={ii} style={{ marginBottom:"0.45rem", lineHeight:1.5 }}>
+                <span style={{ fontFamily:"var(--font-body)", fontSize:"0.66rem", fontWeight:700, color:"var(--accent)", letterSpacing:"0.18em", textTransform:"uppercase" }}>{item.label} · </span>
+                <span style={{ fontFamily:"var(--font-body)", fontSize:"0.82rem", color:"var(--text-sec)" }}>{item.val}</span>
+                {item.note && <span style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"0.78rem", color:"var(--text-muted)", display:"block", marginTop:"0.15rem" }}>{item.note}</span>}
               </div>
             ))}
           </div>
@@ -4668,17 +4723,21 @@ function CalendrierSection() {
   const filteredEvents = filter === "all" ? EVENTS : EVENTS.filter(e => e.type === filter);
 
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:"0.75rem" }}>
+    <div style={{ display:"flex", flexDirection:"column", gap:"1.25rem" }}>
 
       {/* INTRO */}
-      <div style={{ background:v("cardBg",dark), border:`1px solid ${v("border",dark)}`, borderRadius:"12px", padding:"0.875rem 1rem" }}>
-        <h2 style={{ fontFamily:"var(--font-serif)", fontSize:"1.1rem", fontWeight:600, color:v("textPrimary",dark), margin:"0 0 0.4rem", letterSpacing:"-0.01em" }}>🎌 Calendrier culturel — 27 avril → 11 mai</h2>
-        <p style={{ fontSize:"0.75rem", color:v("textSec",dark), margin:"0 0 0.5rem", lineHeight:1.55 }}>
-          Votre séjour chevauche la <strong style={{ color:"var(--accent)" }}>Golden Week</strong> (27 avril → 6 mai), la plus grande semaine de vacances du Japon. Chaque jour a un impact différent sur la foule, les transports et les prix. Utilisez ce calendrier pour anticiper et adapter votre rythme.
+      <div style={{ borderTop:"1px solid var(--border)", borderBottom:"1px solid var(--border)", padding:"1rem 0" }}>
+        <div style={{ display:"flex", alignItems:"baseline", gap:"0.75rem", marginBottom:"0.55rem" }}>
+          <span style={{ fontFamily:"var(--font-display)", fontSize:"1.9rem", fontWeight:900, fontStyle:"italic", color:"var(--accent)", lineHeight:1, letterSpacing:"-0.04em" }}>§</span>
+          <h2 style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"1.5rem", fontWeight:600, color:"var(--text-primary)", margin:0, letterSpacing:"-0.01em", lineHeight:1.15 }}>Calendrier culturel</h2>
+        </div>
+        <p style={{ fontFamily:"var(--font-mono)", fontSize:"0.72rem", color:"var(--text-muted)", margin:"0 0 0.5rem", fontVariantNumeric:"tabular-nums", letterSpacing:"0.05em" }}>27 avr → 11 mai</p>
+        <p style={{ fontFamily:"var(--font-body)", fontSize:"0.84rem", color:"var(--text-sec)", margin:"0 0 0.7rem", lineHeight:1.6, textWrap:"pretty" }}>
+          Votre séjour chevauche la <span style={{ fontFamily:"var(--font-display)", fontStyle:"italic", color:"var(--accent)", fontWeight:600 }}>Golden Week</span> (27 avril → 6 mai), la plus grande semaine de vacances du Japon. Chaque jour a un impact différent sur la foule, les transports et les prix. Utilisez ce calendrier pour anticiper et adapter votre rythme.
         </p>
         <div style={{ display:"flex", flexWrap:"wrap", gap:"0.4rem" }}>
           {Object.entries(IMPACT).map(([k,v2]) => (
-            <span key={k} style={{ fontSize:"0.7rem", fontWeight:600, padding:"0.15rem 0.5rem", borderRadius:"8px", background:v2.bg, color:v2.color }}>{v2.label}</span>
+            <span key={k} style={{ fontFamily:"var(--font-body)", fontSize:"0.58rem", fontWeight:700, padding:"0.2rem 0.5rem", background:v2.bg, color:v2.color, border:`1px solid ${v2.dot}`, letterSpacing:"0.18em", textTransform:"uppercase" }}>{v2.label}</span>
           ))}
         </div>
       </div>
@@ -4687,11 +4746,11 @@ function CalendrierSection() {
       <div style={{ display:"flex", gap:"0.4rem", flexWrap:"wrap" }}>
         {FILTERS.map(f => (
           <button key={f.val} onClick={() => setFilter(f.val)} style={{
-            padding:"0.3rem 0.65rem", borderRadius:"20px", fontSize:"0.72rem", fontFamily:"inherit", cursor:"pointer",
-            border:`1.5px solid ${filter===f.val?"var(--gold-bdr)":"var(--border-light)"}`,
-            background: filter===f.val ? "var(--gold-soft)" : "transparent",
-            color: filter===f.val ? "var(--warning)" : v("textSec",dark),
-            fontWeight: filter===f.val ? 700 : 400, transition:"all 0.15s",
+            padding:"0.3rem 0.65rem", fontFamily:"var(--font-body)", fontSize:"0.6rem", cursor:"pointer",
+            border:`1px solid ${filter===f.val?"var(--accent)":"var(--border-light)"}`,
+            background: filter===f.val ? "var(--accent-wash)" : "transparent",
+            color: filter===f.val ? "var(--accent)" : "var(--text-muted)",
+            fontWeight:700, letterSpacing:"0.18em", textTransform:"uppercase", transition:"all 0.15s",
           }}>{f.label}</button>
         ))}
       </div>
@@ -4699,7 +4758,7 @@ function CalendrierSection() {
       {/* TIMELINE */}
       <div style={{ position:"relative", paddingLeft:"2.5rem" }}>
         {/* Vertical line */}
-        <div style={{ position:"absolute", left:"0.9rem", top:0, bottom:0, width:"2px", background:`linear-gradient(to bottom, var(--danger), var(--city-osaka), var(--gold), var(--success), var(--info))`, borderRadius:"1px", opacity:0.4 }} />
+        <div style={{ position:"absolute", left:"0.9rem", top:0, bottom:0, width:"1px", background:"var(--border-light)" }} />
 
         {filteredEvents.map((ev, i) => {
           const imp = IMPACT[ev.impact];
@@ -4707,55 +4766,55 @@ function CalendrierSection() {
           // Find matching festivals for this date
           const fests = FESTIVALS.filter(f => f.date === ev.date || (ev.date >= f.date.split("-")[0] && f.date.includes("-") && ev.date <= f.date.split("-")[1]));
           return (
-            <div key={i} style={{ position:"relative", marginBottom: i < filteredEvents.length-1 ? "0.875rem" : 0 }}>
+            <div key={i} style={{ position:"relative", marginBottom: i < filteredEvents.length-1 ? "1.1rem" : 0 }}>
               {/* Dot */}
               <div style={{
-                position:"absolute", left:"-2rem", top:"0.9rem",
-                width:"0.7rem", height:"0.7rem", borderRadius:"50%",
+                position:"absolute", left:"-1.75rem", top:"0.75rem",
+                width:"0.55rem", height:"0.55rem", borderRadius:"50%",
                 background: imp.dot, border:`2px solid var(--bg-page)`,
-                boxShadow:`0 0 0 2px ${imp.bg}`,
+                boxShadow:`0 0 0 1px ${imp.dot}`,
                 zIndex:1,
               }} />
-              {/* Card */}
-              <div style={{ background:v("cardBg",dark), borderRadius:"10px", border:`1px solid ${v("border",dark)}`, overflow:"hidden", boxShadow:"var(--shadow-card)" }}>
+              {/* Card — flat editorial */}
+              <div style={{ borderTop:"0.5px solid var(--border-light)", borderBottom:"0.5px solid var(--border-light)" }}>
                 {/* Header */}
-                <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", padding:"0.6rem 0.875rem", background:imp.bg, borderBottom:`1px solid ${v("borderLight",dark)}` }}>
-                  <span style={{ fontSize:"1.1rem", flexShrink:0 }}>{ev.emoji}</span>
+                <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", padding:"0.7rem 0", borderBottom:"0.5px solid var(--border-light)" }}>
+                  <span style={{ fontSize:"1rem", flexShrink:0, opacity:0.8 }}>{ev.emoji}</span>
                   <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ display:"flex", alignItems:"center", gap:"0.4rem", flexWrap:"wrap" }}>
-                      <span style={{ fontSize:"0.72rem", fontWeight:700, color:typeCol, whiteSpace:"nowrap" }}>{ev.date} — {ev.jour}</span>
-                      <span style={{ fontSize:"0.7rem", fontWeight:600, padding:"0.1rem 0.4rem", borderRadius:"6px", background:imp.bg, color:imp.color, border:"1px solid currentColor", whiteSpace:"nowrap" }}>{imp.label}</span>
+                    <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", flexWrap:"wrap" }}>
+                      <span style={{ fontFamily:"var(--font-mono)", fontSize:"0.68rem", fontWeight:700, color:typeCol, whiteSpace:"nowrap", fontVariantNumeric:"tabular-nums", letterSpacing:"0.05em" }}>{ev.date} · {ev.jour}</span>
+                      <span style={{ fontFamily:"var(--font-body)", fontSize:"0.58rem", fontWeight:700, padding:"0.15rem 0.4rem", background:imp.bg, color:imp.color, border:"1px solid currentColor", whiteSpace:"nowrap", letterSpacing:"0.18em", textTransform:"uppercase" }}>{imp.label}</span>
                     </div>
-                    <p style={{ fontFamily:"var(--font-serif)", fontSize:"0.9rem", fontWeight:600, color:v("textPrimary",dark), margin:"0.1rem 0 0", lineHeight:1.3, letterSpacing:"-0.01em" }}>{ev.titre}</p>
+                    <p style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"1.02rem", fontWeight:600, color:"var(--text-primary)", margin:"0.2rem 0 0", lineHeight:1.25, letterSpacing:"-0.01em" }}>{ev.titre}</p>
                   </div>
                 </div>
                 {/* Body */}
-                <div style={{ padding:"0.6rem 0.875rem" }}>
-                  <p style={{ fontSize:"0.73rem", color:v("textSec",dark), margin:"0 0 0.5rem", lineHeight:1.5 }}>{ev.desc}</p>
+                <div style={{ padding:"0.7rem 0" }}>
+                  <p style={{ fontFamily:"var(--font-body)", fontSize:"0.84rem", color:"var(--text-sec)", margin:"0 0 0.55rem", lineHeight:1.55, textWrap:"pretty" }}>{ev.desc}</p>
                   {/* Tips */}
                   {ev.tips.length > 0 && (
-                    <div style={{ background:v("tipsBg",dark), borderLeft:`3px solid ${v("tipsBdr",dark)}`, borderRadius:"0 6px 6px 0", padding:"0.4rem 0.6rem", marginBottom:"0.45rem" }}>
+                    <div style={{ borderLeft:`2px solid var(--accent)`, paddingLeft:"0.65rem", marginBottom:"0.55rem" }}>
                       {ev.tips.map((tip, ti) => (
-                        <p key={ti} style={{ fontSize:"0.7rem", color:v("tipsTxt",dark), margin: ti > 0 ? "0.25rem 0 0" : 0, lineHeight:1.4 }}>
-                          💡 {tip}
+                        <p key={ti} style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"0.8rem", color:"var(--text-sec)", margin: ti > 0 ? "0.3rem 0 0" : 0, lineHeight:1.5 }}>
+                          {tip}
                         </p>
                       ))}
                     </div>
                   )}
                   {/* Festival overlays */}
                   {fests.map((f, fi) => (
-                    <div key={fi} style={{ background:v("optBg",dark), border:`1px solid ${v("optBdr",dark)}`, borderRadius:"6px", padding:"0.35rem 0.6rem", marginBottom:"0.35rem", display:"flex", gap:"0.4rem", alignItems:"flex-start" }}>
-                      <span style={{ fontSize:"0.9rem", flexShrink:0 }}>{f.emoji}</span>
+                    <div key={fi} style={{ borderLeft:`2px solid var(--city-kyoto)`, padding:"0.15rem 0.65rem", marginBottom:"0.4rem", display:"flex", gap:"0.5rem", alignItems:"flex-start" }}>
+                      <span style={{ fontSize:"0.85rem", flexShrink:0, opacity:0.8 }}>{f.emoji}</span>
                       <div>
-                        <p style={{ fontSize:"0.7rem", fontWeight:700, color:v("optTxt",dark), margin:"0 0 0.1rem" }}>{f.titre}</p>
-                        <p style={{ fontSize:"0.72rem", color:v("optTxt",dark), margin:0, opacity:0.85, lineHeight:1.4 }}>{f.desc}</p>
+                        <p style={{ fontFamily:"var(--font-body)", fontSize:"0.62rem", fontWeight:700, color:"var(--city-kyoto)", margin:"0 0 0.15rem", letterSpacing:"0.18em", textTransform:"uppercase" }}>{f.titre}</p>
+                        <p style={{ fontFamily:"var(--font-body)", fontSize:"0.8rem", color:"var(--text-sec)", margin:0, lineHeight:1.5 }}>{f.desc}</p>
                       </div>
                     </div>
                   ))}
                   {/* Link to planning */}
                   {ev.tabId && (
-                    <button onClick={() => goTo(ev.tabId, ev.dayN)} style={{ fontSize:"0.68rem", color:"var(--info)", background:"transparent", border:"none", cursor:"pointer", padding:0, fontWeight:600, textDecoration:"underline", fontFamily:"inherit" }}>
-                      → Voir J{ev.dayN} dans le planning
+                    <button onClick={() => goTo(ev.tabId, ev.dayN)} style={{ fontFamily:"var(--font-body)", fontSize:"0.6rem", color:"var(--accent)", background:"transparent", border:"1px solid var(--border-light)", cursor:"pointer", padding:"0.25rem 0.55rem", fontWeight:700, letterSpacing:"0.18em", textTransform:"uppercase" }}>
+                      J{ev.dayN} — planning →
                     </button>
                   )}
                 </div>
@@ -4766,13 +4825,13 @@ function CalendrierSection() {
       </div>
 
       {/* LÉGENDE */}
-      <div style={{ background:v("cardBg",dark), border:`1px solid ${v("border",dark)}`, borderRadius:"10px", padding:"0.7rem 0.875rem" }}>
-        <p style={{ fontSize:"0.68rem", fontWeight:700, color:v("textPrimary",dark), margin:"0 0 0.4rem", textTransform:"uppercase", letterSpacing:"0.06em" }}>Légende des types</p>
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"0.3rem" }}>
+      <div style={{ borderTop:"0.5px solid var(--border-light)", borderBottom:"0.5px solid var(--border-light)", padding:"0.75rem 0" }}>
+        <p style={{ fontFamily:"var(--font-body)", fontSize:"0.66rem", fontWeight:700, color:"var(--text-primary)", margin:"0 0 0.5rem", textTransform:"uppercase", letterSpacing:"0.22em" }}>Légende des types</p>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"0.35rem" }}>
           {Object.entries(TYPE_COLOR).map(([k, col]) => (
-            <div key={k} style={{ display:"flex", alignItems:"center", gap:"0.4rem" }}>
+            <div key={k} style={{ display:"flex", alignItems:"center", gap:"0.45rem" }}>
               <div style={{ width:"8px", height:"8px", borderRadius:"50%", background:col, flexShrink:0 }} />
-              <span style={{ fontSize:"0.68rem", color:v("textSec",dark), textTransform:"capitalize" }}>
+              <span style={{ fontFamily:"var(--font-body)", fontSize:"0.72rem", color:"var(--text-sec)" }}>
                 {{ ferie:"🎌 Jour férié", festival:"🎏 Festival", pratique:"✈️ Info pratique", foule:"🌊 Alerte foule" }[k]}
               </span>
             </div>
@@ -4873,58 +4932,61 @@ function PhrasebookSection() {
       )})).filter(cat=>cat.phrases.length>0)
     : CATS;
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:"0.75rem" }}>
-      <div style={{ background:v("cardBg",dark), borderRadius:"10px", padding:"0.6rem 0.75rem", border:`1px solid ${v("border",dark)}` }}>
-        <p style={{ fontSize:"0.75rem", color:v("textSec",dark), margin:0, lineHeight:1.5 }}>
-          🗣 <strong style={{ color:v("textPrimary",dark) }}>Mini guide de conversation</strong> — Phrases essentielles avec phonétique. Appuyez sur <strong>Copier</strong> pour montrer votre téléphone.
+    <div style={{ display:"flex", flexDirection:"column", gap:"1.25rem" }}>
+      <div style={{ borderTop:"1px solid var(--border)", borderBottom:"1px solid var(--border)", padding:"1rem 0" }}>
+        <div style={{ display:"flex", alignItems:"baseline", gap:"0.75rem", marginBottom:"0.5rem" }}>
+          <span style={{ fontFamily:"var(--font-display)", fontSize:"1.9rem", fontWeight:900, fontStyle:"italic", color:"var(--accent)", lineHeight:1, letterSpacing:"-0.04em" }}>§</span>
+          <h2 style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"1.5rem", fontWeight:600, color:"var(--text-primary)", margin:0, letterSpacing:"-0.01em", lineHeight:1.15 }}>Mini guide de conversation</h2>
+        </div>
+        <p style={{ fontFamily:"var(--font-body)", fontSize:"0.84rem", color:"var(--text-sec)", margin:0, lineHeight:1.6, textWrap:"pretty" }}>
+          Phrases essentielles avec phonétique. Appuyez sur <span style={{ fontFamily:"var(--font-body)", fontSize:"0.62rem", fontWeight:700, letterSpacing:"0.18em", textTransform:"uppercase", padding:"0.1rem 0.35rem", border:"1px solid var(--border-light)" }}>Copier</span> pour montrer votre téléphone.
         </p>
       </div>
       {/* Search */}
-      <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", background:v("cardBg2",dark), border:`1px solid ${v("borderLight",dark)}`, borderRadius:"8px", padding:"0.38rem 0.7rem" }}>
-        <span style={{ color:v("textMuted",dark), fontSize:"0.82rem" }}>🔍</span>
-        <input type="text" placeholder="Chercher une phrase..." value={q} onChange={e=>setQ(e.target.value)}
-          style={{ flex:1, border:"none", outline:"none", background:"transparent", fontSize:"0.78rem", color:v("textPrimary",dark), fontFamily:"inherit" }} />
-        {q && <button onClick={()=>setQ("")} style={{ border:"none", background:"transparent", cursor:"pointer", color:v("textMuted",dark), fontSize:"0.8rem", padding:0 }}>✕</button>}
+      <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", border:"1px solid var(--border-light)", padding:"0.4rem 0.7rem" }}>
+        <span style={{ color:"var(--text-muted)", fontSize:"0.75rem" }}>🔍</span>
+        <input type="text" placeholder="Chercher une phrase…" value={q} onChange={e=>setQ(e.target.value)}
+          style={{ flex:1, border:"none", outline:"none", background:"transparent", fontFamily:"var(--font-body)", fontSize:"0.82rem", color:"var(--text-primary)" }} />
+        {q && <button onClick={()=>setQ("")} style={{ border:"none", background:"transparent", cursor:"pointer", color:"var(--text-muted)", fontSize:"0.8rem", padding:0 }}>✕</button>}
       </div>
       {filtered.length===0 && (
-        <div style={{ textAlign:"center", padding:"2rem", color:v("textSec",dark) }}>
-          <div style={{ fontSize:"2rem", marginBottom:"0.5rem" }}>🤔</div>
-          <p style={{ fontSize:"0.85rem", margin:0 }}>Aucune phrase pour « {q} »</p>
+        <div style={{ textAlign:"center", padding:"2rem 0", color:"var(--text-sec)" }}>
+          <p style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"0.95rem", margin:0 }}>Aucune phrase pour « {q} »</p>
         </div>
       )}
       {filtered.map(cat => {
         const isOpen = q ? true : open.has(cat.id);
         return (
-          <div key={cat.id} style={{ background:v("cardBg",dark), borderRadius:"12px", overflow:"hidden", border:`1px solid ${v("border",dark)}` }}>
-            <button onClick={()=>toggle(cat.id)} style={{ width:"100%", display:"flex", alignItems:"center", gap:"0.75rem", padding:"0.8rem 1rem", background:"transparent", border:"none", cursor:"pointer", outline:"none" }}>
-              <span style={{ fontSize:"1.3rem" }}>{cat.emoji}</span>
-              <span style={{ flex:1, fontSize:"0.9rem", fontWeight:700, color:cat.color, textAlign:"left" }}>{cat.titre}</span>
-              <span style={{ fontSize:"0.68rem", color:v("textMuted",dark), marginRight:"0.4rem" }}>{cat.phrases.length} phrases</span>
-              <span style={{ color:v("textMuted",dark), fontSize:"0.8rem", display:"inline-block", transform:isOpen?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▼</span>
+          <div key={cat.id} style={{ borderTop:"1px solid var(--border)", borderBottom:"1px solid var(--border)" }}>
+            <button onClick={()=>toggle(cat.id)} style={{ width:"100%", display:"flex", alignItems:"center", gap:"0.75rem", padding:"0.95rem 0", background:"transparent", border:"none", cursor:"pointer", outline:"none" }}>
+              <span style={{ fontSize:"1rem", opacity:0.75 }}>{cat.emoji}</span>
+              <span style={{ flex:1, fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"1.25rem", fontWeight:600, color:"var(--text-primary)", textAlign:"left", letterSpacing:"-0.01em" }}>{cat.titre}</span>
+              <span style={{ fontFamily:"var(--font-mono)", fontSize:"0.7rem", color:"var(--text-muted)", marginRight:"0.4rem", fontVariantNumeric:"tabular-nums", letterSpacing:"0.05em" }}>{cat.phrases.length}</span>
+              <span style={{ color:"var(--text-muted)", fontSize:"0.7rem", display:"inline-block", transform:isOpen?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▼</span>
             </button>
             {isOpen && (
-              <div style={{ borderTop:`1px solid ${v("borderLight",dark)}` }}>
+              <div style={{ borderTop:"0.5px solid var(--border-light)" }}>
                 {cat.phrases.map((p, pi) => {
                   const dc = DIFF[p.diff];
                   const isCopied = copied === `${cat.id}-${pi}`;
                   return (
-                    <div key={pi} style={{ padding:"0.75rem 1rem", borderBottom: pi<cat.phrases.length-1?`1px solid ${v("borderMid",dark)}`:"none" }}>
+                    <div key={pi} style={{ padding:"0.85rem 0", borderBottom: pi<cat.phrases.length-1?"0.5px solid var(--border-light)":"none" }}>
                       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:"0.5rem", marginBottom:"0.3rem" }}>
-                        <p style={{ fontSize:"0.73rem", color:v("textSec",dark), margin:0 }}>{p.fr}</p>
-                        <span style={{ fontSize:"0.68rem", fontWeight:600, padding:"0.12rem 0.4rem", borderRadius:"6px", whiteSpace:"nowrap", flexShrink:0, background:dc.bg, color:dc.color }}>{p.diff}</span>
+                        <p style={{ fontFamily:"var(--font-body)", fontSize:"0.8rem", color:"var(--text-sec)", margin:0, lineHeight:1.5 }}>{p.fr}</p>
+                        <span style={{ fontFamily:"var(--font-body)", fontSize:"0.6rem", fontWeight:700, padding:"0.15rem 0.4rem", whiteSpace:"nowrap", flexShrink:0, background:dc.bg, color:dc.color, border:`1px solid ${dc.color}`, letterSpacing:"0.18em", textTransform:"uppercase" }}>{p.diff}</span>
                       </div>
-                      <p style={{ fontSize:"0.88rem", fontWeight:700, color:cat.color, margin:"0 0 0.2rem", letterSpacing:"0.02em" }}>{p.rom}</p>
+                      <p style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"1.05rem", fontWeight:700, color:cat.color, margin:"0 0 0.25rem", letterSpacing:"-0.01em" }}>{p.rom}</p>
                       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", gap:"0.5rem" }}>
-                        <p style={{ fontSize:"0.78rem", color:v("textMuted",dark), margin:0, flex:1 }}>{p.jp}</p>
+                        <p style={{ fontFamily:"var(--font-kanji)", fontSize:"0.9rem", color:"var(--text-muted)", margin:0, flex:1 }}>{p.jp}</p>
                         <div style={{ display:"flex", gap:"0.3rem", flexShrink:0 }}>
                           <button
                             onClick={()=>speakJapanese(p.jp)}
                             aria-label={`Prononcer ${p.fr}`}
-                            style={{ fontSize:"0.7rem", padding:"0.2rem 0.5rem", borderRadius:"6px", border:`1px solid ${cat.color}`, background:"transparent", color:cat.color, cursor:"pointer", fontFamily:"inherit", whiteSpace:"nowrap" }}
+                            style={{ fontFamily:"var(--font-body)", fontSize:"0.6rem", fontWeight:700, padding:"0.28rem 0.55rem", border:`1px solid ${cat.color}`, background:"transparent", color:cat.color, cursor:"pointer", whiteSpace:"nowrap", letterSpacing:"0.18em", textTransform:"uppercase" }}
                           >
                             🔊 Lire
                           </button>
-                          <button onClick={()=>copyPhrase(p.jp, `${cat.id}-${pi}`)} style={{ fontSize:"0.7rem", padding:"0.2rem 0.5rem", borderRadius:"6px", border:`1px solid ${v("borderLight",dark)}`, background: isCopied ? "var(--success-soft)" : "transparent", color: isCopied ? "var(--success)" : v("textMuted",dark), cursor:"pointer", fontFamily:"inherit", transition:"all 0.2s", whiteSpace:"nowrap" }}>
+                          <button onClick={()=>copyPhrase(p.jp, `${cat.id}-${pi}`)} style={{ fontFamily:"var(--font-body)", fontSize:"0.6rem", fontWeight:700, padding:"0.28rem 0.55rem", border:`1px solid ${isCopied ? "var(--success)" : "var(--border-light)"}`, background: isCopied ? "var(--success)" : "transparent", color: isCopied ? "var(--bg-page)" : "var(--text-muted)", cursor:"pointer", transition:"all 0.2s", whiteSpace:"nowrap", letterSpacing:"0.18em", textTransform:"uppercase" }}>
                             {isCopied ? "✓ Copié" : "Copier"}
                           </button>
                         </div>
@@ -5455,15 +5517,13 @@ function DoAndDont() {
 }
 
 function InfoCard({ title, color, headerBg, children }) {
-  const dark = useDark();
-  // headerBg may be a plain string (CSS var) or legacy {light,dark} object.
-  const bg = typeof headerBg === "string" ? headerBg : headerBg?.[dark?"dark":"light"];
   return (
-    <div style={{ background:v("cardBg",dark), borderRadius:"12px", overflow:"hidden", boxShadow:"var(--shadow-card)", border:`1px solid ${v("border",dark)}`, transition:"background 0.3s" }}>
-      <div style={{ padding:"0.75rem 1rem", borderBottom:`1px solid ${v("borderLight",dark)}`, background:bg }}>
-        <h2 style={{ fontFamily:"var(--font-serif)", fontSize:"1rem", fontWeight:600, color, margin:0, letterSpacing:"-0.01em" }}>{title}</h2>
+    <div style={{ borderTop:"1px solid var(--border)", borderBottom:"1px solid var(--border)", transition:"background 0.3s" }}>
+      <div style={{ padding:"1rem 0 0.75rem", borderBottom:"0.5px solid var(--border-light)", display:"flex", alignItems:"baseline", gap:"0.75rem" }}>
+        <span style={{ fontFamily:"var(--font-display)", fontSize:"1.75rem", fontWeight:900, fontStyle:"italic", color: color || "var(--accent)", lineHeight:1, letterSpacing:"-0.04em" }}>§</span>
+        <h2 style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"1.35rem", fontWeight:600, color:"var(--text-primary)", margin:0, letterSpacing:"-0.01em", lineHeight:1.15 }}>{title}</h2>
       </div>
-      <div style={{ padding:"0.875rem 1rem" }}>{children}</div>
+      <div style={{ padding:"1rem 0" }}>{children}</div>
     </div>
   );
 }
@@ -5479,7 +5539,7 @@ function InfoSection() {
       <DepartureChecklist />
       <ShareSection />
       <NotificationsSection />
-      <InfoCard title="🚄 Transports & JR Pass" color="var(--success)" headerBg="var(--success-soft)">
+      <InfoCard title="Transports & JR Pass" color="var(--success)" headerBg="var(--success-soft)">
         {[
           ["🎫 JR Pass — Ce qui est couvert","Shinkansen HIKARI et KODAMA uniquement (⚠️ PAS le Nozomi ni le Mizuho). JR Locaux dans toutes les villes. Tokyo Monorail Haneda. JR Nara Line (Inari, Nara). JR Yumesaki Line (USJ). JR Sagano Line (Arashiyama). Réserver sièges GRATUITEMENT au guichet Midori no Madoguchi (みどりの窓口) dans toutes les grandes gares — indispensable 3 mai."],
           ["🚇 Suica IC Card","Acheter à la machine bleue 'IC Card' dès Haneda T3 — charger 5000¥. Valide : tous les métros de Tokyo/Osaka/Kyoto, bus Kyoto (230¥ fixe), konbinis 7-Eleven / FamilyMart / Lawson, certains taxis. Recharger aux machines vertes dans chaque station."],
@@ -5487,13 +5547,13 @@ function InfoSection() {
           ["✈️ Haneda Départ (11 mai 11h45)","Être au T3 International avant 9h30. Depuis Keikyu EX Inn Haneda : Keikyu Line ~12 min. Depuis Shinagawa : Keikyu ~25 min — départ hôtel 8h15. Enregistrement + sécurité + douane = 2h minimum."],
           ["🚄 Shinkansen — Horaires clés","Tokyo→Kyoto (3 mai) : Hikari toutes les 30 min depuis ~6h, durée ~2h40. Siège côté gauche pour le Fuji.\n\nKyoto→Shin-Osaka (7 mai) : Hikari ou Kodama, ~15 min.\n\nShin-Osaka→Tokyo (10 mai) : Hikari ~2h30. Réserver tous les sièges le J1 au guichet JR."],
         ].map(([t2,d],i)=>(
-          <div key={i} style={{ marginBottom:i<4?"0.65rem":0 }}>
-            <p style={{ fontSize:"0.8rem", fontWeight:600, color:"var(--success)", margin:0 }}>{t2}</p>
-            <p style={{ fontSize:"0.75rem", color:v("textSec",dark), marginTop:"0.1rem", lineHeight:1.5 }}>{d}</p>
+          <div key={i} style={{ marginBottom:i<4?"0.9rem":0, paddingBottom:i<4?"0.9rem":0, borderBottom:i<4?"0.5px solid var(--border-light)":"none" }}>
+            <p style={{ fontFamily:"var(--font-body)", fontSize:"0.7rem", fontWeight:700, color:"var(--success)", margin:"0 0 0.35rem", letterSpacing:"0.22em", textTransform:"uppercase" }}>{t2}</p>
+            <p style={{ fontFamily:"var(--font-body)", fontSize:"0.84rem", color:"var(--text-sec)", margin:0, lineHeight:1.6, textWrap:"pretty", whiteSpace:"pre-line" }}>{d}</p>
           </div>
         ))}
       </InfoCard>
-      <InfoCard title="🍶 Boissons — Sans bière !" color="var(--city-kyoto)" headerBg="var(--city-kyoto-wash)">
+      <InfoCard title="Boissons — Sans bière !" color="var(--city-kyoto)" headerBg="var(--city-kyoto-wash)">
         {[
           ["🥃 Highball Whisky (ハイボール)","Le standard de toutes les izakayas. Suntory Kakubin (角) + soda = définition du haiboru. Toki ou Hibiki pour les versions premium. Commander : 'Kakubin haiboru hitotsu onegaishimasu'. ~400-700¥."],
           ["🍶 Saké (日本酒)","Junmai (純米) = riz pur, body rond. Ginjo (吟醸) = fermentation basse température, floral. Daiginjo (大吟醸) = arômes complexes de fruit. Nigori (にごり) = trouble, légèrement sucré. Hiyaoroshi (ひやおろし) = saké saisonnier automnal. Commander : 'osusume no junmai ginjo kudasai' (recommandez-moi un junmai ginjo). 80-180ml selon le verre."],
@@ -5502,13 +5562,13 @@ function InfoSection() {
           ["🍵 Matcha & Hojicha","Matcha latte (抹茶ラテ) : partout depuis 300¥. Hojicha (ほうじ茶) : thé torréfié, caramel doux, peu de caféine. Amazake (甘酒) : saké doux chauffé, 0% alcool, fermenté de riz — goûter au moins une fois, ~200¥."],
           ["🍬 Ramune (ラムネ)","Soda pétillant en bouteille en verre avec bille. Pour ouvrir : insérer le poussoir plastique fourni dans le goulot et appuyer d'un coup sec. La bille tombe dans la bouteille. Saveurs : citron, melon, fraise, cola. ~150-200¥ en supermarché, ~300¥ touristique."],
         ].map(([t2,d],i)=>(
-          <div key={i} style={{ marginBottom:i<5?"0.55rem":0, paddingBottom:i<5?"0.55rem":0, borderBottom:i<5?`1px solid var(--city-kyoto-border)`:"none" }}>
-            <p style={{ fontSize:"0.8rem", fontWeight:600, color:"var(--city-kyoto)", margin:0 }}>{t2}</p>
-            <p style={{ fontSize:"0.74rem", color:v("textSec",dark), marginTop:"0.1rem", lineHeight:1.45 }}>{d}</p>
+          <div key={i} style={{ marginBottom:i<5?"0.9rem":0, paddingBottom:i<5?"0.9rem":0, borderBottom:i<5?"0.5px solid var(--border-light)":"none" }}>
+            <p style={{ fontFamily:"var(--font-body)", fontSize:"0.7rem", fontWeight:700, color:"var(--city-kyoto)", margin:"0 0 0.35rem", letterSpacing:"0.22em", textTransform:"uppercase" }}>{t2}</p>
+            <p style={{ fontFamily:"var(--font-body)", fontSize:"0.84rem", color:"var(--text-sec)", margin:0, lineHeight:1.6, textWrap:"pretty" }}>{d}</p>
           </div>
         ))}
       </InfoCard>
-      <InfoCard title="🇯🇵 Astuces Japon pratiques" color="var(--info)" headerBg="var(--info-soft)">
+      <InfoCard title="Astuces Japon pratiques" color="var(--info)" headerBg="var(--info-soft)">
         {[
           ["🛍 TAX-FREE (détaxe immédiate en magasin)","Dès 5 000¥ HT d'achats dans un même magasin estampillé 'Tax Free Shop' (environ 7% de réduction immédiate en caisse sur les produits éligibles). Présenter le passeport — obligatoire, pas de photocopie acceptée. Les articles sont scellés dans un sac transparent avec reçu agrafé : NE PAS OUVRIR avant de quitter le Japon. Magasins majeurs : Don Quijote, BicCamera, Yodobashi, grands magasins Isetan/Takashimaya. Ne s'applique pas aux cafés et restaurants."],
           ["📅 FERMETURES HEBDO — À VÉRIFIER AVANT DE S'Y RENDRE","La plupart des musées ferment le LUNDI (Tokyo National Museum, Nezu, Roppongi Mori Art, Shibuya Parco, Kyoto National Museum). Ghibli Museum : fermé MARDI. Hama-Rikyu Garden : ouvert tous les jours. TeamLab Planets : pas de fermeture hebdo fixe, vérifier sur le site. Temples et sanctuaires shinto : ouverts 7j/7 (certains bâtiments intérieurs peuvent fermer mais l'enceinte reste accessible). Astuce : chercher le site officiel + jour de la semaine avant de se déplacer, surtout en Golden Week où les jours fériés peuvent décaler les fermetures habituelles."],
@@ -5516,13 +5576,13 @@ function InfoSection() {
           ["🏥 HOSPITAL & MÉDECIN — Si besoin sur place","AMDA Helpline (FR/EN/ES 24h/7) : +81-3-6233-9266 — oriente vers les hôpitaux anglophones/francophones les plus proches.\n\nHôpitaux avec services internationaux :\n• Tokyo : St. Luke's International Hospital (Tsukiji), Tokyo Midtown Clinic (Roppongi)\n• Kyoto : Kyoto University Hospital (Sakyo-ku)\n• Osaka : Osaka University Hospital (Suita)\n\nGarder toujours sur soi : passeport + attestation d'assurance voyage (photo dans téléphone) + nom du médicament en nom DCI international (ibuprofène, paracétamol — pas les marques FR). Les pharmacies ne vendent PAS les antibiotiques sans ordonnance : Doliprane ≈ Tylenol japonais (acetaminophène 500mg)."],
           ["🚄 SHINKANSEN — RÉSERVATIONS GOLDEN WEEK","Les sièges réservés (shiteiseki) sont indispensables pendant la Golden Week — les wagons non-réservés (jiyūseki) sont saturés début (27-29 avril) et fin (5-6 mai).\n\nRÉSERVER GRATUITEMENT avec le JR Pass :\n• Guichet Midori no Madoguchi (みどりの窓口) dans toutes les gares JR majeures\n• App EKINET (https://www.eki-net.com) pour les utilisateurs de JR East\n• App SmartEX (https://smart-ex.jp) pour Tokaido Shinkansen\n\nPRIORITÉ J1 à Tokyo : réserver TOUS les Shinkansen du voyage en une fois au guichet JR dès l'activation du pass à Haneda ou à Tokyo Station. Phrases utiles : 'Hikari, Tokyo kara Kyoto, gogatsu mikka, sannin, madogawa onegaishimasu' (Hikari, Tokyo à Kyoto, 3 mai, 3 personnes, côté fenêtre s'il vous plaît).\n\n⚠️ JR Pass ne couvre PAS : Nozomi, Mizuho. Prendre Hikari ou Kodama (plus lents mais gratuits)."],
         ].map(([t2,d],i)=>(
-          <div key={i} style={{ marginBottom:i<4?"0.75rem":0, paddingBottom:i<4?"0.75rem":0, borderBottom:i<4?`1px solid var(--info-bdr)`:"none" }}>
-            <p style={{ fontSize:"0.8rem", fontWeight:600, color:"var(--info)", margin:0 }}>{t2}</p>
-            <p style={{ fontSize:"0.74rem", color:v("textSec",dark), marginTop:"0.15rem", lineHeight:1.5, whiteSpace:"pre-line" }}>{d}</p>
+          <div key={i} style={{ marginBottom:i<4?"0.9rem":0, paddingBottom:i<4?"0.9rem":0, borderBottom:i<4?"0.5px solid var(--border-light)":"none" }}>
+            <p style={{ fontFamily:"var(--font-body)", fontSize:"0.7rem", fontWeight:700, color:"var(--info)", margin:"0 0 0.35rem", letterSpacing:"0.22em", textTransform:"uppercase" }}>{t2}</p>
+            <p style={{ fontFamily:"var(--font-body)", fontSize:"0.84rem", color:"var(--text-sec)", margin:0, lineHeight:1.6, whiteSpace:"pre-line", textWrap:"pretty" }}>{d}</p>
           </div>
         ))}
       </InfoCard>
-      <InfoCard title="🎌 Codes Culturels" color="var(--text-primary)" headerBg="var(--bg-card-2)">
+      <InfoCard title="Codes Culturels" color="var(--text-primary)" headerBg="var(--bg-card-2)">
         {[
           "💴 CASH : Retirer dans les ATM verts Japan Post Bank ou ATM 7-Eleven (logo rouge). Les distributeurs BNP/Société Générale ne fonctionnent pas. PIN 4 chiffres. Garder 10 000¥ minimum sur soi en permanence.",
           "🍽 RESTAURANTS : Attendre toujours d'être placé (même si c'est vide). 'Itadakimasu' avant de manger. Aucun pourboire — c'est vraiment offensant. Paiement à la caisse en sortant dans 80% des cas. Mettre l'argent dans le plateau (pas en main).",
@@ -5531,7 +5591,9 @@ function InfoSection() {
           "📸 PHOTOS : Demander toujours avant de photographier des personnes. Les Geiko/Maiko à Gion = surtout ne pas bloquer leur chemin ni les toucher. Certains temples et jardins interdisent les photos (panneau 撮影禁止, satsueï kinshi).",
           "♨️ ONSEN : Se doucher ENTIÈREMENT avec savon ET shampoing au poste douche individuel avant d'entrer dans le bain commun. Pas de maillot de bain dans les bains publics. Tatouages : beaucoup d'onsen refusent encore. Vérifier avant.",
           "🗣 MOTS CLÉS INDISPENSABLES : Sumimasen = excusez-moi / pardon\n\nArigatou gozaimasu = merci beaucoup\n\nIkura desu ka ? = combien ?\n\nEigo menu arimasu ka ? = avez-vous le menu en anglais ?\n\nOishii ! = délicieux !",
-        ].map((tip,i)=><p key={i} style={{ fontSize:"0.75rem", color:v("textSec",dark), lineHeight:1.5, margin:i>0?"0.4rem 0 0":0 }}>{tip}</p>)}
+        ].map((tip,i)=>(
+          <p key={i} style={{ fontFamily:"var(--font-body)", fontSize:"0.84rem", color:"var(--text-sec)", lineHeight:1.6, margin:i>0?"0.8rem 0 0":0, paddingTop:i>0?"0.8rem":0, borderTop:i>0?"0.5px solid var(--border-light)":"none", textWrap:"pretty", whiteSpace:"pre-line" }}>{tip}</p>
+        ))}
       </InfoCard>
     </div>
   );
