@@ -1202,6 +1202,7 @@ body { overflow-x: hidden; max-width: 100vw; }
         <OfflineBanner />
         <InstallBanner />
         <EmergencyFAB />
+        <ScrollFAB />
         <header className="safe-top" style={{ background:"var(--bg-page)", color:"var(--text-primary)", padding:"1.75rem 1.25rem 0", position:"relative", overflow:"hidden" }}>
           {/* Seigaiha wave band — inked strokes, fades toward the bottom so
               the editorial block below reads cleanly. Stroke color adapts
@@ -4151,6 +4152,94 @@ const speakJapanese = (text) => {
     return true;
   } catch { return false; }
 };
+
+// ─── SCROLL FAB ─────────────────────────────────────────────────
+// Deux flèches flottantes haut/bas à gauche pour remonter/descendre
+// rapidement dans une page longue. Masquées automatiquement si la
+// page n'est pas scrollable (courte). En style éditorial : filet
+// 1 px ink + fond papier, pas de cercle à gradient.
+function ScrollFAB() {
+  const [showUp, setShowUp] = React.useState(false);
+  const [showDown, setShowDown] = React.useState(true);
+
+  React.useEffect(() => {
+    const update = () => {
+      const y = window.scrollY || window.pageYOffset || 0;
+      const max = Math.max(0, (document.documentElement.scrollHeight || 0) - window.innerHeight);
+      // Only show buttons if the page is taller than ~1.5 viewport.
+      if (max < window.innerHeight * 0.5) {
+        setShowUp(false);
+        setShowDown(false);
+        return;
+      }
+      setShowUp(y > 160);
+      setShowDown(y < max - 160);
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  const scrollTo = (top) => {
+    const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top, behavior: reduced ? "auto" : "smooth" });
+  };
+
+  const btn = {
+    width:"2.5rem", height:"2.5rem",
+    background:"var(--bg-page)",
+    border:"1px solid var(--text-primary)",
+    color:"var(--text-primary)",
+    cursor:"pointer",
+    display:"flex", alignItems:"center", justifyContent:"center",
+    fontFamily:"var(--font-body)", fontSize:"0.95rem", fontWeight:700,
+    letterSpacing:"0.02em",
+    padding:0,
+    transition:"transform 0.15s, opacity 0.2s",
+  };
+
+  return (
+    <div
+      className="no-print safe-fab-bottom"
+      style={{
+        position:"fixed", left:"1.1rem", zIndex:900,
+        display:"flex", flexDirection:"column", gap:"0.45rem",
+        pointerEvents:"none",
+      }}
+    >
+      <button
+        onClick={() => scrollTo(0)}
+        aria-label="Remonter en haut de la page"
+        style={{
+          ...btn,
+          opacity: showUp ? 1 : 0,
+          pointerEvents: showUp ? "auto" : "none",
+        }}
+        onTouchStart={e => { e.currentTarget.style.transform = "scale(0.92)"; }}
+        onTouchEnd={e => { e.currentTarget.style.transform = "scale(1)"; }}
+      >
+        ↑
+      </button>
+      <button
+        onClick={() => scrollTo(document.documentElement.scrollHeight)}
+        aria-label="Descendre en bas de la page"
+        style={{
+          ...btn,
+          opacity: showDown ? 1 : 0,
+          pointerEvents: showDown ? "auto" : "none",
+        }}
+        onTouchStart={e => { e.currentTarget.style.transform = "scale(0.92)"; }}
+        onTouchEnd={e => { e.currentTarget.style.transform = "scale(1)"; }}
+      >
+        ↓
+      </button>
+    </div>
+  );
+}
 
 function EmergencyFAB() {
   const dark = useDark();

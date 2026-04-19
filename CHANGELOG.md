@@ -6,6 +6,10 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ## Session 7 — 2026-04-19
 
+### Scroll FAB (haut / bas)
+
+- Nouveau composant `ScrollFAB` (App.jsx:4155) : deux boutons flottants à gauche de l'écran (opposé du FAB urgence à droite), flèches ↑ et ↓ pour remonter/descendre instantanément. Style éditorial (filet 1 px ink + fond papier, pas de cercle gradient). Masqués automatiquement si la page est courte (<1.5 viewport), ↑ n'apparaît qu'après 160 px scrollés, ↓ disparaît en approchant du bas. Respecte `prefers-reduced-motion`.
+
 ### Fallback taux JPY → 186
 
 - `ConverterCard` fallback passe de 163 → 186 (taux réel d'avril 2026). Utilisé uniquement si localStorage vide ET première visite offline. Les visites en ligne écrasent toujours via `api.frankfurter.app`.
