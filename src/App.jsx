@@ -830,6 +830,8 @@ export default function App() {
       },
       currentDayN,
       inTrip,
+      afterTrip,
+      daysToStart,
     }}>
     <DarkCtx.Provider value={dark}>
       <div className="min-h-screen" style={{ background:"var(--bg-page)", color:"var(--text-primary)", transition:"background 0.3s, color 0.3s" }}>
@@ -1306,7 +1308,7 @@ body { overflow-x: hidden; max-width: 100vw; }
                 <div style={{ fontFamily:"var(--font-body)", fontSize:"0.56rem", letterSpacing:"0.24em", textTransform:"uppercase", color:"var(--text-muted)", fontWeight:600, marginBottom:"0.1rem" }}>
                   {afterTrip ? "Voyage" : inTrip ? "Jour actuel" : "Départ dans"}
                 </div>
-                <div style={{ fontFamily:"var(--font-display)", fontSize:"2.65rem", fontWeight:900, color:"var(--accent)", lineHeight:0.9, fontStyle:"italic", letterSpacing:"-0.04em", fontVariationSettings:'"opsz" 144' }}>
+                <div id="masthead-day-indicator" style={{ fontFamily:"var(--font-display)", fontSize:"2.65rem", fontWeight:900, color:"var(--accent)", lineHeight:0.9, fontStyle:"italic", letterSpacing:"-0.04em", fontVariationSettings:'"opsz" 144' }}>
                   {afterTrip ? "✓" : inTrip ? `J${currentDayN}` : `J–${daysToStart}`}
                 </div>
               </div>
@@ -4319,6 +4321,18 @@ function ScrollFAB() {
   const nav = useNav();
   const [showUp, setShowUp] = useState(false);
   const [showDown, setShowDown] = useState(true);
+  const [mastheadVisible, setMastheadVisible] = useState(true);
+
+  useEffect(() => {
+    const el = document.getElementById("masthead-day-indicator");
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      entries => setMastheadVisible(entries[0]?.isIntersecting ?? false),
+      { threshold: 0.01 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     const update = () => {
@@ -4369,27 +4383,40 @@ function ScrollFAB() {
         pointerEvents:"none",
       }}
     >
-      {nav?.currentDayN != null && (
-        <button
-          onClick={() => nav.jumpToday && nav.jumpToday()}
-          aria-label={`Aller au jour J${nav.currentDayN}`}
-          title={nav.inTrip ? "Aujourd'hui" : "Ouvrir un jour"}
-          style={{
-            ...btn,
-            opacity: 1,
-            pointerEvents: "auto",
-            background: "var(--accent)",
-            borderColor: "var(--accent)",
-            color: "var(--bg-page)",
-            fontFamily: "var(--font-display)", fontStyle: "italic",
-            fontSize: "0.85rem", fontWeight: 700,
-          }}
-          onTouchStart={e => { e.currentTarget.style.transform = "scale(0.92)"; }}
-          onTouchEnd={e => { e.currentTarget.style.transform = "scale(1)"; }}
-        >
-          J{nav.currentDayN}
-        </button>
-      )}
+      {nav?.currentDayN != null && !mastheadVisible && (() => {
+        const label = nav.afterTrip
+          ? "✓"
+          : nav.inTrip
+            ? `J${nav.currentDayN}`
+            : `J–${nav.daysToStart}`;
+        const aria = nav.afterTrip
+          ? "Voyage terminé"
+          : nav.inTrip
+            ? `Aller au jour en cours (J${nav.currentDayN})`
+            : `Départ dans ${nav.daysToStart} jour(s) — ouvrir J1`;
+        return (
+          <button
+            onClick={() => nav.jumpToday && nav.jumpToday()}
+            aria-label={aria}
+            title={aria}
+            style={{
+              ...btn,
+              opacity: 1,
+              pointerEvents: "auto",
+              background: "var(--accent)",
+              borderColor: "var(--accent)",
+              color: "var(--bg-page)",
+              fontFamily: "var(--font-display)", fontStyle: "italic",
+              fontSize: label.length > 3 ? "0.72rem" : "0.85rem", fontWeight: 700,
+              width: "2.75rem",
+            }}
+            onTouchStart={e => { e.currentTarget.style.transform = "scale(0.92)"; }}
+            onTouchEnd={e => { e.currentTarget.style.transform = "scale(1)"; }}
+          >
+            {label}
+          </button>
+        );
+      })()}
       <button
         onClick={() => scrollTo(0)}
         aria-label="Remonter en haut de la page"

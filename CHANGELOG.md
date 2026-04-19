@@ -6,9 +6,10 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ## Session 7 — 2026-04-19 (améliorations batch)
 
-### Bouton J{N} toujours visible (test)
+### Bouton J{N} — label contextuel + hide quand masthead visible
 
-- Retrait de la condition `inTrip` sur le bouton J{N} du `ScrollFAB`. Affiche J1 avant le voyage (test/démo), J{courant} pendant, J15 après. Le deep-link `#/jour/N` reste le mécanisme URL officiel.
+- Label : `J–{daysToStart}` avant le voyage, `J{N}` pendant, `✓` après. Cohérent avec le masthead.
+- `IntersectionObserver` sur `#masthead-day-indicator` : le bouton disparaît tant que l'indicateur du masthead est visible, apparaît dès qu'on scrolle au-delà. Plus de doublon visuel.
 
 ### Deep-link #/jour/N + bouton "Today"
 
