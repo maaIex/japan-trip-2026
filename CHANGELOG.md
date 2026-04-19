@@ -6,6 +6,14 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ## Session 7 — 2026-04-19
 
+### Fallback taux JPY → 186
+
+- `ConverterCard` fallback passe de 163 → 186 (taux réel d'avril 2026). Utilisé uniquement si localStorage vide ET première visite offline. Les visites en ligne écrasent toujours via `api.frankfurter.app`.
+
+---
+
+## Session 7 — 2026-04-19 (restyle)
+
 **Contexte :** Après la Session 6 (masthead + listing jours éditoriaux), le contenu *à l'intérieur* d'un jour restait en vieux style (cartes arrondies, pills, période en bandeau coloré), et les six onglets Ressources (Infos, Checklist, Gastro, Météo, Phrases, Calendrier) conservaient des en-têtes en gradient + cartes rondes. Objectif : harmoniser ces zones avec la DA Indigo Ukiyo-e (Fraunces italique, filets ink, "§ N", mono tabular, drapeau vermillon).
 
 ### Détail d'un jour — timeline éditoriale

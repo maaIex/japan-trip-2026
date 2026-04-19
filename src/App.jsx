@@ -3430,12 +3430,12 @@ function GastroSection() {
 // ═══════════════════════════════════════════════════════════════════
 function ConverterCard() {
   const dark = useDark();
-  // Persist the rate across reloads; start from cached value, or 163 as a sane fallback.
+  // Persist the rate across reloads; start from cached value, or 186 as a sane fallback (taux ~avril 2026).
   const [rate, setRate] = useState(() => {
     try {
       const cached = parseFloat(localStorage.getItem("jpy-rate"));
-      return Number.isFinite(cached) && cached > 0 ? cached : 163;
-    } catch { return 163; }
+      return Number.isFinite(cached) && cached > 0 ? cached : 186;
+    } catch { return 186; }
   });
   const [rateMeta, setRateMeta] = useState(() => {
     try {
@@ -3480,7 +3480,7 @@ function ConverterCard() {
   const handleYen = v => { setYen(v); setEur(v === "" ? "" : (parseFloat(v)/rate).toFixed(2)); };
   const handleEur = v => { setEur(v); setYen(v === "" ? "" : Math.round(parseFloat(v)*rate).toString()); };
   const handleRate = v => {
-    const r = parseFloat(v) || 163;
+    const r = parseFloat(v) || 186;
     setRate(r);
     if (yen !== "") setEur((parseFloat(yen)/r).toFixed(2));
   };
