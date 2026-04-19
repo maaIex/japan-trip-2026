@@ -4,6 +4,42 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ---
 
+## Session 7 — 2026-04-19 (améliorations batch)
+
+### Deep-link #/jour/N + bouton "Today"
+
+- `NavCtx` étendu avec `jumpToday`, `currentDayN`, `inTrip`. Calcul du jour courant en fonction de la date système (27 avril → J1, etc., clamp 1..15). Handler `popstate` synchronise la nav sur le hash `#/jour/N` — partage direct d'un jour possible, retour navigateur supporté.
+- `ScrollFAB` (App.jsx:4155) : ajout d'un 3e bouton "J{N}" (JetBrains Mono) au-dessus des flèches ↑/↓, visible uniquement pendant la période du voyage (27 avr – 11 mai 2026), ouvre directement le jour courant.
+
+### Indicateur progression par jour
+
+- `DayCard` (App.jsx:1710) : mini-badge à droite du titre affichant `n/total` tâches faites pour ce jour (ignore les items `opt`). Passe en ✓ vert quand tout est coché, en gris sinon. Se met à jour live via `DONE_ITEMS_EVENT`.
+
+### Bannière offline renforcée
+
+- `OfflineBanner` (App.jsx:~3972) : sticky en haut, couleur warning (vermillon clair) + pill `OFFLINE` en JetBrains Mono uppercase tracked. Plus difficile à rater qu'un simple texte gris.
+
+### Conversion ¥ → € inline
+
+- Nouveaux helpers (près de `DONE_ITEMS_KEY`) : `useYenRate()` (lit `jpy-rate` avec fallback 186), `extractYenAmounts(text)` (regex `/(\d[\d\s.,]*)\s*¥/g`, dédup, max 4), `formatEur(v)` (décimales graduées selon magnitude).
+- `ActivityItem` : quand le sous-titre contient des montants en ¥, une ligne secondaire en mono or 0.62rem affiche `980¥ ≈ 5,27€` pour chaque montant détecté. Grisée si l'item est coché.
+
+### Sauvegarde / restauration JSON
+
+- Nouveau composant `BackupSection` dans `InfoSection` (après `ShareSection`). Bouton **Exporter** → télécharge `japon-2026-backup-YYYY-MM-DD.json` contenant les 8 clés localStorage utiles (`japan-done-items-v1`, `japan-day-notes-v1`, `japan-reservations-done-v1`, `jpy-rate`, `jpy-rate-ts`, `dark-mode`, `large-text`, `viewMode`). Bouton **Importer** → parse, filtre aux clés whitelisted, dispatch `DONE_ITEMS_EVENT`, reload. Permet de synchroniser manuellement entre 2 téléphones (papa + maman).
+
+### Boutons rafraîchir explicites (Météo / Convertisseur)
+
+- `ConverterCard` : `fetchRate(force)` refactorisé via `useCallback`, bouton **↻ Rafraîchir** à droite de la ligne "taux en cache". Désactivé si offline ou pendant un fetch en cours.
+- `LiveWeatherCard` : même pattern, `fetchAll(force)` exposé, bouton **↻ Rafraîchir** dans l'en-tête.
+- Pull-to-refresh natif non implémenté (comportement imprévisible sur iOS Safari PWA, conflits avec overscroll). Les boutons explicites couvrent le besoin sans surprises.
+
+### Bug fix — React.useState dans ScrollFAB
+
+- Imports nommés uniquement (`useState`, `useEffect`, …), pas de namespace `React` en scope. Commit précédent `79f5a34` utilisait `React.useState` → ErrorBoundary. Corrigé en repassant aux hooks nommés.
+
+---
+
 ## Session 7 — 2026-04-19
 
 ### Scroll FAB (haut / bas)

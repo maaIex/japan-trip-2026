@@ -767,29 +767,70 @@ export default function App() {
     return () => clearTimeout(id);
   }, [query, activeTab]);
 
-  // Auto-navigate to current day
-  useEffect(() => {
-    if (voyageMode && inTrip && currentDayN != null) {
-      const tabForDay = findTabForDay(currentDayN);
-      if (tabForDay) {
-        setActiveTab(tabForDay.id);
-        setTimeout(() => {
-          const el = document.getElementById("day-" + currentDayN);
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 300);
+  // Helper: open a specific day (set tab, expand, scroll, sync hash).
+  const openDayDeep = useCallback((dayN, { updateHash = true } = {}) => {
+    const tabForDay = findTabForDay(dayN);
+    if (!tabForDay) return;
+    setActiveTab(tabForDay.id);
+    setOpenDays(prev => new Set(prev).add(dayN));
+    if (updateHash) {
+      try {
+        if (window.location.hash !== `#/jour/${dayN}`) {
+          history.replaceState(null, "", `#/jour/${dayN}`);
+        }
+      } catch {}
+    }
+    setTimeout(() => {
+      const el = document.getElementById("day-" + dayN);
+      if (el) {
+        const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        el.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
       }
+    }, 180);
+  }, []);
+
+  // Deep-link: #/jour/N opens that day. Respected on load + hashchange.
+  useEffect(() => {
+    const handle = () => {
+      const m = (window.location.hash || "").match(/^#\/jour\/(\d+)/);
+      if (m) {
+        const dayN = parseInt(m[1], 10);
+        if (DAYS.find(d => d.n === dayN)) openDayDeep(dayN, { updateHash: false });
+      }
+    };
+    handle();
+    window.addEventListener("hashchange", handle);
+    return () => window.removeEventListener("hashchange", handle);
+  }, [openDayDeep]);
+
+  // Auto-navigate to current day (only if no hash deep-link present)
+  useEffect(() => {
+    if ((window.location.hash || "").match(/^#\/jour\//)) return;
+    if (voyageMode && inTrip && currentDayN != null) {
+      openDayDeep(currentDayN, { updateHash: false });
     }
   // eslint-disable-next-line
   }, [voyageMode]);
 
   return (
-    <NavCtx.Provider value={{ goTo: (tabId, dayN) => {
+    <NavCtx.Provider value={{
+      goTo: (tabId, dayN) => {
         setActiveTab(tabId);
+        if (dayN != null) {
+          setOpenDays(prev => new Set(prev).add(dayN));
+          try { history.replaceState(null, "", `#/jour/${dayN}`); } catch {}
+        }
         setTimeout(() => {
           const el = document.getElementById("day-" + dayN);
           if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 120);
-      }}}>
+      },
+      jumpToday: () => {
+        if (currentDayN != null) openDayDeep(currentDayN);
+      },
+      currentDayN,
+      inTrip,
+    }}>
     <DarkCtx.Provider value={dark}>
       <div className="min-h-screen" style={{ background:"var(--bg-page)", color:"var(--text-primary)", transition:"background 0.3s, color 0.3s" }}>
         <style>{`
@@ -1722,6 +1763,17 @@ const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query, matc
   const kanji = CITY_KANJI[day.city] || "";
   const nLabel = day.nLabel || String(day.n).padStart(2, "0");
   const hasBooking = day.sections?.some(s => s.items?.some(i => i.s === "ok" || i.s === "book"));
+  // Progression des items "marqués fait" pour ce jour
+  const { done: doneItems } = useDoneItems();
+  const totalItems = useMemo(() => day.sections?.reduce((n, s) => n + (s.items?.length || 0), 0) || 0, [day]);
+  const doneCount = useMemo(() => {
+    if (!totalItems) return 0;
+    const prefix = `${day.n}-`;
+    let n = 0;
+    for (const k of doneItems) if (k.startsWith(prefix)) n++;
+    return n;
+  }, [doneItems, day.n, totalItems]);
+  const allDone = totalItems > 0 && doneCount === totalItems;
   return (
     <article
       ref={ref}
@@ -1815,6 +1867,20 @@ const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query, matc
                 color: "var(--alert-txt)",
                 lineHeight: 1.1,
               }}>🎌 Férié</span>
+            )}
+            {totalItems > 0 && doneCount > 0 && (
+              <span
+                aria-label={`${doneCount} sur ${totalItems} activités faites`}
+                title={`${doneCount}/${totalItems} faits`}
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "0.6rem", fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  color: allDone ? "var(--success)" : "var(--text-sec)",
+                  fontVariantNumeric: "tabular-nums",
+                  lineHeight: 1.1,
+                }}
+              >{allDone ? "✓ " : ""}{doneCount}/{totalItems}</span>
             )}
             {query && matchCount > 0 && (
               <span
@@ -2219,6 +2285,55 @@ function TimelineView({ sections, city }) {
 }
 
 
+// ─── JPY → EUR helper ────────────────────────────────────────────
+// Lit le taux caché par le ConverterCard. Fallback 186 si absent.
+// Sync via l'event custom "jpy-rate-changed" (facultatif, actuellement
+// non émis — la page se recharge rarement sans reload de toute façon).
+function useYenRate() {
+  const [rate, setRate] = useState(() => {
+    try {
+      const r = parseFloat(localStorage.getItem("jpy-rate"));
+      return Number.isFinite(r) && r > 0 ? r : 186;
+    } catch { return 186; }
+  });
+  useEffect(() => {
+    const h = () => {
+      try {
+        const r = parseFloat(localStorage.getItem("jpy-rate"));
+        if (Number.isFinite(r) && r > 0) setRate(r);
+      } catch {}
+    };
+    window.addEventListener("storage", h);
+    return () => window.removeEventListener("storage", h);
+  }, []);
+  return rate;
+}
+
+// Parse yen amounts like "980¥", "~650 ¥", "12 000¥", "5,000¥" from text.
+// Returns up to 4 distinct values, preserving order of appearance.
+function extractYenAmounts(text) {
+  if (!text || typeof text !== "string") return [];
+  const re = /(\d[\d\s.,]*)\s*¥/g;
+  const seen = new Set();
+  const out = [];
+  let m;
+  while ((m = re.exec(text)) !== null && out.length < 4) {
+    const raw = m[1].replace(/[\s.]/g, "").replace(",", ".");
+    const n = parseFloat(raw);
+    if (Number.isFinite(n) && n > 0 && !seen.has(n)) {
+      seen.add(n);
+      out.push(n);
+    }
+  }
+  return out;
+}
+
+function formatEur(v) {
+  if (v >= 100) return v.toFixed(0) + " €";
+  if (v >= 10) return v.toFixed(1).replace(".", ",") + " €";
+  return v.toFixed(2).replace(".", ",") + " €";
+}
+
 // ─── DONE ITEMS HOOK (U12) ───────────────────────────────────────
 // Tracks which planning items the user has marked as completed.
 // Storage: Set of stable string keys "dayN-sectionId-idx".
@@ -2366,10 +2481,13 @@ function SectionBlock({ section, query, dayN, dayCity, idx = 0 }) {
 function ActivityItem({ item, query, itemKey, dayCity, isLast = false }) {
   const dark = useDark();
   const { done, toggle } = useDoneItems();
+  const rate = useYenRate();
   const st = ST[item.s] || ST.free;
   const isOpt = item.s === "opt";
   const isDone = itemKey ? done.has(itemKey) : false;
   const cityName = { tokyo:"Tokyo", kyoto:"Kyoto", osaka:"Osaka" }[dayCity] || "";
+  // Extrait jusqu'à 4 montants en ¥ du sous-titre pour affichage inline €.
+  const yenAmounts = useMemo(() => extractYenAmounts(item.sub || ""), [item.sub]);
 
   // Split "🕘 9h30 — Titre" into time + clean title. Leaves title unchanged if no time prefix.
   const timeMatch = item.t.match(/^(.*?)(\d{1,2}h\d{0,2})\s*[—–\-]\s*([\s\S]*)$/);
@@ -2456,6 +2574,26 @@ function ActivityItem({ item, query, itemKey, dayCity, isLast = false }) {
               <p key={pi} style={{ margin: pi > 0 ? "0.45rem 0 0" : 0 }}>
                 {query ? highlight(para, query, dark) : para}
               </p>
+            ))}
+          </div>
+        )}
+        {yenAmounts.length > 0 && (
+          <div
+            aria-label="Conversion euros"
+            style={{
+              display:"flex", flexWrap:"wrap", gap:"0.35rem 0.7rem",
+              marginTop:"0.4rem",
+              fontFamily:"var(--font-mono)", fontSize:"0.62rem",
+              letterSpacing:"0.04em",
+              color: isDone ? "var(--text-muted)" : "var(--gold)",
+              fontVariantNumeric:"tabular-nums",
+              opacity: isDone ? 0.6 : 1,
+            }}
+          >
+            {yenAmounts.map((y, i) => (
+              <span key={i}>
+                {y.toLocaleString("fr-FR")}¥ <span style={{ opacity:0.55 }}>≈</span> {formatEur(y / rate)}
+              </span>
             ))}
           </div>
         )}
@@ -3444,14 +3582,16 @@ function ConverterCard() {
       return ts ? { ts, source: "cache" } : null;
     } catch { return null; }
   });
-  // Refresh rate from frankfurter.app (ECB data, free, no key) at most once per 24h.
-  // If offline or the API is down, we silently keep the cached value.
-  useEffect(() => {
-    try {
-      const last = parseInt(localStorage.getItem("jpy-rate-ts") || "0", 10);
-      if (last && Date.now() - last < 24 * 60 * 60 * 1000) return;
-    } catch {}
+  const [refreshing, setRefreshing] = useState(false);
+  const fetchRate = useCallback((force = false) => {
+    if (!force) {
+      try {
+        const last = parseInt(localStorage.getItem("jpy-rate-ts") || "0", 10);
+        if (last && Date.now() - last < 24 * 60 * 60 * 1000) return;
+      } catch {}
+    }
     if (!navigator.onLine) return;
+    setRefreshing(true);
     fetch("https://api.frankfurter.app/latest?from=EUR&to=JPY")
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(data => {
@@ -3466,8 +3606,10 @@ function ConverterCard() {
           localStorage.setItem("jpy-rate-ts", String(ts));
         } catch {}
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setRefreshing(false));
   }, []);
+  useEffect(() => { fetchRate(false); }, [fetchRate]);
   const [yen, setYen] = useState("");
   const [eur, setEur] = useState("");
   const refs = [
@@ -3506,13 +3648,17 @@ function ConverterCard() {
         <span style={{ fontSize:"0.72rem", color:v("textSec",dark) }}>¥</span>
         <button onClick={reset} style={{ marginLeft:"auto", fontSize:"0.7rem", color:v("textMuted",dark), background:"transparent", border:`1px solid ${v("borderLight",dark)}`, borderRadius:"6px", padding:"0.25rem 0.6rem", cursor:"pointer", fontFamily:"inherit" }}>Réinitialiser</button>
       </div>
-      {rateMeta && (
-        <p style={{ fontSize:"0.66rem", color:v("textMuted",dark), margin:"0 0 0.75rem", lineHeight:1.3 }}>
-          {rateMeta.source === "live" ? "🟢 Taux mis à jour" : "📦 Taux en cache"} —{" "}
-          {new Date(rateMeta.ts).toLocaleDateString("fr-FR", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" })}
-          {" · source BCE via frankfurter.app"}
-        </p>
-      )}
+      <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", margin:"0 0 0.75rem" }}>
+        {rateMeta && (
+          <p style={{ fontSize:"0.66rem", color:v("textMuted",dark), margin:0, lineHeight:1.3, flex:1 }}>
+            {rateMeta.source === "live" ? "🟢 Taux à jour" : "📦 Taux en cache"} —{" "}
+            {new Date(rateMeta.ts).toLocaleDateString("fr-FR", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" })}
+          </p>
+        )}
+        <button onClick={() => fetchRate(true)} disabled={refreshing || !navigator.onLine} style={{ fontSize:"0.68rem", color:"var(--gold)", background:"transparent", border:`1px solid var(--gold)`, borderRadius:"6px", padding:"0.25rem 0.6rem", cursor: refreshing ? "wait" : "pointer", fontFamily:"inherit", opacity: refreshing || !navigator.onLine ? 0.5 : 1, whiteSpace:"nowrap" }}>
+          {refreshing ? "↻ …" : "↻ Rafraîchir"}
+        </button>
+      </div>
       <div style={{ borderTop:`1px solid ${v("borderLight",dark)}`, paddingTop:"0.6rem" }}>
         <p style={{ fontSize:"0.7rem", color:v("textMuted",dark), marginBottom:"0.4rem", fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase" }}>Références rapides</p>
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"0.3rem" }}>
@@ -3637,53 +3783,46 @@ function LiveWeatherCard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const CACHE_KEY = "weather-cache-v1";
-    const MAX_AGE = 3 * 60 * 60 * 1000; // 3h
-    let cancelled = false;
+  const CACHE_KEY = "weather-cache-v1";
+  const MAX_AGE = 3 * 60 * 60 * 1000; // 3h
 
-    // Try cache first (instant render).
-    try {
-      const raw = localStorage.getItem(CACHE_KEY);
-      if (raw) {
-        const cached = JSON.parse(raw);
-        if (cached && cached.fetchedAt) {
-          setData(cached);
-          // If fresh enough, skip network entirely.
-          if (Date.now() - cached.fetchedAt < MAX_AGE) {
-            setLoading(false);
-            return;
+  const fetchAll = useCallback(async (force = false) => {
+    if (!force) {
+      try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (raw) {
+          const cached = JSON.parse(raw);
+          if (cached && cached.fetchedAt) {
+            setData(cached);
+            if (Date.now() - cached.fetchedAt < MAX_AGE) {
+              setLoading(false);
+              return;
+            }
           }
         }
-      }
-    } catch {}
-
-    // Refresh from Open-Meteo.
-    const fetchAll = async () => {
-      try {
-        const results = await Promise.all(WEATHER_CITIES.map(async c => {
-          const url = `https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&timezone=Asia%2FTokyo&forecast_days=7`;
-          const res = await fetch(url);
-          if (!res.ok) throw new Error("HTTP " + res.status);
-          const json = await res.json();
-          return { id: c.id, daily: json.daily };
-        }));
-        if (cancelled) return;
-        const payload = { fetchedAt: Date.now(), cities: Object.fromEntries(results.map(r => [r.id, r.daily])) };
-        setData(payload);
-        setError(null);
-        try { localStorage.setItem(CACHE_KEY, JSON.stringify(payload)); } catch {}
-      } catch (err) {
-        if (cancelled) return;
-        // Don't wipe the previous cached data if present — we still show it.
-        setError(err.message || "Erreur réseau");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    fetchAll();
-    return () => { cancelled = true; };
+      } catch {}
+    }
+    setLoading(true);
+    try {
+      const results = await Promise.all(WEATHER_CITIES.map(async c => {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&timezone=Asia%2FTokyo&forecast_days=7`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const json = await res.json();
+        return { id: c.id, daily: json.daily };
+      }));
+      const payload = { fetchedAt: Date.now(), cities: Object.fromEntries(results.map(r => [r.id, r.daily])) };
+      setData(payload);
+      setError(null);
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify(payload)); } catch {}
+    } catch (err) {
+      setError(err.message || "Erreur réseau");
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => { fetchAll(false); }, [fetchAll]);
 
   const ageText = formatAge(data?.fetchedAt);
   // Cache older than 24h is stale enough to flag — the user may have been
@@ -3692,10 +3831,15 @@ function LiveWeatherCard() {
 
   return (
     <InfoCard title="🌐 Météo live (7 prochains jours)" color="var(--info)" headerBg="var(--info-soft)">
-      <p style={{ fontSize:"0.7rem", color:v("textMuted",dark), margin:"0 0 0.6rem" }}>
-        Source : Open-Meteo (gratuit, sans clé) • {loading && !data ? "chargement…" : ageText ? `MAJ ${ageText}` : ""}
-        {error && data ? " • hors-ligne (cache)" : ""}
-      </p>
+      <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", margin:"0 0 0.6rem" }}>
+        <p style={{ fontSize:"0.7rem", color:v("textMuted",dark), margin:0, flex:1 }}>
+          Source : Open-Meteo (gratuit, sans clé) • {loading && !data ? "chargement…" : ageText ? `MAJ ${ageText}` : ""}
+          {error && data ? " • hors-ligne (cache)" : ""}
+        </p>
+        <button onClick={() => fetchAll(true)} disabled={loading || !navigator.onLine} style={{ fontSize:"0.68rem", color:"var(--info)", background:"transparent", border:`1px solid var(--info)`, borderRadius:"6px", padding:"0.25rem 0.6rem", cursor: loading ? "wait" : "pointer", fontFamily:"inherit", opacity: loading || !navigator.onLine ? 0.5 : 1, whiteSpace:"nowrap" }}>
+          {loading ? "↻ …" : "↻ Rafraîchir"}
+        </button>
+      </div>
 
       {staleCache && (
         <p style={{
@@ -3981,9 +4125,22 @@ function OfflineBanner() {
   }, []);
   if (!offline) return null;
   return (
-    <div style={{ background:"var(--success-soft)", padding:"0.35rem 1rem", display:"flex", alignItems:"center", gap:"0.5rem", borderBottom:`1px solid var(--success-bdr)` }}>
-      <span style={{ fontSize:"0.7rem" }}>🟢</span>
-      <span style={{ fontSize:"0.72rem", fontWeight:600, color:"var(--success)" }}>Mode hors-ligne — toutes les données sont disponibles</span>
+    <div style={{
+      background:"var(--warning-soft)",
+      padding:"0.5rem 1rem",
+      display:"flex", alignItems:"center", gap:"0.6rem",
+      borderBottom:"1px solid var(--warning-bdr)",
+      position:"sticky", top:0, zIndex:50,
+    }}>
+      <span aria-hidden="true" style={{
+        fontFamily:"var(--font-mono)", fontSize:"0.6rem", fontWeight:700,
+        letterSpacing:"0.18em", textTransform:"uppercase",
+        color:"var(--bg-page)", background:"var(--warning)",
+        padding:"0.18rem 0.5rem", flexShrink:0,
+      }}>Offline</span>
+      <span style={{ fontSize:"0.75rem", fontWeight:600, color:"var(--warning)", lineHeight:1.3 }}>
+        Mode hors-ligne actif — itinéraire, notes, checklist disponibles. Taux &amp; météo figés sur cache.
+      </span>
     </div>
   );
 }
@@ -4159,6 +4316,7 @@ const speakJapanese = (text) => {
 // page n'est pas scrollable (courte). En style éditorial : filet
 // 1 px ink + fond papier, pas de cercle à gradient.
 function ScrollFAB() {
+  const nav = useNav();
   const [showUp, setShowUp] = useState(false);
   const [showDown, setShowDown] = useState(true);
 
@@ -4211,6 +4369,27 @@ function ScrollFAB() {
         pointerEvents:"none",
       }}
     >
+      {nav?.inTrip && nav?.currentDayN != null && (
+        <button
+          onClick={() => nav.jumpToday && nav.jumpToday()}
+          aria-label={`Aller au jour en cours (J${nav.currentDayN})`}
+          title="Aujourd'hui"
+          style={{
+            ...btn,
+            opacity: 1,
+            pointerEvents: "auto",
+            background: "var(--accent)",
+            borderColor: "var(--accent)",
+            color: "var(--bg-page)",
+            fontFamily: "var(--font-display)", fontStyle: "italic",
+            fontSize: "0.85rem", fontWeight: 700,
+          }}
+          onTouchStart={e => { e.currentTarget.style.transform = "scale(0.92)"; }}
+          onTouchEnd={e => { e.currentTarget.style.transform = "scale(1)"; }}
+        >
+          J{nav.currentDayN}
+        </button>
+      )}
       <button
         onClick={() => scrollTo(0)}
         aria-label="Remonter en haut de la page"
@@ -5204,6 +5383,119 @@ function ShareSection() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// A.2 SAUVEGARDE & RESTAURATION (Export/Import JSON)
+// ═══════════════════════════════════════════════════════════════════
+const BACKUP_KEYS = [
+  "japan-done-items-v1",
+  "japan-day-notes-v1",
+  "japan-reservations-done-v1",
+  "jpy-rate",
+  "jpy-rate-ts",
+  "dark-mode",
+  "large-text",
+  "viewMode",
+];
+
+function BackupSection() {
+  const dark = useDark();
+  const [msg, setMsg] = useState(null);
+  const fileRef = useRef(null);
+
+  const flash = (type, text) => {
+    setMsg({ type, text });
+    setTimeout(() => setMsg(null), 3500);
+  };
+
+  const exportJSON = () => {
+    try {
+      const data = { version: 1, exportedAt: new Date().toISOString(), data: {} };
+      BACKUP_KEYS.forEach(k => {
+        const v = localStorage.getItem(k);
+        if (v !== null) data.data[k] = v;
+      });
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const ts = new Date().toISOString().slice(0,10);
+      a.download = `japon-2026-backup-${ts}.json`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      flash("ok", "Sauvegarde téléchargée");
+    } catch (e) {
+      flash("err", "Erreur export : " + e.message);
+    }
+  };
+
+  const importJSON = (file) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(reader.result);
+        const payload = parsed && parsed.data ? parsed.data : parsed;
+        if (!payload || typeof payload !== "object") throw new Error("Format invalide");
+        let count = 0;
+        Object.entries(payload).forEach(([k, v]) => {
+          if (BACKUP_KEYS.includes(k) && typeof v === "string") {
+            localStorage.setItem(k, v);
+            count++;
+          }
+        });
+        window.dispatchEvent(new Event(DONE_ITEMS_EVENT));
+        flash("ok", `${count} clé(s) restaurée(s). Rechargement…`);
+        setTimeout(() => window.location.reload(), 1200);
+      } catch (e) {
+        flash("err", "Fichier invalide : " + e.message);
+      }
+    };
+    reader.onerror = () => flash("err", "Lecture impossible");
+    reader.readAsText(file);
+  };
+
+  const onPick = (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (f) importJSON(f);
+    e.target.value = "";
+  };
+
+  const btnStyle = (color) => ({
+    display:"flex", alignItems:"center", gap:"0.5rem",
+    padding:"0.55rem 0.875rem", borderRadius:"8px",
+    border:`1px solid ${color}`, background:"transparent",
+    color: color, fontSize:"0.78rem", fontWeight:600,
+    cursor:"pointer", fontFamily:"inherit", width:"100%",
+    justifyContent:"flex-start", transition:"background 0.15s",
+  });
+
+  return (
+    <InfoCard title="💾 Sauvegarde & Restauration" color="var(--accent)" headerBg="var(--bg-card-2)">
+      <div style={{ display:"flex", flexDirection:"column", gap:"0.5rem" }}>
+        <button style={btnStyle("var(--accent)")} onClick={exportJSON}>
+          ⬇️ <span>Exporter les données (JSON)</span>
+        </button>
+        <button style={btnStyle("var(--city-kyoto)")} onClick={() => fileRef.current && fileRef.current.click()}>
+          ⬆️ <span>Importer une sauvegarde</span>
+        </button>
+        <input ref={fileRef} type="file" accept="application/json,.json" onChange={onPick} style={{ display:"none" }} />
+        {msg && (
+          <div style={{
+            padding:"0.5rem 0.65rem", borderRadius:"6px",
+            background: msg.type === "ok" ? "var(--success-soft)" : "var(--warning-soft)",
+            color: msg.type === "ok" ? "var(--success)" : "var(--warning)",
+            fontSize:"0.75rem", fontWeight:600,
+          }}>{msg.text}</div>
+        )}
+        <div style={{ marginTop:"0.25rem", padding:"0.5rem 0.65rem", background:v("sectionBg",dark), borderRadius:"6px" }}>
+          <p style={{ fontSize:"0.68rem", color:v("textMuted",dark), margin:0, lineHeight:1.45 }}>
+            💡 Sauvegarde : cases cochées, notes, réservations, taux, préférences. Utile avant un reset ou pour synchroniser entre téléphones.
+          </p>
+        </div>
+      </div>
+    </InfoCard>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // B. RAPPELS & NOTIFICATIONS
 // ═══════════════════════════════════════════════════════════════════
 function NotificationsSection() {
@@ -5627,6 +5919,7 @@ function InfoSection() {
       <DoAndDont />
       <DepartureChecklist />
       <ShareSection />
+      <BackupSection />
       <NotificationsSection />
       <InfoCard title="Transports & JR Pass" color="var(--success)" headerBg="var(--success-soft)">
         {[
