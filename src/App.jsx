@@ -620,7 +620,7 @@ export default function App() {
   // handles fractional days cleanly.
   const currentDayN = inTrip
     ? Math.min(15, Math.floor((now - TRIP_START) / 86400000) + 1)
-    : null;
+    : afterTrip ? 15 : 1;
   const currentDayObj = currentDayN != null
     ? DAYS.find(d => d.n === currentDayN)
     : null;
@@ -4369,11 +4369,11 @@ function ScrollFAB() {
         pointerEvents:"none",
       }}
     >
-      {nav?.inTrip && nav?.currentDayN != null && (
+      {nav?.currentDayN != null && (
         <button
           onClick={() => nav.jumpToday && nav.jumpToday()}
-          aria-label={`Aller au jour en cours (J${nav.currentDayN})`}
-          title="Aujourd'hui"
+          aria-label={`Aller au jour J${nav.currentDayN}`}
+          title={nav.inTrip ? "Aujourd'hui" : "Ouvrir un jour"}
           style={{
             ...btn,
             opacity: 1,

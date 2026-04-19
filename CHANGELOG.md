@@ -6,6 +6,10 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ## Session 7 — 2026-04-19 (améliorations batch)
 
+### Bouton J{N} toujours visible (test)
+
+- Retrait de la condition `inTrip` sur le bouton J{N} du `ScrollFAB`. Affiche J1 avant le voyage (test/démo), J{courant} pendant, J15 après. Le deep-link `#/jour/N` reste le mécanisme URL officiel.
+
 ### Deep-link #/jour/N + bouton "Today"
 
 - `NavCtx` étendu avec `jumpToday`, `currentDayN`, `inTrip`. Calcul du jour courant en fonction de la date système (27 avril → J1, etc., clamp 1..15). Handler `popstate` synchronise la nav sur le hash `#/jour/N` — partage direct d'un jour possible, retour navigateur supporté.
