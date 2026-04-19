@@ -4159,10 +4159,10 @@ const speakJapanese = (text) => {
 // page n'est pas scrollable (courte). En style éditorial : filet
 // 1 px ink + fond papier, pas de cercle à gradient.
 function ScrollFAB() {
-  const [showUp, setShowUp] = React.useState(false);
-  const [showDown, setShowDown] = React.useState(true);
+  const [showUp, setShowUp] = useState(false);
+  const [showDown, setShowDown] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const update = () => {
       const y = window.scrollY || window.pageYOffset || 0;
       const max = Math.max(0, (document.documentElement.scrollHeight || 0) - window.innerHeight);
