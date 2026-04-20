@@ -3690,14 +3690,15 @@ function ConverterCard() {
         <button onClick={reset} style={{ marginLeft:"auto", fontSize:"0.7rem", color:v("textMuted",dark), background:"transparent", border:`1px solid ${v("borderLight",dark)}`, borderRadius:"6px", padding:"0.25rem 0.6rem", cursor:"pointer", fontFamily:"inherit" }}>Réinitialiser</button>
       </div>
       <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", margin:"0 0 0.75rem" }}>
-        {rateMeta && (
-          <p style={{ fontSize:"0.66rem", color:v("textMuted",dark), margin:0, lineHeight:1.3, flex:1 }}>
-            {rateMeta.source === "live" ? "🟢 Taux à jour" : "📦 Taux en cache"} —{" "}
-            {new Date(rateMeta.ts).toLocaleDateString("fr-FR", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" })}
-          </p>
-        )}
+        <p style={{ fontSize:"0.66rem", color:v("textMuted",dark), margin:0, lineHeight:1.3, flex:1 }}>
+          {refreshing
+            ? "Rafraîchissement…"
+            : rateMeta
+              ? <>{rateMeta.source === "live" ? "🟢 Taux à jour" : "📦 Taux en cache"} — {new Date(rateMeta.ts).toLocaleDateString("fr-FR", { day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" })}</>
+              : ""}
+        </p>
         <button onClick={() => fetchRate(true)} disabled={refreshing || !navigator.onLine} style={{ fontSize:"0.68rem", color:"var(--gold)", background:"transparent", border:`1px solid var(--gold)`, borderRadius:"6px", padding:"0.25rem 0.6rem", cursor: refreshing ? "wait" : "pointer", fontFamily:"inherit", opacity: refreshing || !navigator.onLine ? 0.5 : 1, whiteSpace:"nowrap" }}>
-          {refreshing ? "↻ …" : "↻ Rafraîchir"}
+          <span style={{ display:"inline-block", animation: refreshing ? "spin 1s linear infinite" : "none" }}>↻</span> {refreshing ? "…" : "Rafraîchir"}
         </button>
       </div>
       <div style={{ borderTop:`1px solid ${v("borderLight",dark)}`, paddingTop:"0.6rem" }}>
@@ -3823,6 +3824,9 @@ function LiveWeatherCard() {
   const [data, setData] = useState(null);   // { city: {...}, fetchedAt }
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [flash, setFlash] = useState(null); // { type: "ok"|"err", text } ponctuel après clic
+  const flashTimerRef = useRef(null);
+  useEffect(() => () => { if (flashTimerRef.current) clearTimeout(flashTimerRef.current); }, []);
 
   const CACHE_KEY = "weather-cache-v1";
   const MAX_AGE = 3 * 60 * 60 * 1000; // 3h
@@ -3853,6 +3857,11 @@ function LiveWeatherCard() {
     const ctrl = new AbortController();
     abortRef.current = ctrl;
     setLoading(true);
+    const showFlash = (type, text) => {
+      setFlash({ type, text });
+      if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+      flashTimerRef.current = setTimeout(() => { if (mountedRef.current) setFlash(null); }, 2500);
+    };
     try {
       const results = await Promise.all(WEATHER_CITIES.map(async c => {
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&timezone=Asia%2FTokyo&forecast_days=7`;
@@ -3866,9 +3875,11 @@ function LiveWeatherCard() {
       setData(payload);
       setError(null);
       try { localStorage.setItem(CACHE_KEY, JSON.stringify(payload)); } catch {}
+      if (force) showFlash("ok", "✓ Données à jour");
     } catch (err) {
       if (err.name === "AbortError" || !mountedRef.current) return;
       setError(err.message || "Erreur réseau");
+      if (force) showFlash("err", "✕ Échec — " + (err.message || "réseau"));
     } finally {
       if (mountedRef.current && !ctrl.signal.aborted) setLoading(false);
     }
@@ -3884,12 +3895,15 @@ function LiveWeatherCard() {
   return (
     <InfoCard title="🌐 Météo live (7 prochains jours)" color="var(--info)" headerBg="var(--info-soft)">
       <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", margin:"0 0 0.6rem" }}>
-        <p style={{ fontSize:"0.7rem", color:v("textMuted",dark), margin:0, flex:1 }}>
-          Source : Open-Meteo (gratuit, sans clé) • {loading && !data ? "chargement…" : ageText ? `MAJ ${ageText}` : ""}
-          {error && data ? " • hors-ligne (cache)" : ""}
+        <p style={{ fontSize:"0.7rem", color: flash ? (flash.type === "ok" ? "var(--success)" : "var(--danger)") : v("textMuted",dark), margin:0, flex:1, fontWeight: flash ? 600 : 400 }}>
+          {flash
+            ? flash.text
+            : loading
+              ? (data ? "Rafraîchissement…" : "Chargement…")
+              : <>Source : Open-Meteo • {ageText ? `MAJ ${ageText}` : ""}{error && data ? " • hors-ligne (cache)" : ""}</>}
         </p>
         <button onClick={() => fetchAll(true)} disabled={loading || !navigator.onLine} style={{ fontSize:"0.68rem", color:"var(--info)", background:"transparent", border:`1px solid var(--info)`, borderRadius:"6px", padding:"0.25rem 0.6rem", cursor: loading ? "wait" : "pointer", fontFamily:"inherit", opacity: loading || !navigator.onLine ? 0.5 : 1, whiteSpace:"nowrap" }}>
-          {loading ? "↻ …" : "↻ Rafraîchir"}
+          <span style={{ display:"inline-block", animation: loading ? "spin 1s linear infinite" : "none" }}>↻</span> {loading ? "…" : "Rafraîchir"}
         </button>
       </div>
 

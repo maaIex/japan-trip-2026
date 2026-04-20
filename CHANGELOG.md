@@ -4,6 +4,19 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ---
 
+## Session 7 — 2026-04-20
+
+### Fix — feedback visuel du bouton Rafraîchir (météo + devise)
+
+- Quand l'utilisateur clique Rafraîchir alors qu'un cache existe déjà, le texte restait figé sur "MAJ à l'instant" et seul un `↻ …` microscopique signalait le fetch → impression que le bouton ne faisait rien.
+- Correctif :
+  - Icône `↻` avec `@keyframes spin` (déjà dans `index.html`) pendant le fetch.
+  - Texte de statut remplacé par **"Rafraîchissement…"** tant que la requête est en vol (plus de "MAJ X" qui ne bouge pas).
+  - `LiveWeatherCard` affiche un flash ponctuel (2.5s) `✓ Données à jour` en vert ou `✕ Échec — …` en rouge après un clic explicite.
+  - Appliqué au convertisseur EUR↔JPY (mêmes symptômes).
+
+---
+
 ## Session 7 — 2026-04-19 (audit fixes — suite)
 
 ### Stabilisation des listes filtrables
