@@ -4,6 +4,21 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ---
 
+## Session 7 — 2026-04-20 (fix spin infini)
+
+### Fix — spinner infini sur météo + devise
+
+- **Symptôme** : après clic sur Rafraîchir, l'icône `↻` continuait de tourner sans fin, même après succès du fetch.
+- **Causes possibles** :
+  - Garde `!ctrl.signal.aborted` dans `finally` trop stricte : si un double-mount StrictMode ou un abort mal timé survenait, `setLoading(false)` ne firait jamais.
+  - Aucun timeout côté client → si l'API hangait, on attendait pour toujours.
+- **Correctifs** :
+  - Remplacement du check `ctrl.signal.aborted` par `replacedByNewer = abortRef.current !== ctrl`. Seul le fetch *dont le ctrl est encore le plus récent* toggle loading/refreshing. Les fetchs remplacés par un clic ultérieur laissent le nouveau gérer l'état.
+  - `setTimeout(() => ctrl.abort(), 10000)` : safety timeout de 10s qui abort le fetch et affiche l'erreur si l'API ne répond pas. Le `clearTimeout` est dans le `finally`.
+  - Appliqué à `LiveWeatherCard.fetchAll` ET `ConverterCard.fetchRate`.
+
+---
+
 ## Session 7 — 2026-04-20
 
 ### Fix — feedback visuel du bouton Rafraîchir (météo + devise)

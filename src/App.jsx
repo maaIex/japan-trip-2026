@@ -3632,6 +3632,7 @@ function ConverterCard() {
     const ctrl = new AbortController();
     abortRef.current = ctrl;
     setRefreshing(true);
+    const timeoutId = setTimeout(() => ctrl.abort(), 10000);
     fetch("https://api.frankfurter.app/latest?from=EUR&to=JPY", { signal: ctrl.signal })
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(data => {
@@ -3648,7 +3649,11 @@ function ConverterCard() {
         } catch {}
       })
       .catch(() => {})
-      .finally(() => { if (mountedRef.current) setRefreshing(false); });
+      .finally(() => {
+        clearTimeout(timeoutId);
+        const replacedByNewer = abortRef.current !== ctrl;
+        if (mountedRef.current && !replacedByNewer) setRefreshing(false);
+      });
   }, []);
   useEffect(() => { fetchRate(false); }, [fetchRate]);
   const [yen, setYen] = useState("");
@@ -3857,11 +3862,14 @@ function LiveWeatherCard() {
     const ctrl = new AbortController();
     abortRef.current = ctrl;
     setLoading(true);
+    // Safety timeout — si le fetch hang plus de 10s, abort et afficher erreur.
+    const timeoutId = setTimeout(() => ctrl.abort(), 10000);
     const showFlash = (type, text) => {
       setFlash({ type, text });
       if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
       flashTimerRef.current = setTimeout(() => { if (mountedRef.current) setFlash(null); }, 2500);
     };
+    let fetchError = null;
     try {
       const results = await Promise.all(WEATHER_CITIES.map(async c => {
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&timezone=Asia%2FTokyo&forecast_days=7`;
@@ -3870,19 +3878,28 @@ function LiveWeatherCard() {
         const json = await res.json();
         return { id: c.id, daily: json.daily };
       }));
-      if (!mountedRef.current || ctrl.signal.aborted) return;
-      const payload = { fetchedAt: Date.now(), cities: Object.fromEntries(results.map(r => [r.id, r.daily])) };
-      setData(payload);
-      setError(null);
-      try { localStorage.setItem(CACHE_KEY, JSON.stringify(payload)); } catch {}
-      if (force) showFlash("ok", "✓ Données à jour");
+      if (mountedRef.current) {
+        const payload = { fetchedAt: Date.now(), cities: Object.fromEntries(results.map(r => [r.id, r.daily])) };
+        setData(payload);
+        setError(null);
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(payload)); } catch {}
+        if (force) showFlash("ok", "✓ Données à jour");
+      }
     } catch (err) {
-      if (err.name === "AbortError" || !mountedRef.current) return;
-      setError(err.message || "Erreur réseau");
-      if (force) showFlash("err", "✕ Échec — " + (err.message || "réseau"));
+      fetchError = err;
+      if (mountedRef.current && err.name !== "AbortError") {
+        setError(err.message || "Erreur réseau");
+        if (force) showFlash("err", "✕ Échec — " + (err.message || "réseau"));
+      }
     } finally {
-      if (mountedRef.current && !ctrl.signal.aborted) setLoading(false);
+      clearTimeout(timeoutId);
+      // Garantit que loading redevient false dès que notre fetch est terminé,
+      // sauf si on a été remplacé par un fetch plus récent (abort depuis le
+      // bouton). Dans ce cas le nouveau fetch gère son propre loading.
+      const replacedByNewer = abortRef.current !== ctrl;
+      if (mountedRef.current && !replacedByNewer) setLoading(false);
     }
+    void fetchError;
   }, []);
 
   useEffect(() => { fetchAll(false); }, [fetchAll]);
