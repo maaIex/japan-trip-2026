@@ -4,6 +4,16 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ---
 
+## Session 7 — 2026-04-19 (fix spin infini — vraie cause)
+
+### Fix — `mountedRef` jamais réinitialisé en StrictMode
+
+- **Symptôme** : le spinner `↻` tournait à l'infini dès l'arrivée sur la page, même sans cliquer.
+- **Cause racine** : en React 18 StrictMode (dev), l'effet de cleanup fait `mountedRef.current = false`, puis le setup effect re-tourne — mais il ne réinitialisait PAS `mountedRef.current = true`. Du coup dans le `finally` de `fetchAll`/`fetchRate`, la garde `if (mountedRef.current && !replacedByNewer) setLoading(false)` ne firait jamais → `loading` restait bloqué à `true`.
+- **Fix** : setup effect écrit `mountedRef.current = true` au montage ; le cleanup garde `= false`. Appliqué à `LiveWeatherCard` (App.jsx:3840) et `ConverterCard` (App.jsx:3619).
+
+---
+
 ## Session 7 — 2026-04-20 (fix spin infini)
 
 ### Fix — spinner infini sur météo + devise

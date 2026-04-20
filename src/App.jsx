@@ -3616,9 +3616,12 @@ function ConverterCard() {
   const [refreshing, setRefreshing] = useState(false);
   const abortRef = useRef(null);
   const mountedRef = useRef(true);
-  useEffect(() => () => {
-    mountedRef.current = false;
-    if (abortRef.current) abortRef.current.abort();
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      if (abortRef.current) abortRef.current.abort();
+    };
   }, []);
   const fetchRate = useCallback((force = false) => {
     if (!force) {
@@ -3837,9 +3840,12 @@ function LiveWeatherCard() {
   const MAX_AGE = 3 * 60 * 60 * 1000; // 3h
   const abortRef = useRef(null);
   const mountedRef = useRef(true);
-  useEffect(() => () => {
-    mountedRef.current = false;
-    if (abortRef.current) abortRef.current.abort();
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      if (abortRef.current) abortRef.current.abort();
+    };
   }, []);
 
   const fetchAll = useCallback(async (force = false) => {
