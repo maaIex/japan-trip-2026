@@ -4,6 +4,38 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ---
 
+## Session 7 — 2026-04-20 (phrasebook — audit + phrases terrain)
+
+### Phrasebook — audit linguistique + ~35 nouvelles phrases
+
+**Corrections** (13 phrases corrigées) :
+- `3人お願いします` → `3名でお願いします` (compteur restaurant standard)
+- Label FR *"Je recommande celui-ci"* → *"Je prends celui-ci"* (matche le JP `これをください`)
+- `肉なしで` → `肉抜きで` (formule restaurant naturelle)
+- `生魚なしでお願いします` → `生ものは食べられません` (couvre aussi œufs crus)
+- `ここでスイカをタッチしてください` (impératif inversé ❌) → `ICカードはどこでタッチしますか？` (question du voyageur ✓)
+- `迷子になりました` (terme pour enfant) → `道に迷いました` (adulte)
+- `医者が必要です` (calque) → `病院に行きたいのですが` (naturel)
+- `タオルを追加でください` → `タオルをもう一枚いただけますか？` (plus poli)
+- `[場所]はどうやって行きますか？` → `...へはどうやって行けばいいですか？` (forme idiomatique)
+- `見ているだけです` → `ちょっと見ているだけです` (adouci)
+- `ごちそうさまでした` : difficulté 🔴 → 🟡 (en fait ultra-courant)
+- Supprimé : `ビールなしでお願いします` (phrase artificielle), `もっと安いものはありますか？` (impoli au Japon)
+
+**Nouvelles phrases** (~35 ajouts répartis) :
+- **Transports** : train qui s'arrête à X, combien d'arrêts, shinkansen vers Kyoto, je me suis trompé de train, où activer le JR Pass, taxi avec adresse, "déposez-moi ici"
+- **Resto** : allergies spécifiques (gluten, fruits de mer, arachides), contient porc/bœuf/poisson, spécialité maison, sans [ingrédient], partager, paiements séparés, refill
+- **Nouvelle catégorie ⛩ Temples & Sanctuaires** : photos, prix entrée, fermeture, goshuin, admiration authentique, pourquoi fermé, temps d'attente
+- **Nouvelle catégorie ♨ Onsen** : tatouages, casiers, bain mixte ou séparé
+- **Shopping** : autre taille/couleur, emballage cadeau, tax-free
+- **Urgences & Santé** : médecin anglophone, pharmacie, mal tête/ventre, fièvre, au feu
+- **Nouvelle catégorie 🗾 Spécial voyage 2026** : Tōshō-gū (Nikkō), Fuji visible (Hakone), temps d'attente Golden Week, ouvert pendant GW
+
+**Nouvelle section "🗣 Bien prononcer"** (pliable, en haut) :
+6 pièges francophones — R japonais, U amuï (`des`/`mass`), voyelles longues (ō/ū), TSU et FU, absence d'accent tonique, doubles consonnes (kitte vs kite).
+
+---
+
 ## Session 7 — 2026-04-19 (fix spin infini — vraie cause)
 
 ### Fix — `mountedRef` jamais réinitialisé en StrictMode

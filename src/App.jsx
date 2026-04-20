@@ -5228,6 +5228,7 @@ function PhrasebookSection() {
   const dark = useDark();
   const [open, setOpen] = useState(new Set(["resto"]));
   const [q, setQ] = useState("");
+  const [pronOpen, setPronOpen] = useState(false);
   const [copied, setCopied] = useState(null);
   const copiedTimerRef = useRef(null);
   useEffect(() => () => { if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current); }, []);
@@ -5245,57 +5246,101 @@ function PhrasebookSection() {
   };
   const CATS = [
     { id:"resto", emoji:"🍽", titre:"Au restaurant", color:"var(--accent)", phrases:[
-      { fr:"Une table pour 3 personnes s'il vous plaît", jp:"3人お願いします", rom:"Sannin onegaishimasu", diff:"🟢" },
+      { fr:"Une table pour 3 personnes s'il vous plaît", jp:"3名でお願いします", rom:"Sanmei de onegaishimasu", diff:"🟢" },
       { fr:"Le menu en anglais, s'il vous plaît", jp:"英語のメニューはありますか？", rom:"Eigo no menyu wa arimasu ka?", diff:"🟡" },
-      { fr:"Je recommande celui-ci (pointer)", jp:"これをください", rom:"Kore wo kudasai", diff:"🟢" },
+      { fr:"Je prends celui-ci (pointer)", jp:"これをください", rom:"Kore wo kudasai", diff:"🟢" },
       { fr:"L'addition s'il vous plaît", jp:"お会計をお願いします", rom:"Okaikei wo onegaishimasu", diff:"🟡" },
-      { fr:"C'est délicieux !", jp:"おいしい！", rom:"Oishii!", diff:"🟢" },
-      { fr:"Je suis allergique à [ingrédient]", jp:"[食材]アレルギーがあります", rom:"[shokuzai] arerugi ga arimasu", diff:"🔴" },
-      { fr:"Sans viande / végétarien", jp:"肉なしでお願いします", rom:"Niku nashi de onegaishimasu", diff:"🟡" },
-      { fr:"Pas de bière s'il vous plaît", jp:"ビールなしでお願いします", rom:"Biiru nashi de onegaishimasu", diff:"🟡" },
-      { fr:"Sans wasabi s'il vous plaît", jp:"サビ抜きでお願いします", rom:"Sabi nuki de onegaishimasu", diff:"🟡" },
-      { fr:"Sans poisson cru", jp:"生魚なしでお願いします", rom:"Namazakana nashi de onegaishimasu", diff:"🔴" },
+      { fr:"Paiements séparés, s'il vous plaît", jp:"別々でお願いします", rom:"Betsubetsu de onegaishimasu", diff:"🟡" },
       { fr:"Puis-je payer par carte ?", jp:"カードで払えますか？", rom:"Kaado de haraemasu ka?", diff:"🟡" },
-      { fr:"C'était excellent, merci", jp:"ごちそうさまでした", rom:"Gochisousama deshita", diff:"🔴" },
-      { fr:"Encore de l'eau, s'il vous plaît", jp:"お水をお願いします", rom:"Omizu wo onegaishimasu", diff:"🟢" },
+      { fr:"Quelle est la spécialité de la maison ?", jp:"お店のおすすめは何ですか？", rom:"Omise no osusume wa nan desu ka?", diff:"🟡" },
       { fr:"Pouvez-vous recommander ?", jp:"おすすめは何ですか？", rom:"Osusume wa nan desu ka?", diff:"🟡" },
+      { fr:"Ce plat contient-il du porc / bœuf / poisson ?", jp:"これは豚肉／牛肉／魚が入っていますか？", rom:"Kore wa butaniku / gyuuniku / sakana ga haitte imasu ka?", diff:"🟡" },
+      { fr:"Je suis allergique à [ingrédient]", jp:"[食材]アレルギーがあります", rom:"[shokuzai] arerugii ga arimasu", diff:"🔴" },
+      { fr:"Allergie au gluten / blé", jp:"小麦アレルギーがあります", rom:"Komugi arerugii ga arimasu", diff:"🟡" },
+      { fr:"Allergie aux fruits de mer", jp:"甲殻類と貝のアレルギーがあります", rom:"Koukakurui to kai no arerugii ga arimasu", diff:"🔴" },
+      { fr:"Allergie aux arachides", jp:"ピーナッツアレルギーがあります", rom:"Piinattsu arerugii ga arimasu", diff:"🟡" },
+      { fr:"Sans viande / végétarien", jp:"肉抜きでお願いします", rom:"Niku nuki de onegaishimasu", diff:"🟡" },
+      { fr:"Sans wasabi s'il vous plaît", jp:"サビ抜きでお願いします", rom:"Sabi nuki de onegaishimasu", diff:"🟡" },
+      { fr:"Sans [oignon], s'il vous plaît", jp:"[玉ねぎ]抜きでお願いします", rom:"[tamanegi] nuki de onegaishimasu", diff:"🟡" },
+      { fr:"Je ne mange pas de cru (poisson, œuf)", jp:"生ものは食べられません", rom:"Namamono wa taberaremasen", diff:"🔴" },
+      { fr:"On peut partager un plat ?", jp:"シェアしてもいいですか？", rom:"Shea shite mo ii desu ka?", diff:"🟢" },
+      { fr:"Encore un peu, s'il vous plaît (refill)", jp:"お代わりをお願いします", rom:"Okawari wo onegaishimasu", diff:"🟡" },
+      { fr:"Encore de l'eau, s'il vous plaît", jp:"お水をお願いします", rom:"Omizu wo onegaishimasu", diff:"🟢" },
+      { fr:"C'est délicieux !", jp:"おいしい！", rom:"Oishii!", diff:"🟢" },
+      { fr:"C'était excellent, merci", jp:"ごちそうさまでした", rom:"Gochisousama deshita", diff:"🟡" },
     ]},
     { id:"transport", emoji:"🚇", titre:"Dans les transports", color:"var(--city-tokyo)", phrases:[
       { fr:"Où est le quai pour [ville] ?", jp:"[都市]行きのホームはどこですか？", rom:"[toshi]-yuki no hoomu wa doko desu ka?", diff:"🔴" },
+      { fr:"Quel quai pour le Shinkansen vers Kyoto ?", jp:"京都行きの新幹線は何番ホームですか？", rom:"Kyouto-yuki no Shinkansen wa nanban hoomu desu ka?", diff:"🔴" },
+      { fr:"Ce train s'arrête-t-il à [station] ?", jp:"この電車は[駅]に止まりますか？", rom:"Kono densha wa [eki] ni tomarimasu ka?", diff:"🟡" },
+      { fr:"Combien d'arrêts jusqu'à [station] ?", jp:"[駅]まで何駅ですか？", rom:"[eki] made nan-eki desu ka?", diff:"🟡" },
+      { fr:"À quelle heure part le prochain train ?", jp:"次の電車は何時ですか？", rom:"Tsugi no densha wa nanji desu ka?", diff:"🔴" },
+      { fr:"Je me suis trompé de train, comment revenir ?", jp:"電車を間違えました。戻るにはどうすればいいですか？", rom:"Densha wo machigaemashita. Modoru ni wa dou sureba ii desu ka?", diff:"🔴" },
+      { fr:"Où est-ce que je tape ma carte IC ?", jp:"ICカードはどこでタッチしますか？", rom:"Ai-shii kaado wa doko de tatchi shimasu ka?", diff:"🔴" },
+      { fr:"Où est-ce que j'active mon JR Pass ?", jp:"JRパスはどこで使い始めますか？", rom:"Jei-aaru pasu wa doko de tsukai hajimemasu ka?", diff:"🔴" },
       { fr:"Ce siège est-il libre ?", jp:"ここは空いていますか？", rom:"Koko wa aite imasu ka?", diff:"🟡" },
       { fr:"Je vais à Asakusa", jp:"浅草に行きます", rom:"Asakusa ni ikimasu", diff:"🟡" },
-      { fr:"Comment aller à [lieu] ?", jp:"[場所]はどうやって行きますか？", rom:"[basho] wa dou yatte ikimasu ka?", diff:"🔴" },
-      { fr:"Validez votre Suica ici (pointer)", jp:"ここでスイカをタッチしてください", rom:"Koko de Suika wo tatchi shite kudasai", diff:"🔴" },
-      { fr:"À quelle heure part le prochain train ?", jp:"次の電車は何時ですか？", rom:"Tsugi no densha wa nanji desu ka?", diff:"🔴" },
+      { fr:"Comment aller à [lieu] ?", jp:"[場所]へはどうやって行けばいいですか？", rom:"[basho] e wa dou yatte ikeba ii desu ka?", diff:"🔴" },
+      { fr:"(Taxi) À cette adresse, s'il vous plaît", jp:"この住所までお願いします", rom:"Kono juusho made onegaishimasu", diff:"🟡" },
+      { fr:"(Taxi) Vous pouvez me déposer ici ?", jp:"ここで降ろしてください", rom:"Koko de oroshite kudasai", diff:"🟢" },
+    ]},
+    { id:"temples", emoji:"⛩", titre:"Temples & Sanctuaires", color:"var(--city-kyoto)", phrases:[
+      { fr:"Puis-je prendre des photos ici ?", jp:"写真を撮ってもいいですか？", rom:"Shashin wo totte mo ii desu ka?", diff:"🟡" },
+      { fr:"Combien coûte l'entrée ?", jp:"入場料はいくらですか？", rom:"Nyuujouryou wa ikura desu ka?", diff:"🟡" },
+      { fr:"À quelle heure ça ferme ?", jp:"閉館は何時ですか？", rom:"Heikan wa nan-ji desu ka?", diff:"🟡" },
+      { fr:"Où achète-t-on le goshuin ?", jp:"御朱印はどこでいただけますか？", rom:"Goshuin wa doko de itadakemasu ka?", diff:"🔴" },
+      { fr:"C'est magnifique / émouvant", jp:"本当に素晴らしいですね", rom:"Hontou ni subarashii desu ne", diff:"🟡" },
+      { fr:"Pourquoi c'est fermé aujourd'hui ?", jp:"今日はどうしてお休みですか？", rom:"Kyou wa doushite oyasumi desu ka?", diff:"🟡" },
+      { fr:"Ça rouvre quand ?", jp:"次はいつ開きますか？", rom:"Tsugi wa itsu akimasu ka?", diff:"🟡" },
+      { fr:"Combien de temps d'attente ?", jp:"待ち時間はどのくらいですか？", rom:"Machi-jikan wa dono kurai desu ka?", diff:"🟡" },
+    ]},
+    { id:"onsen", emoji:"♨", titre:"Onsen & Bains", color:"var(--info)", phrases:[
+      { fr:"Les tatouages sont-ils acceptés ?", jp:"タトゥーがあっても大丈夫ですか？", rom:"Tatuu ga atte mo daijoubu desu ka?", diff:"🟡" },
+      { fr:"Où sont les casiers ?", jp:"ロッカーはどこですか？", rom:"Rokkaa wa doko desu ka?", diff:"🟢" },
+      { fr:"Bain mixte ou séparé ?", jp:"混浴ですか、男女別ですか？", rom:"Kon'yoku desu ka, danjo-betsu desu ka?", diff:"🔴" },
     ]},
     { id:"shopping", emoji:"🛍", titre:"Shopping", color:"var(--city-kyoto)", phrases:[
       { fr:"Combien ça coûte ?", jp:"いくらですか？", rom:"Ikura desu ka?", diff:"🟢" },
-      { fr:"Je regarde seulement", jp:"見ているだけです", rom:"Mite iru dake desu", diff:"🟡" },
+      { fr:"Je regarde seulement", jp:"ちょっと見ているだけです", rom:"Chotto mite iru dake desu", diff:"🟡" },
       { fr:"Avez-vous la taille S/M/L ?", jp:"S/M/Lサイズはありますか？", rom:"S/M/L saizu wa arimasu ka?", diff:"🟡" },
+      { fr:"Vous avez une autre taille / couleur ?", jp:"他のサイズ／色はありますか？", rom:"Hoka no saizu / iro wa arimasu ka?", diff:"🟡" },
+      { fr:"Emballage cadeau, s'il vous plaît", jp:"プレゼント用に包んでもらえますか？", rom:"Purezento-you ni tsutsunde moraemasu ka?", diff:"🔴" },
+      { fr:"C'est possible en tax-free ?", jp:"免税できますか？", rom:"Menzei dekimasu ka?", diff:"🟡" },
       { fr:"Je paye en espèces", jp:"現金で払います", rom:"Genkin de haraimasu", diff:"🟡" },
       { fr:"Un sac s'il vous plaît", jp:"袋をください", rom:"Fukuro wo kudasai", diff:"🟢" },
-      { fr:"Avez-vous quelque chose de moins cher ?", jp:"もっと安いものはありますか？", rom:"Motto yasui mono wa arimasu ka?", diff:"🔴" },
     ]},
     { id:"hotel", emoji:"🏨", titre:"À l'hôtel", color:"var(--success)", phrases:[
-      { fr:"J'ai une réservation au nom de...", jp:"...で予約しています", rom:"... de yoyaku shite imasu", diff:"🟡" },
+      { fr:"J'ai une réservation au nom de...", jp:"...の名前で予約しています", rom:"... no namae de yoyaku shite imasu", diff:"🟡" },
       { fr:"Check-in / Check-out s'il vous plaît", jp:"チェックイン/チェックアウトお願いします", rom:"Chekku-in/Chekku-auto onegaishimasu", diff:"🟢" },
-      { fr:"Des serviettes supplémentaires s'il vous plaît", jp:"タオルを追加でください", rom:"Taoru wo tsuika de kudasai", diff:"🟡" },
+      { fr:"Une serviette supplémentaire, SVP", jp:"タオルをもう一枚いただけますか？", rom:"Taoru wo mou ichimai itadakemasu ka?", diff:"🔴" },
       { fr:"Le wifi ne fonctionne pas", jp:"ワイファイが繋がりません", rom:"Waifai ga tsunagarimasen", diff:"🟡" },
       { fr:"Pouvez-vous garder mes bagages ?", jp:"荷物を預かってもらえますか？", rom:"Nimotsu wo azukatte moraemasu ka?", diff:"🔴" },
       { fr:"La chambre est très belle, merci", jp:"部屋がとても素敵です、ありがとう", rom:"Heya ga totemo suteki desu, arigatou", diff:"🟡" },
     ]},
-    { id:"urgence", emoji:"🚨", titre:"Urgences", color:"var(--danger)", phrases:[
+    { id:"urgence", emoji:"🚨", titre:"Urgences & Santé", color:"var(--danger)", phrases:[
       { fr:"Au secours !", jp:"助けてください！", rom:"Tasukete kudasai!", diff:"🟢" },
+      { fr:"Au feu !", jp:"火事だ！", rom:"Kaji da!", diff:"🟢" },
       { fr:"Appelez la police !", jp:"警察を呼んでください！", rom:"Keisatsu wo yonde kudasai!", diff:"🟡" },
-      { fr:"J'ai besoin d'un médecin", jp:"医者が必要です", rom:"Isha ga hitsuyou desu", diff:"🟡" },
-      { fr:"Je suis perdu(e)", jp:"迷子になりました", rom:"Maigo ni narimashita", diff:"🟡" },
+      { fr:"Appelez une ambulance, SVP", jp:"救急車を呼んでください", rom:"Kyuukyuusha wo yonde kudasai", diff:"🔴" },
+      { fr:"Je voudrais aller à l'hôpital", jp:"病院に行きたいのですが", rom:"Byouin ni ikitai no desu ga", diff:"🟡" },
+      { fr:"Un médecin qui parle anglais, SVP", jp:"英語が話せる医者はいますか？", rom:"Eigo ga hanaseru isha wa imasu ka?", diff:"🔴" },
+      { fr:"Où est l'hôpital le plus proche ?", jp:"一番近い病院はどこですか？", rom:"Ichiban chikai byouin wa doko desu ka?", diff:"🔴" },
+      { fr:"Où est la pharmacie la plus proche ?", jp:"一番近い薬局はどこですか？", rom:"Ichiban chikai yakkyoku wa doko desu ka?", diff:"🔴" },
+      { fr:"J'ai mal à la tête", jp:"頭が痛いです", rom:"Atama ga itai desu", diff:"🟢" },
+      { fr:"J'ai mal au ventre", jp:"お腹が痛いです", rom:"Onaka ga itai desu", diff:"🟢" },
+      { fr:"J'ai de la fièvre", jp:"熱があります", rom:"Netsu ga arimasu", diff:"🟢" },
       { fr:"Je me sens mal", jp:"気分が悪いです", rom:"Kibun ga warui desu", diff:"🟢" },
+      { fr:"Je me suis perdu(e)", jp:"道に迷いました", rom:"Michi ni mayoimashita", diff:"🟡" },
       { fr:"Mon passeport a été volé", jp:"パスポートが盗まれました", rom:"Pasupooto ga nusumaremashita", diff:"🔴" },
       { fr:"J'ai perdu mon passeport", jp:"パスポートをなくしました", rom:"Pasupooto wo nakushimashita", diff:"🟡" },
-      { fr:"Pouvez-vous appeler une ambulance ?", jp:"救急車を呼んでください", rom:"Kyuukyuusha wo yonde kudasai", diff:"🔴" },
       { fr:"Où sont les toilettes ?", jp:"トイレはどこですか？", rom:"Toire wa doko desu ka?", diff:"🟢" },
       { fr:"Je ne parle pas japonais", jp:"日本語が話せません", rom:"Nihongo ga hanasemasen", diff:"🟡" },
-      { fr:"Où est l'hôpital le plus proche ?", jp:"一番近い病院はどこですか？", rom:"Ichiban chikai byouin wa doko desu ka?", diff:"🔴" },
+    ]},
+    { id:"voyage", emoji:"🗾", titre:"Spécial voyage 2026", color:"var(--gold)", phrases:[
+      { fr:"(Nikkō) Chemin vers le Tōshō-gū ?", jp:"東照宮への道を教えてください", rom:"Toushou-guu e no michi wo oshiete kudasai", diff:"🔴" },
+      { fr:"(Hakone) Voit-on le Fuji aujourd'hui ?", jp:"今日、富士山は見えますか？", rom:"Kyou, Fuji-san wa miemasu ka?", diff:"🟡" },
+      { fr:"(Golden Week) Combien de temps d'attente ?", jp:"待ち時間はどのくらいですか？", rom:"Machi-jikan wa dono kurai desu ka?", diff:"🟡" },
+      { fr:"Est-ce ouvert pendant la Golden Week ?", jp:"ゴールデンウィーク中も開いていますか？", rom:"Gooruden wiiku-chuu mo aite imasu ka?", diff:"🔴" },
     ]},
     { id:"politesse", emoji:"🙏", titre:"Politesse & Formules", color:"var(--gold)", phrases:[
       { fr:"Merci beaucoup", jp:"ありがとうございます", rom:"Arigatou gozaimasu", diff:"🟢" },
@@ -5304,7 +5349,7 @@ function PhrasebookSection() {
       { fr:"Bonjour (la journée)", jp:"こんにちは", rom:"Konnichiwa", diff:"🟢" },
       { fr:"Bonsoir", jp:"こんばんは", rom:"Konbanwa", diff:"🟢" },
       { fr:"Bon appétit (avant de manger)", jp:"いただきます", rom:"Itadakimasu", diff:"🟡" },
-      { fr:"Merci pour le repas (après)", jp:"ごちそうさまでした", rom:"Gochisousama deshita", diff:"🔴" },
+      { fr:"Merci pour le repas (après)", jp:"ごちそうさまでした", rom:"Gochisousama deshita", diff:"🟡" },
       { fr:"Je ne comprends pas", jp:"わかりません", rom:"Wakarimasen", diff:"🟢" },
       { fr:"Parlez-vous anglais ?", jp:"英語を話せますか？", rom:"Eigo wo hanasemasu ka?", diff:"🟡" },
     ]},
@@ -5326,6 +5371,34 @@ function PhrasebookSection() {
         <p style={{ fontFamily:"var(--font-body)", fontSize:"0.84rem", color:"var(--text-sec)", margin:0, lineHeight:1.6, textWrap:"pretty" }}>
           Phrases essentielles avec phonétique. Appuyez sur <span style={{ fontFamily:"var(--font-body)", fontSize:"0.62rem", fontWeight:700, letterSpacing:"0.18em", textTransform:"uppercase", padding:"0.1rem 0.35rem", border:"1px solid var(--border-light)" }}>Copier</span> pour montrer votre téléphone.
         </p>
+      </div>
+      {/* Pronunciation tips — collapsible */}
+      <div style={{ borderTop:"1px solid var(--border)", borderBottom:"1px solid var(--border)" }}>
+        <button onClick={()=>setPronOpen(o=>!o)} style={{ width:"100%", display:"flex", alignItems:"center", gap:"0.75rem", padding:"0.85rem 0", background:"transparent", border:"none", cursor:"pointer", outline:"none" }}>
+          <span style={{ fontSize:"1rem", opacity:0.75 }}>🗣</span>
+          <span style={{ flex:1, fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"1.15rem", fontWeight:600, color:"var(--text-primary)", textAlign:"left", letterSpacing:"-0.01em" }}>Bien prononcer — pièges francophones</span>
+          <span style={{ color:"var(--text-muted)", fontSize:"0.7rem", display:"inline-block", transform:pronOpen?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▼</span>
+        </button>
+        {pronOpen && (
+          <div style={{ borderTop:"0.5px solid var(--border-light)", padding:"0.85rem 0", display:"flex", flexDirection:"column", gap:"0.85rem" }}>
+            {[
+              { n:"1", titre:"Le R japonais", corps:<>Ni <em>r</em> français ni <em>l</em> — un claquement léger de la langue au palais, plus proche d'un <em>d</em> très doux. <strong>arigatō</strong> ≈ <em>a-di-ga-tô</em>.</> },
+              { n:"2", titre:"Le U amuï", corps:<>En fin de mot et entre consonnes sourdes, le <em>u</em> disparaît. <strong>です</strong> = <em>dess</em>, <strong>ます</strong> = <em>mass</em>, <strong>すみません</strong> = <em>ss'mimass'n</em>.</> },
+              { n:"3", titre:"Voyelles longues (ō, ū)", corps:<>Elles tiennent <strong>deux temps</strong> et changent le sens. <strong>大阪 Ōsaka</strong> ≠ <strong>小坂 Osaka</strong>. <strong>学校 gakkō</strong> = <em>gak-kô-ou</em>, pas <em>gako</em>.</> },
+              { n:"4", titre:"TSU et FU", corps:<><strong>つ tsu</strong> = un seul son, <em>ts</em> collé au <em>u</em> (pas « tou »). <strong>ふ fu</strong> = souffle sur les lèvres, entre <em>f</em> et <em>h</em>.</> },
+              { n:"5", titre:"Pas d'accent tonique", corps:<>Chaque syllabe au <strong>même niveau</strong>, régulière comme un métronome. Pas de <em>arigaTOOO</em> à la française.</> },
+              { n:"6", titre:"Doubles consonnes (petit っ)", corps:<>Silence d'un temps avant la consonne. <strong>切手 kitte</strong> (timbre) ≠ <strong>来て kite</strong> (viens). Marquer la pause : <em>kit-te</em>.</> },
+            ].map(tip => (
+              <div key={tip.n} style={{ display:"flex", gap:"0.7rem", alignItems:"flex-start" }}>
+                <span style={{ fontFamily:"var(--font-mono)", fontSize:"0.7rem", color:"var(--accent)", fontWeight:700, minWidth:"1.1rem" }}>{tip.n}</span>
+                <div style={{ flex:1 }}>
+                  <p style={{ fontFamily:"var(--font-display)", fontStyle:"italic", fontSize:"0.95rem", fontWeight:600, color:"var(--text-primary)", margin:"0 0 0.2rem", letterSpacing:"-0.01em" }}>{tip.titre}</p>
+                  <p style={{ fontFamily:"var(--font-body)", fontSize:"0.78rem", color:"var(--text-sec)", margin:0, lineHeight:1.55 }}>{tip.corps}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       {/* Search */}
       <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", border:"1px solid var(--border-light)", padding:"0.4rem 0.7rem" }}>
