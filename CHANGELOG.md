@@ -4,6 +4,13 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ---
 
+## Session 7 — 2026-04-20 (phrasebook — ajustements)
+
+- Retour à `3人お願いします` (sannin) au lieu de `3名` (sanmei) — sanmei est la formule utilisée *par* le personnel, un client dit naturellement *sannin*.
+- Suppression des 4 phrases d'allergie (générique + gluten / fruits de mer / arachides) — non concerné par le voyage.
+
+---
+
 ## Session 7 — 2026-04-20 (phrasebook — audit + phrases terrain)
 
 ### Phrasebook — audit linguistique + ~35 nouvelles phrases

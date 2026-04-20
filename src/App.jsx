@@ -5246,7 +5246,7 @@ function PhrasebookSection() {
   };
   const CATS = [
     { id:"resto", emoji:"🍽", titre:"Au restaurant", color:"var(--accent)", phrases:[
-      { fr:"Une table pour 3 personnes s'il vous plaît", jp:"3名でお願いします", rom:"Sanmei de onegaishimasu", diff:"🟢" },
+      { fr:"Une table pour 3 personnes s'il vous plaît", jp:"3人お願いします", rom:"Sannin onegaishimasu", diff:"🟢" },
       { fr:"Le menu en anglais, s'il vous plaît", jp:"英語のメニューはありますか？", rom:"Eigo no menyu wa arimasu ka?", diff:"🟡" },
       { fr:"Je prends celui-ci (pointer)", jp:"これをください", rom:"Kore wo kudasai", diff:"🟢" },
       { fr:"L'addition s'il vous plaît", jp:"お会計をお願いします", rom:"Okaikei wo onegaishimasu", diff:"🟡" },
@@ -5255,10 +5255,6 @@ function PhrasebookSection() {
       { fr:"Quelle est la spécialité de la maison ?", jp:"お店のおすすめは何ですか？", rom:"Omise no osusume wa nan desu ka?", diff:"🟡" },
       { fr:"Pouvez-vous recommander ?", jp:"おすすめは何ですか？", rom:"Osusume wa nan desu ka?", diff:"🟡" },
       { fr:"Ce plat contient-il du porc / bœuf / poisson ?", jp:"これは豚肉／牛肉／魚が入っていますか？", rom:"Kore wa butaniku / gyuuniku / sakana ga haitte imasu ka?", diff:"🟡" },
-      { fr:"Je suis allergique à [ingrédient]", jp:"[食材]アレルギーがあります", rom:"[shokuzai] arerugii ga arimasu", diff:"🔴" },
-      { fr:"Allergie au gluten / blé", jp:"小麦アレルギーがあります", rom:"Komugi arerugii ga arimasu", diff:"🟡" },
-      { fr:"Allergie aux fruits de mer", jp:"甲殻類と貝のアレルギーがあります", rom:"Koukakurui to kai no arerugii ga arimasu", diff:"🔴" },
-      { fr:"Allergie aux arachides", jp:"ピーナッツアレルギーがあります", rom:"Piinattsu arerugii ga arimasu", diff:"🟡" },
       { fr:"Sans viande / végétarien", jp:"肉抜きでお願いします", rom:"Niku nuki de onegaishimasu", diff:"🟡" },
       { fr:"Sans wasabi s'il vous plaît", jp:"サビ抜きでお願いします", rom:"Sabi nuki de onegaishimasu", diff:"🟡" },
       { fr:"Sans [oignon], s'il vous plaît", jp:"[玉ねぎ]抜きでお願いします", rom:"[tamanegi] nuki de onegaishimasu", diff:"🟡" },
