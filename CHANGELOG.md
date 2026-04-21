@@ -4,6 +4,15 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ---
 
+## Session 8 — 2026-04-21 (J13 — Kittan Hibiki réservation confirmée)
+
+- J13 (9 mai) : Kittan Hibiki déplacé de 19h (soir) à **13h00 (déjeuner)** — réservation confirmée.
+- Statut passé de `book` (à réserver) à `ok` (confirmé) dans la checklist urgences.
+- Soir J13 simplifié : soirée libre (Kitashinchi / Dotonbori).
+- Mise à jour du renvoi dans la section wagyu (ou:).
+
+---
+
 ## Session 7 — 2026-04-20 (phrasebook — ajustements)
 
 - Retour à `3人お願いします` (sannin) au lieu de `3名` (sanmei) — sanmei est la formule utilisée *par* le personnel, un client dit naturellement *sannin*.
