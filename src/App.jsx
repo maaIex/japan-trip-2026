@@ -356,6 +356,11 @@ const DAYS = [
       "🦌 NARA : Les daims muent en mai — leur pelage est encore un peu hirsute. Avril-mai = période de naissance des faons. Si vous voyez un faon seul : ne pas le toucher, la mère est toujours proche.",
       "🚄 DEPUIS INARI : JR Nara Line directe (pas besoin de revenir à Kyoto Station). Gain de temps : 20 min par rapport à passer par Kyoto Station.",
     ],
+    meals:{
+      dejeuner:{ nom:"Tanbaya + Nakatanidou", nomJp:"丹波屋 + 中谷堂", plat:"Phase 1 (11h, descente Fushimi) : inari-zushi Tanbaya (200¥/pièce, set 5 + miso ~600¥). Phase 2 (13h, Nara) : mochi yomogi pilé en live toutes les heures chez Nakatanidou (200¥/pièce, spectacle !)", prix:"~1 200¥/pers (combiné)", attente:"0–5 min chaque stand", s:"free", commande:"green", planB:"Konbini Fushimi ou autre stand inari au bas du sanctuaire (nombreux)", adresse:"Tanbaya : rue principale Fushimi vers la gare. Nakatanidou : 29 Hashimotocho, 3 min de Kintetsu Nara Station", transport:"Tanbaya au pied du sanctuaire Fushimi Inari. Nakatanidou à l'arrivée Nara (13h env.)" },
+      gouter:{ nom:"Manshodo dango (Nara)", nomJp:"", plat:"Mitarashi dango — brochettes sauce soja sucrée grillée, 140¥/brochette", prix:"280–420¥ (2–3 brochettes)", attente:"0–5 min", s:"free", commande:"green", planB:"Senjuan Yoshimune (39-1 Oshiagecho, 4.3/5, kakigori matcha + warabi mochi ~1 500¥, pause assise)", adresse:"24-1 Higashimuki Nakamachi (Higashimuki Shopping Arcade, centre Nara)", transport:"Dans Higashimuki Shopping Arcade, 5 min de Kintetsu Nara Station" },
+      diner:{ nom:"Kichi Kichi Omurice", nomJp:"", plat:"Omurice spectaculaire — riz sauté au poulet enveloppé d'une crêpe d'œufs ultra-fine, ouverture théâtrale au couteau devant vous. 6 places seulement.", prix:"4 000–6 000¥/pers", attente:"0 min (réservation, déjà réservé ✅)", s:"ok", commande:"green", planB:"Omen Noodles (udon semi-épais Okazaki, ~1 400¥) si annulation de dernière minute", adresse:"Kyoto centre (Nakagyo-ku)", transport:"Retour Kyoto depuis Nara (JR 42 min) — arrivée ~17h pour le dîner 19h" },
+    },
   },
   // ═══════════════════════════════════════════════════════
   // J10 — 6 MAI — KIYOMIZUDERA + GION
@@ -383,6 +388,11 @@ const DAYS = [
       "📸 KIYOMIZUDERA : La meilleure photo de la scène suspendue est depuis le sentier nord (chemin vers Jishu Shrine) — vue de face sur la scène avec la vallée en dessous. À 6h30, lumière matinale directe sur les bois.",
       "👘 KIMONO : Si location à Ninenzaka, inclure l'accès taxi pour Gion — marcher en geta (sandales en bois) sur pavés = épuisant après 2h.",
     ],
+    meals:{
+      dejeuner:{ nom:"Katsukura Shijo Higashinotoin", nomJp:"", plat:"Hire-katsu set (pork tenderloin 160g) + moudre soi-même les graines de sésame dans le mortier pour la sauce maison. Cabbage/riz/miso refills gratuits.", prix:"2 200–3 000¥/pers", attente:"15–30 min (sous-sol avec tables supplémentaires, ça tourne)", s:"free", commande:"green", planB:"Katsukura Sanjo Main Store (16 Ishibashicho, même enseigne) ou Gyukatsu Kyoto Katsugyu Pontocho (188 Zaimokucho, 4.8/5)", adresse:"674 Bantoyacho, Nakagyo-ku", transport:"8 min à pied de Gion/Higashiyama vers Shijo-Teramachi, après la descente de Ninenzaka" },
+      gouter:{ nom:"Sawawa Matcha Sweets", nomJp:"", plat:"Matcha warabi mochi sur glace matcha, takeaway box à manger upstairs. Ou Kyo ha Matcha de Kimeru (matcha latte préparé devant vous, ~15 min d'expérience)", prix:"800–1 200¥", attente:"0–10 min", s:"free", commande:"green", planB:"Tsujiri (辻利, thé matcha depuis 1860, sur Ninenzaka) — glace matcha ~500¥", adresse:"456 Jumonjicho, Nakagyo-ku (dans Nishiki Market)", transport:"Dans Nishiki Market, direction sud depuis Kiyomizudera" },
+      diner:{ nom:"Chuka-Soba Rantan", nomJp:"", plat:"Tori paitan (ramen bouillon poulet crémeux) classique ou spicy niveau 2 — noodles firmes, chashu deux tranches, œuf mollet. Tablet anglais + 3 niveaux de spiciness.", prix:"1 200–1 800¥/pers", attente:"30–45 min en prime time (18h–20h), 15 min sinon", s:"free", commande:"green", planB:"Ramen Muraji (404 Izutsuyacho, 4.6/5, black chicken ramen) ou Yakimeshi to Men Kyoto (4.8/5, ramen + fried rice)", adresse:"528 Kamiosakacho, Nakagyo-ku — entrée nord de Pontocho", transport:"5 min à pied de l'hôtel Blossom Kyoto" },
+    },
   },
   // ═══════════════════════════════════════════════════════
   // J11 — 7 MAI — KYOTO → OSAKA
@@ -407,6 +417,11 @@ const DAYS = [
       "🗣 OSAKA DIALECT : Les Osakans parlent le 'Kansai-ben' (関西弁). 'Maido !' = bonjour / bienvenue (lieu de commerce). 'Ookini !' = merci. Montrer que vous connaissez = sourires garantis.",
       "⚠️ KUSHIKATSU : La sauce commune dans les seaux en bois est partagée entre tous les clients. Re-tremper après avoir mordu = règle d'hygiène absolue au Japon. Demander un supplément de sauce si pas assez.",
     ],
+    meals:{
+      dejeuner:{ nom:"Kuromon Sanpei", nomJp:"", plat:"Chirashi don (mix poisson sur riz vinaigré) ou seared scallop + uni. Tables à l'intérieur du stand. Labels anglais + photos.", prix:"1 500–3 500¥/pers selon sélection", attente:"10–20 min", s:"free", commande:"green", planB:"Kuromon Sushi (1-16-9 Nipponbashi, 4.5/5, chef Amy très friendly) — NB : Kuromon Sushi Suehiro réservé pour J14, éviter ici", adresse:"1-22-25 Nipponbashi, dans Kuromon Market", transport:"5 min de Namba Station (arrivée Osaka depuis Kyoto)" },
+      gouter:{ nom:"Takoyaki Juhachiban", nomJp:"", plat:"6 pièces classique ~630¥ ou moitié-moitié (mayo + sel) — baptême street food Osaka sans les queues des tourist traps", prix:"630–900¥", attente:"5–15 min (ticket machine)", s:"free", commande:"green", planB:"Takoyaki Wanaka Dotonbori (1-6-7, 4.2/5, indoor seating, ex-Michelin)", adresse:"1-7-21 Dotonbori", transport:"2 min de l'hôtel Takuto" },
+      diner:{ nom:"Okonomiyaki Izakaya Gen", nomJp:"", plat:"Okonomiyaki « mix » (porc + crevette + œuf) préparée par chef solo devant vous + yakisoba. 1 drink minimum (plum wine / highball / biru). Chef parle anglais.", prix:"2 500–3 500¥/pers", attente:"20–40 min — arriver avant 18h30 (one-man show)", s:"free", commande:"green", planB:"OKO Fun Okonomiyaki Bar (2-4-13 Dotonbori, 4.7/5, vegan/GF friendly) ou Chibo Dotonbori (4.1/5, chaîne 6 étages, plus touristique)", adresse:"2-31 Souemoncho, Chuo-ku", transport:"5 min à pied de l'hôtel Takuto (Shinsaibashi/Dotonbori)" },
+    },
   },
   // ═══════════════════════════════════════════════════════
   // J12 — 8 MAI — USJ
