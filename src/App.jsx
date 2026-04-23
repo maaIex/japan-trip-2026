@@ -98,6 +98,11 @@ const DAYS = [
       "📱 OFFLINE J1 : Dans le terminal, connecter au wifi gratuit 'Haneda Free Wi-Fi' et télécharger Google Maps (zones Tokyo/Kyoto/Osaka/Nara) + Google Translate (pack japonais) + Navitime Japan. Ensuite vous êtes autonomes sans SIM.",
       "🛏 JET LAG : Rester éveillé jusqu'à 21h-22h heure japonaise même si épuisé. Exposer les yeux à la lumière naturelle l'après-midi (se promener dehors). Ne pas faire de sieste > 20 min.",
     ],
+    meals:{
+      dejeuner:{ nom:"Asakusa Gyukatsu", nomJp:"浅草 牛かつ", plat:"Gyukatsu set M (pour 2) ou L (pour 3) — bœuf pané que vous grillez sur pierre chaude à votre cuisson", prix:"2 500–3 000¥/pers", attente:"20–30 min — viser 11h30 à l'ouverture ou 14h, éviter 12h30–13h30 en Golden Week", s:"free", commande:"green", planB:"Asakusa Gyukatsu Sub-branch (2-18-16 Kaminarimon 2F, 100m plus loin — file généralement plus courte, 4.9/5)", adresse:"2-17-10 Kaminarimon, Taito-ku", transport:"4–5 min à pied depuis l'hôtel, sortie sud direction Kaminarimon" },
+      gouter:{ nom:"Taiyaki Sawada", nomJp:"", plat:"Taiyaki garnitures crème / chocolat / cheese, cuits à la demande", prix:"300–400¥/pièce", attente:"5–10 min", s:"free", commande:"green", planB:"Naruto Taiyaki Honpo (1-28-1 Asakusa, grillé au charbon, 4.5/5)", adresse:"Vira Appex Asakusa-Shinnakamise 1F, 1-29-2 Asakusa", transport:"3 min à pied de l'hôtel, dans Kappabashi" },
+      diner:{ nom:"Sometaro", nomJp:"染太郎", plat:"Okonomiyaki « mix » (seafood + porc + œuf) à faire soi-même sur plaque intégrée à la table — institution depuis 1937", prix:"1 500–2 000¥/pers", attente:"15–30 min après 18h30", s:"free", commande:"yellow", planB:"Umaimon Azuma (même quartier Nishi-Asakusa, sans queue, menu varié)", adresse:"2-2-2 Nishi-Asakusa", transport:"8–10 min à pied nord-ouest de l'hôtel, ruelle étroite maison en bois" },
+    },
   },
   // ═══════════════════════════════════════════════════════
   // J2 — 28 AVRIL — AKIHABARA + SKYTREE
@@ -124,6 +129,11 @@ const DAYS = [
       "⚡ AKIHABARA : Super Potato est souvent bondé le week-end — arriver à l'ouverture (11h) pour fouiller tranquillement. Certaines cartouches rétro sont en quantité limitée.",
       "📸 SKYTREE : pour photographier le coucher de soleil à 18h, se placer côté OUEST du Tembo Deck (fenêtres face à Shinjuku). Côté EST pour les photos de Tokyo Bay après 19h30.",
     ],
+    meals:{
+      dejeuner:{ nom:"Kitchen Nankai", nomJp:"", plat:"Katsu curry classique noir — crispy pork cutlet sur riz + sauce curry maison, cash only", prix:"900–1 200¥/pers", attente:"30–45 min (commandes prises dans la file, service rapide une fois en salle)", s:"free", commande:"yellow", planB:"Rice Curry Manten (1-54 Jinbocho, 4.3/5) ou Curry Bondy (2-3-3 Jinbocho, 4.3/5)", adresse:"1-39-8 Kanda Jinbocho", transport:"8 min à pied d'Akihabara Station ou 1 arrêt Shinjuku Line vers Jinbocho" },
+      gouter:{ nom:"Matcha Sweets Kaminari-Issa", nomJp:"", plat:"Glaces matcha/hojicha soft serve, parfaits — parfait avant de monter au Skytree", prix:"600–900¥", attente:"0–10 min", s:"free", commande:"green", planB:"Konbini Lawson Asakusa si fermé", adresse:"2-7-3 Asakusa", transport:"3 min à pied de l'hôtel" },
+      diner:{ nom:"Asakusa Imahan Annex", nomJp:"今半 別館", plat:"Sukiyaki wagyu — menu early dinner avant 18h à 3 500–4 000¥ / menu soir 6 000–9 000¥. Staff en kimono traditionnel explique la préparation.", prix:"6 000–8 000¥/pers (soir)", attente:"30–60 min sans réservation — appeler le matin au 03-3841-2690 ou arriver 17h30 pile", s:"book", commande:"yellow", planB:"Asakusa Imahan Honten (3-1-12 Nishi-Asakusa, 4.5/5, 10 min à pied) ou Umaimon Azuma", adresse:"2-2-5 Asakusa", transport:"3 min à pied de l'hôtel" },
+    },
   },
 
   // ═══════════════════════════════════════════════════════
@@ -152,6 +162,11 @@ const DAYS = [
       "🌸 CERISIERS TARDIFS : Nikko est en altitude (600m) — les cerisiers fleurissent 2-3 semaines après Tokyo. Fin avril = potentiellement encore en fleurs. Vérifier sakuraforecast.jp avant de partir.",
       "⏰ IMPÉRATIF : Partir d'Asakusa avant 7h pour avoir le temps de tout voir. Nikko ferme ses sanctuaires à 17h (16h en hiver).",
     ],
+    meals:{
+      dejeuner:{ nom:"Yuba-gozen Sun Field", nomJp:"", plat:"Yuba Set unique — 12 petits plats à base de yuba (peau de tofu), spécialité de Nikko depuis le 13e siècle. Cash only.", prix:"2 200¥/pers", attente:"15–30 min vers midi en saison", s:"free", commande:"yellow", planB:"Yuba Ryori Aburagen (1028-3 Kamihatsuishi, 4.4/5) ou Nikko Yubamaki ZEN (4.2/5, fermé mardi)", adresse:"819 Shimohatsuishimachi, Nikko", transport:"10 min à pied de Tobu Nikko Station sur la rue principale vers les sanctuaires, avant le pont Shinkyo" },
+      gouter:{ nom:"Ekiben Utsunomiya Station", nomJp:"", plat:"Gyoza bento (~800¥, spécialité locale) à prendre avant le JR retour — ou konbini onigiri premium à Tobu-Nikko Station", prix:"~800¥", attente:"0 min", s:"free", commande:"green", planB:"Konbini onigiri Tobu-Nikko Station si pas d'ekiben disponible" },
+      diner:{ nom:"Ramen Kagari Asakusa", nomJp:"", plat:"Tori soba / ramen au bouillon de poulet crémeux blanc (tori paitan signature) — branche Asakusa de la chaîne Ginza", prix:"1 200–1 500¥/pers", attente:"20–30 min en file, ça tourne vite", s:"free", commande:"yellow", planB:"Ramen Ichiran Asakusa (24h/24) ou Umaimon Azuma si envie d'izakaya", adresse:"1-39-7 Asakusa, 2F", transport:"5 min à pied de l'hôtel" },
+    },
   },
 
   // ═══════════════════════════════════════════════════════
@@ -184,6 +199,11 @@ const DAYS = [
       "🌇 SHIBUYA SKY : ✅ Réservé pour le 30 avril à 19h00 — bascule jour/nuit parfaite à cette heure (coucher de soleil ~18h35, blue hour jusqu'à 19h20).",
       "🌉 ODAIBA : Vue nocturne sur Rainbow Bridge depuis la plage = une des plus belles de Tokyo.",
     ],
+    meals:{
+      dejeuner:{ nom:"Kitchaan Harajuku", nomJp:"", plat:"Matcha soba set hot (soba au matcha + tempura chicken) ou zaru soba froid — machine à tickets avec photos", prix:"1 000–1 500¥/pers", attente:"0–15 min", s:"free", commande:"green", planB:"BASO Omotesando (6-11-7 Jingumae, duck soba, 4.1/5)", adresse:"1-17-5 Jingumae", transport:"3 min de Harajuku Station, juste au début de Takeshita Street" },
+      gouter:{ nom:"Crêpe Takeshita Street", nomJp:"", plat:"Crêpe roulée en cône : matcha / cheesecake / fraise (Angela's Crêpe ou Santa Monica Crêpes)", prix:"500–800¥", attente:"5–15 min", s:"free", commande:"green", planB:"Konbini Lawson près Toyosu si temps serré vers TeamLab — matcha sando + cream cheese ~400¥" },
+      diner:{ nom:"Sushi Matsue", nomJp:"", plat:"Sushi Rin course (8 appetizers + 10 nigiri + miso) ou omakase nigiri (~6 000¥). Chef parle anglais, explique chaque pièce.", prix:"6 000–10 000¥/pers", attente:"Réserver via Tablecheck.com dès J1 — même bâtiment que Shibuya Sky, descendre du 46F au 12F", s:"book", commande:"green", planB:"Sushi Inase Shibuya (3-15-5 Shibuya B1F, 4.9/5) ou Katsu Midori Shibuya (Mark City 1F, kaiten 130–400¥/assiette)", adresse:"Scramble Square Tower 12F, 2-24-12 Shibuya", transport:"0 min de transit — même bâtiment que Shibuya Sky" },
+    },
   },
   // ═══════════════════════════════════════════════════════
   // J5 — 1 MAI — KYU-FURUKAWA + DAWN + DAIKOKU
@@ -1962,6 +1982,7 @@ const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query, matc
           ) : (
           <>{day.sections.filter(s=>s.items.length>0).map((section, si)=><SectionBlock key={section.id} section={section} query={query} dayN={day.n} dayCity={day.city} idx={si} />)}</>
           )}
+          {day.meals && <MealSection meals={day.meals} city={day.city} />}
           {day.tips?.length>0 && (
             <div style={{
               marginTop:"0.85rem", padding:"0.8rem 0.95rem",
@@ -2499,6 +2520,70 @@ function SectionBlock({ section, query, dayN, dayCity, idx = 0 }) {
           />
         ))}
       </div>
+    </div>
+  );
+}
+
+// ─── MEAL SLOTS ─────────────────────────────────────────────────
+const MEAL_SLOTS = [
+  { key:"dejeuner", label:"🍱 Déjeuner", time:"~12h" },
+  { key:"gouter",   label:"☕ Goûter",   time:"~16h" },
+  { key:"diner",    label:"🍜 Dîner",    time:"~19h" },
+];
+
+function MealCard({ slot, meal, city }) {
+  const [open, setOpen] = useState(false);
+  const [addrOpen, setAddrOpen] = useState(false);
+  const cc = CITY[city] || CITY.transit;
+  const st = ST[meal.s] || ST.free;
+  const commandeIcon = meal.commande === "green" ? "🟢" : meal.commande === "yellow" ? "🟡" : meal.commande === "red" ? "🔴" : (meal.commande || "");
+  return (
+    <div style={{ border:"1px solid var(--border-light)", borderLeft:`3px solid ${cc.color}`, background:"var(--bg-card-2)", marginBottom:"0.5rem", overflow:"hidden" }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{ width:"100%", display:"flex", alignItems:"center", gap:"0.4rem", padding:"0.55rem 0.75rem", background:"transparent", border:"none", cursor:"pointer", textAlign:"left", fontFamily:"inherit", color:"inherit", flexWrap:"wrap" }}
+      >
+        <span style={{ fontSize:"0.6rem", fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--text-muted)", whiteSpace:"nowrap", minWidth:"4.2rem", flexShrink:0 }}>{slot.label}</span>
+        <span style={{ flex:1, fontFamily:"var(--font-display)", fontSize:"0.9rem", fontWeight:700, color:"var(--text-primary)", lineHeight:1.2, minWidth:"8rem" }}>
+          {meal.nom}
+          {meal.nomJp && <span style={{ fontFamily:"var(--font-kanji)", fontSize:"0.75rem", fontWeight:400, color:"var(--text-muted)", marginLeft:"0.35rem" }}>{meal.nomJp}</span>}
+        </span>
+        <span style={{ fontFamily:"var(--font-mono)", fontSize:"0.67rem", fontWeight:600, color:"var(--text-sec)", whiteSpace:"nowrap", flexShrink:0 }}>{meal.prix}</span>
+        <span style={{ fontSize:"0.54rem", fontWeight:700, letterSpacing:"0.13em", textTransform:"uppercase", padding:"0.13rem 0.36rem", background:st.bg.light, color:st.color.light, border:`1px solid ${st.bdr.light}`, whiteSpace:"nowrap", flexShrink:0 }}>{st.label}</span>
+        <span title="Niveau de commande" style={{ fontSize:"0.78rem", flexShrink:0 }}>{commandeIcon}</span>
+        <span aria-hidden="true" style={{ fontSize:"0.65rem", color:"var(--text-muted)", flexShrink:0, display:"inline-block", transform:open?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▾</span>
+      </button>
+      {open && (
+        <div style={{ padding:"0.1rem 0.75rem 0.65rem", borderTop:"1px solid var(--border-light)" }}>
+          {meal.plat    && <p style={{ fontFamily:"var(--font-body)", fontSize:"0.8rem", color:"var(--text-sec)",   margin:"0.42rem 0 0", lineHeight:1.5 }}><strong>Plat :</strong> {meal.plat}</p>}
+          {meal.attente && <p style={{ fontFamily:"var(--font-body)", fontSize:"0.8rem", color:"var(--text-sec)",   margin:"0.26rem 0 0", lineHeight:1.5 }}>⏳ <strong>Attente :</strong> {meal.attente}</p>}
+          {meal.planB   && <p style={{ fontFamily:"var(--font-body)", fontSize:"0.75rem", color:"var(--text-muted)", margin:"0.26rem 0 0", lineHeight:1.5 }}>🔄 <strong>Plan B :</strong> {meal.planB}</p>}
+          {(meal.adresse || meal.transport) && (
+            <div style={{ marginTop:"0.42rem" }}>
+              <button onClick={e=>{e.stopPropagation();setAddrOpen(o=>!o);}} style={{ fontSize:"0.69rem", fontWeight:600, color:"var(--text-muted)", background:"none", border:"none", cursor:"pointer", padding:0, fontFamily:"inherit" }}>
+                📍 Adresse & transport {addrOpen ? "▴" : "▾"}
+              </button>
+              {addrOpen && (
+                <div style={{ marginTop:"0.26rem", paddingLeft:"0.5rem", borderLeft:"2px solid var(--border-light)" }}>
+                  {meal.adresse   && <p style={{ fontFamily:"var(--font-body)", fontSize:"0.75rem", color:"var(--text-sec)",   margin:0, lineHeight:1.5 }}>{meal.adresse}</p>}
+                  {meal.transport && <p style={{ fontFamily:"var(--font-body)", fontSize:"0.75rem", color:"var(--text-muted)", margin:"0.16rem 0 0", lineHeight:1.5 }}>🚶 {meal.transport}</p>}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MealSection({ meals, city }) {
+  const hasAny = MEAL_SLOTS.some(sl => meals[sl.key]);
+  if (!hasAny) return null;
+  return (
+    <div style={{ marginTop:"1rem", borderTop:"2px dashed var(--border-mid)", paddingTop:"0.8rem" }}>
+      <p style={{ fontFamily:"var(--font-body)", fontSize:"0.63rem", fontWeight:700, letterSpacing:"0.2em", textTransform:"uppercase", color:"var(--text-muted)", marginBottom:"0.55rem" }}>🍽 Repas du jour</p>
+      {MEAL_SLOTS.map(sl => meals[sl.key] ? <MealCard key={sl.key} slot={sl} meal={meals[sl.key]} city={city} /> : null)}
     </div>
   );
 }
