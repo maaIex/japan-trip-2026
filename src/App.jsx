@@ -445,6 +445,11 @@ const DAYS = [
       "📱 USJ APP : Créer le compte AVANT le départ depuis la France (usj.co.jp/app). L'appli doit être chargée et connectée avant d'arriver au parc. Connexion wifi lente à l'entrée = risque de rater la réservation Nintendo.",
       "⏰ FLYING DINOSAUR : File maximale 9h-15h, minimum 30 min avant fermeture. Si journée chargée, sacrifier Flying Dinosaur pour Nintendo World + HP = meilleur choix.",
     ],
+    meals:{
+      dejeuner:{ nom:"Dans le parc USJ", nomJp:"", plat:"Pas de queue de 45 min — stratégie fast-casual : Butterbeer Cart (950¥) + Cornish Pasty (~800¥) ou Jurassic Park Restaurant (Jurassic Burger ~1 500¥) ou Mario Café (Mario burger pain moustache ~1 800¥)", prix:"1 800–2 500¥/pers", attente:"5–15 min (eviter les restaurants à table)", s:"free", commande:"green", planB:"Sortir du parc, manger à USJ Station food court (~10 min A/R, plus large choix)" },
+      gouter:{ nom:"Popcorn thématiques USJ", nomJp:"", plat:"Stands partout dans le parc — Popcorn buckets Minion / Nintendo / Jurassic avec rechargement illimité après achat. Minion Café snack si file courte.", prix:"~2 200¥ (bucket avec rechargement illimité)", attente:"5–15 min", s:"free", commande:"green", planB:"Konbini dans le parc ou à l'entrée USJ" },
+      diner:{ nom:"Ichiran Dotonbori", nomJp:"一蘭 道頓堀", plat:"Tonkotsu ramen classique (980¥) + kaedama extra noodles (130¥) + topping ajitama (130¥) — en isoloir individuel pour décompresser après USJ sans interaction sociale", prix:"1 200–1 500¥/pers", attente:"10–25 min", s:"free", commande:"green", planB:"Konbini FamilyMart/Lawson près hôtel si épuisement total — onigiri takoyaki flavor, katsu sando, dango (~600¥)", adresse:"1-7-25 Dotonbori, Chuo-ku", transport:"2 min à pied de l'hôtel Takuto — retour USJ → Shinsaibashi ~30 min de trajet" },
+    },
   },
   // ═══════════════════════════════════════════════════════
   // J13 — 9 MAI — CHÂTEAU + UMEDA SKY
@@ -469,7 +474,13 @@ const DAYS = [
     ],
     tips:[
       "🌇 UMEDA SKY : Coucher de soleil à Osaka en mai vers 18h50. Arriver à 18h15 pour choisir la position. Côté nord-ouest = best sunset position. Prévoir veste légère — vent à 173m.",
-      "🏯 OSAKA-JO : Les murs de pierres cyclopéens (pierres de plusieurs tonnes) sont la vraie merveille du château, plus que le donjon reconstruit. Faire le tour complet des douves (45 min à pied) pour voir les différents assemblages."],
+      "🏯 OSAKA-JO : Les murs de pierres cyclopéens (pierres de plusieurs tonnes) sont la vraie merveille du château, plus que le donjon reconstruit. Faire le tour complet des douves (45 min à pied) pour voir les différents assemblages.",
+    ],
+    meals:{
+      dejeuner:{ nom:"Kittan Hibiki", nomJp:"起燃ひびき", plat:"Wagyu Yakiniku — Zabuton (paleron marbré), Harami (bavette intense), Wagyu tongue, Negi-shio tan. Griller 30–45 sec chaque face sur charbon, manger immédiatement. Déjeuner = 30–40% moins cher qu'au dîner.", prix:"formule déjeuner", attente:"0 min (réservation confirmée ✅ 13h00)", s:"ok", commande:"yellow", planB:"Réservation confirmée — pas de plan B nécessaire", adresse:"Osaka (adresse confirmée lors de la réservation)", transport:"Depuis Château d'Osaka : Tanimachi Line → Shinsaibashi/Namba (~10 min)" },
+      gouter:{ nom:"Horaï 551 Butaman", nomJp:"蓬莱 551", plat:"Gros pork bun vapeur — manger chaud dans les 30 min, très iconique Osaka. Pack de 2 pour commencer.", prix:"210¥/pièce, pack 2 ~420¥", attente:"5–10 min", s:"free", commande:"green", planB:"Taiyaki ou street food Tenjinbashi Suji sur le trajet", adresse:"Hankyu Sanbangai B1 Umeda, ou nombreuses boutiques Osaka", transport:"Sur le trajet Kittan Hibiki → Tenjinbashi Suji → Umeda" },
+      diner:{ nom:"Kushikatsu Daruma Shin-Sekai", nomJp:"だるま 総本店", plat:"Kushikatsu set (8–10 brochettes panées variées : lotus root, asperge, cheese, crevette, porc). ⚠️ RÈGLE : une seule immersion dans la sauce commune, jamais deux (二度漬け禁止). Cabbage + sauce gratuits.", prix:"2 000–3 000¥/pers", attente:"30–45 min, file mouvante rapide. Counter 14 places.", s:"free", commande:"green", planB:"Autres branches Daruma Dotonbori (moins de file, plus touristiques) ou Kushikatsu Tokyo (chaîne)", adresse:"2-3-9 Ebisuhigashi, Naniwa-ku — Shin-Sekai Main Shop", transport:"Dobutsuen-mae Station (Midosuji Line depuis Umeda ~15 min) + 5 min à pied" },
+    },
   },
   // ═══════════════════════════════════════════════════════
   // J14 — 10 MAI — TRANSIT OSAKA → TOKYO HANEDA
@@ -494,6 +505,11 @@ const DAYS = [
       "🧳 TAKUHAIBIN (宅配便) : Si bagages lourds, envoyer depuis l'hôtel Osaka (J13 soir) vers le comptoir Yamato Transport à Haneda Airport. Coût : ~2000-2500¥/valise. Livraison garantie en 24h. Demander le service à la réception de l'hôtel. Récupérer au comptoir 'Yamato Transport' côté départ international, Haneda T3.",
       "⏰ VOL 11H45 DEMAIN : Être au Terminal 3 International avant 9h30 MAXIMUM. Check-in, sécurité, douanes = prévoir 2h minimum. Réveil à 7h30 recommandé.",
     ],
+    meals:{
+      dejeuner:{ nom:"Kuromon Sushi Suehiro", nomJp:"黒門寿司 末廣", plat:"Sushi à la commande par tablet — otoro, uni, wagyu nigiri flambé, chawamushi en side. Chefs 70 ans d'histoire, très fresh. Commander avant 12h pour éviter la queue.", prix:"3 000–5 000¥/pers", attente:"0–20 min avant 12h (arriver tôt)", s:"free", commande:"green", planB:"Kuromon Sushi (1-16-9 Nipponbashi, chef Amy, 4.5/5) ou takoyaki + okonomiyaki Kuromon Market street", adresse:"1-21-33 Nipponbashi, dans Kuromon Market", transport:"8 min à pied de Namba Station — avant de partir vers Shin-Osaka" },
+      gouter:{ nom:"Horaï 551 Butaman Shin-Osaka", nomJp:"蓬莱 551", plat:"Dernier butaman avant le Shinkansen — acheter dans la gare Shin-Osaka pour manger dans le train", prix:"210¥/pièce, pack 2 ~420¥", attente:"5 min", s:"free", commande:"green", planB:"Ekiben kiosk Shin-Osaka (bento variés ~1 200¥) ou konbini gare" },
+      diner:{ nom:"Kaitenzushi Kantaro Tokyo Station", nomJp:"", plat:"Kaiten sushi tablet — chuutoro, ootoro, unagi nigiri, tamago — assiettes arrivent par rampe directe à la table. Private booths. Dernier repas japonais de la soirée.", prix:"2 500–4 000¥/pers (12–15 assiettes à 150–500¥)", attente:"30–45 min à 19h, service rapide une fois assis", s:"free", commande:"green", planB:"Gansozushi Haneda T2 (aéroport) ou dîner léger konbini hôtel Haneda + dernier Suntory Hibiki au bar lobby", adresse:"Tokyo Station Ichibangai B1F", transport:"15 min de Haneda en Keikyu + JR (faisable avant 21h depuis hôtel Haneda)" },
+    },
   },
   // ═══════════════════════════════════════════════════════
   // J15 — 11 MAI — DÉPART HANEDA
