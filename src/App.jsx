@@ -233,6 +233,11 @@ const DAYS = [
       "🌹 KYU-FURUKAWA : Le jeudi et vendredi sont les meilleurs jours (moins de foule japonaise que le week-end). Arriver à l'ouverture (9h) pour les photos de roseraie sans touristes.",
       "🥩 WAGYU : La différence entre les grades A3/A4/A5 se voit au marbre (persillage blanc dans la viande rouge). A5 = marbre maximum, fondant total mais très riche — 2-3 tranches suffisent par personne.",
     ],
+    meals:{
+      dejeuner:{ nom:"Nihonbashi Izumoya", nomJp:"", plat:"Unaju — anguille laquée en boîte + soupe de foie d'anguille. Taille standard ou 3/4.", prix:"4 000–6 500¥/pers", attente:"30–45 min sans réservation — commander avant d'entrer avec le menu distribué en file. Appeler le matin au 03-3241-2476 ou arriver à 11h.", s:"free", commande:"green", planB:"Unagi Kappo Oedo (4-7-10 Nihonbashihoncho, 4.3/5) ou Yaesu Hashimoto (près Tokyo Station, 4.4/5)", adresse:"3-3-4 Nihonbashihongokucho", transport:"10 min à pied de Mitsukoshimae Station (direction Nihonbashi après Yanaka ou Kyu-Furukawa)" },
+      gouter:{ nom:"DAWN Avatar Robot Café", nomJp:"", plat:"OriHime Pass (café + 1 conso 2 200¥) ou OriHime Diner (repas complet servi par robot 5 500¥) — déjà réservé ✅", prix:"2 200–5 500¥/pers", attente:"0 min (réservation)", s:"ok", commande:"green", planB:"Expérience unique, pas de vrai plan B — café + observation robots si dîner non réservé", adresse:"3-8-3 Nihonbashi-Honcho, Chuo-ku (Nihonbashi Life Science Building 1F)", transport:"Hanzomon Line → Mitsukoshimae ou Marunouchi Line → Otemachi, 5 min à pied" },
+      diner:{ nom:"Syamo Sumibi Yakitori Kokekokko", nomJp:"", plat:"Yakitori sumibi (charbon) : chicken skin, liver, tsukune avec jaune d'œuf. Saké nihonshu selection. Dîner rapide avant Daikoku PA 22h30.", prix:"3 000–4 500¥/pers (2–3 brochettes + 1–2 verres)", attente:"20–40 min, pas de réservation", s:"free", commande:"yellow", planB:"Nogataya Shinjuku Omoide Yokocho (4.1/5) ou Motsuyaki Ucchan (4.1/5, motsu grillé)", adresse:"Nishishinjuku 1-1-1 B2F — Omoide Yokocho (Memory Lane), Shinjuku Ouest", transport:"Shinjuku Station sortie Ouest, dans Omoide Yokocho" },
+    },
   },
   {
     n:6, nLabel:"H", date:"2 mai", day:"Sam", city:"transit", title:"Hakone — Lac Ashi, Ropeway & Onsen 🗻 (sac léger)",
@@ -256,6 +261,11 @@ const DAYS = [
       "🎫 HAKONE FREE PASS vs JR PASS : Le Hakone Free Pass d'Odakyu (~6000¥/2j depuis Shinjuku) couvre tous les transports internes. Avec le JR Pass, vous économisez uniquement le Shinkansen jusqu'à Odawara (~4000¥ valeur) mais payez les transports internes séparément. Calculer selon votre situation.",
       "♨️ ONSEN : Si vous avez des tatouages, appeler avant de réserver. Tenzan Tohji-kyo est l'un des plus tolérants. Prévoir ~2h pour profiter pleinement.",
     ],
+    meals:{
+      dejeuner:{ nom:"Hatsuhana Soba Honten", nomJp:"", plat:"Seiro soba (froid à tremper) ou tempura soba chaud — soba fait maison, ingrédients locaux, meilleur soba de Hakone", prix:"1 200–2 000¥/pers", attente:"30–45 min aux heures du midi", s:"free", commande:"green", planB:"Hakone Kamameshi Soba (704 Yumoto, 4.2/5, plus rapide) ou Hakone Akatsukian Yumotochaya (4.1/5, cadre wooden house)", adresse:"635 Yumoto, Hakone", transport:"5 min à pied de Hakone-Yumoto Station, traverser le petit pont sur la rivière Sukumogawa" },
+      gouter:{ nom:"Kuro-tamago Owakudani", nomJp:"黒卵", plat:"Œufs durs cuits dans sources sulfureuses (coquille noire) — légende : +7 ans de vie par œuf", prix:"5 œufs ~500¥", attente:"0 min (stand direct)", s:"free", commande:"green", planB:"Disponible seulement si Owakudani ouvert — vérifier hakonenavi.jp la veille selon activité volcanique" },
+      diner:{ nom:"Ekiben à Odawara Station", nomJp:"", plat:"Deluxe Uminosachi Bento (fruits de mer) ou Gyu Gohan Bento (bœuf grillé sur riz) — à acheter avant 17h20, certains bentos partent vite", prix:"1 000–1 800¥/pers", attente:"0 min (kiosks quai Shinkansen niveau 2F ou B1)", s:"free", commande:"green", planB:"Arrivée Kyoto tardive : Ippudo Kyoto (ouvert 23h) ou konbini FamilyMart Kyoto Station (onigiri premium)" },
+    },
   },
 
   // ═══════════════════════════════════════════════════════
@@ -283,6 +293,11 @@ const DAYS = [
       "🎫 RÉFLEXE KYOTO STATION : Activer le JR Pass au guichet si pas encore fait, puis réserver sièges Kyoto→Osaka (7 mai) et Osaka→Tokyo (10 mai) immédiatement.",
       "🏨 CHECK-IN TARDIF : Si arrivée avant 15h, déposer les bagages à la réception et partir explorer Nishiki Market directement.",
     ],
+    meals:{
+      dejeuner:{ nom:"Ekiben-ya Matsuri", nomJp:"", plat:"Self-heating ekiben (tirer sur la ficelle, chauffe 10 min) : Gyutan Bento Sendai, sushi pressé Kaki-no-ha-zushi ou bento Wagyu — à manger dans le Shinkansen", prix:"1 200–2 500¥/pers", attente:"5–10 min file check-out", s:"free", commande:"green", planB:"Kaitenzushi Kantaro Tokyo Station (Ichibangai B1F, 4.0/5) si vous préférez manger assis avant d'embarquer (~30 min)", adresse:"Tokyo Station, B1F Gransta — passage central Marunouchi", transport:"5 min des quais Shinkansen côté Tokaido, avant d'embarquer sur le Hikari 11h30" },
+      gouter:{ nom:"Nishiki Market — stands à picorer", nomJp:"錦市場", plat:"Tamagoyaki chaud (Miki Keiran, 200–300¥), takoyaki (Karikari Hakase), yatsuhashi frais (Nishiki Seian), tsukemono samples (Nishiki Tsuruya)", prix:"800–1 200¥/pers (total)", attente:"0–5 min par stand", s:"free", commande:"green", planB:"Konbini FamilyMart Kyoto Station si Nishiki Market fermé à l'arrivée", adresse:"Nishiki Market (錦市場), Nakagyo-ku, Kyoto", transport:"10 min à pied du centre Kyoto / hôtel Blossom — arrivée 16h–16h30" },
+      diner:{ nom:"Misoka-an Kawamichiya", nomJp:"御多福", plat:"Nishiki-ten udon (7 garnitures, ~1 800¥) — udon maison depuis 1716. En Pontocho pour le premier soir Kyoto.", prix:"1 400–1 800¥/pers", attente:"15–25 min", s:"free", commande:"yellow", planB:"Fumiya Nishiki (udon maison dans Nishiki Market, ferme 17h30 — option early dinner uniquement) ou Ippudo Kyoto (ramen, ouvert tard)", adresse:"Pontocho, Nakagyo-ku, Kyoto", transport:"10 min à pied de l'hôtel Blossom Kyoto, le long de la rivière Kamo" },
+    },
   },
 
   // ═══════════════════════════════════════════════════════
@@ -312,6 +327,11 @@ const DAYS = [
       "🎋 TIMING ABSOLU : Bus depuis l'hôtel à 5h45-6h10 pour être dans la forêt à 6h45-7h. Ces 45 min valent plus que 3h entre 9h et 12h. C'est la règle d'or d'Arashiyama.",
       "🚌 BUS KYOTO PAIEMENT : Déposer la monnaie exacte (230¥) ou passer la Suica au lecteur vert à MONTER dans le bus et à DESCENDRE. Le chauffeur annonce les arrêts en japonais puis en anglais dans les zones touristiques.",
     ],
+    meals:{
+      dejeuner:{ nom:"Shigetsu", nomJp:"篩月", plat:"Course Hana (花, 6 600¥, 9 plats) ou Tsuki (3 800¥, plus accessible) — shojin ryori bouddhiste végétarien avec vue jardin Zen. Réservation impérative.", prix:"3 800–6 600¥/pers", attente:"0 min (réservation obligatoire)", s:"book", commande:"green", planB:"Yudofu Sagano (Sagatenryuji Susukinobabacho 45, 4.3/5, tofu-focused, pas de réservation) ou Shoraian (4.6/5, tofu kaiseki bord rivière, réserver tôt aussi)", adresse:"Tenryuji 68, Sagatenryuji Susukinobabacho — dans le complexe Tenryu-ji (entrée jardin 500¥ obligatoire)", transport:"Accès via jardins Tenryu-ji — réserver sur shigetsu.jp ou tél. 075-882-9725 plusieurs jours avant" },
+      gouter:{ nom:"Arinco Roll Cake Kyoto", nomJp:"", plat:"Roll cake au matcha / sakura, 400–600¥/slice. OU senbei au sept épices chez Eirakuya Shichimi-ya sur la même rue.", prix:"400–600¥", attente:"5–10 min", s:"free", commande:"green", planB:"Street food rue principale Arashiyama : mochi-yaki grillé (~150¥) ou matcha soft cream (~450¥)", adresse:"Togetsukyo-dori (rue principale Arashiyama)", transport:"Sur la route entre Tenryu-ji et le pont Togetsukyo" },
+      diner:{ nom:"Gion Tanto", nomJp:"", plat:"Kaiseki kyotoïte en cadre machiya (maison en bois historique) — plats de saison : nimono, yakimono, hassun. Menus à partir de 8 000¥. Saké Fushimi.", prix:"8 000¥+/pers", attente:"0 min (réservation obligatoire, déjà réservé ✅)", s:"ok", commande:"green", planB:"Pontocho kawayuka si annulation — sans réservation possible avant 19h en début de ruelle", adresse:"Gion (Higashiyama-ku, côté Hanamikoji)", transport:"Bus 11 ou 93 depuis Arashiyama → Gion (~45 min, 230¥) ou taxi ~2 500¥" },
+    },
   },
   // ═══════════════════════════════════════════════════════
   // J9 — 5 MAI — FUSHIMI + NARA
