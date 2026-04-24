@@ -2028,11 +2028,14 @@ const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query, matc
               {viewMode==="timeline"?"📋 Cartes":"⏱ Timeline"}
             </button>
           </div>
-          {viewMode==="timeline" ? (
-            <TimelineView sections={day.sections} city={day.city} />
-          ) : (
-          <>{day.sections.filter(s=>s.items.length>0).map((section, si)=><SectionBlock key={section.id} section={section} query={query} dayN={day.n} dayCity={day.city} idx={si} />)}</>
-          )}
+          {(() => {
+            const enriched = enrichSectionsWithMeals(day.sections, day.meals);
+            return viewMode==="timeline" ? (
+              <TimelineView sections={enriched} city={day.city} />
+            ) : (
+              <>{enriched.filter(s=>s.items.length>0).map((section, si)=><SectionBlock key={section.id} section={section} query={query} dayN={day.n} dayCity={day.city} idx={si} />)}</>
+            );
+          })()}
           {day.meals && <MealSection meals={day.meals} city={day.city} dayN={day.n} />}
           {day.tips?.length>0 && (
             <div style={{
@@ -2581,6 +2584,35 @@ const MEAL_SLOTS = [
   { key:"gouter",   label:"☕ Goûter",   time:"~16h" },
   { key:"diner",    label:"🍜 Dîner",    time:"~19h" },
 ];
+
+// Inject les repas dans les sections en tant qu'items légers : on voit
+// le nom + adresse à 12h/16h/19h dans la timeline et les cartes normales.
+// Détail complet (plat, attente, plan B, Maps, "Mangé") reste dans MealSection.
+const MEAL_SEC_MAP  = { dejeuner:"aprem", gouter:"aprem", diner:"soir" };
+const MEAL_TIME_MAP = { dejeuner:"12h00", gouter:"16h00", diner:"19h00" };
+const MEAL_ICON_MAP = { dejeuner:"🍱",    gouter:"☕",    diner:"🍜"    };
+function enrichSectionsWithMeals(sections, meals) {
+  if (!meals) return sections;
+  const out = sections.map(s => ({ ...s, items: [...s.items] }));
+  for (const k of Object.keys(meals)) {
+    const m = meals[k]; if (!m) continue;
+    const secId = MEAL_SEC_MAP[k]; if (!secId) continue;
+    const sec = out.find(s => s.id === secId); if (!sec) continue;
+    const nom = (m.nom || "").toLowerCase();
+    const already = nom && sec.items.some(it => (it.t || "").toLowerCase().includes(nom));
+    if (already) continue;
+    const time = m.heure || MEAL_TIME_MAP[k];
+    const title = `🕘 ${time} — ${MEAL_ICON_MAP[k]} ${m.nom}${m.nomJp ? " " + m.nomJp : ""}`;
+    const subParts = [];
+    if (m.plat)    subParts.push(m.plat);
+    if (m.prix)    subParts.push(m.prix);
+    if (m.adresse) subParts.push(`📍 ${m.adresse}`);
+    sec.items.push({ s: m.s || "free", t: title, sub: subParts.join(" · "), isMeal: true });
+  }
+  const parseH = (t) => { const mm = t.match(/(\d{1,2})h(\d{0,2})/); return mm ? parseFloat(mm[1]) + (mm[2] ? parseInt(mm[2] || "0") / 60 : 0) : 99; };
+  out.forEach(s => s.items.sort((a, b) => parseH(a.t) - parseH(b.t)));
+  return out;
+}
 
 const COMMANDE_META = {
   green:  { icon:"🟢", label:"Commande facile (menu photo / anglais)" },

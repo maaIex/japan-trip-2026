@@ -4,6 +4,17 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ---
 
+## Session 10 — 2026-04-24 (Repas injectés dans timeline + cartes)
+
+- Nouveau helper `enrichSectionsWithMeals(sections, meals)` dans App.jsx : clone les sections et insère les repas comme items légers (nom + nom JP + plat/prix/adresse) à 12h00 / 16h00 / 19h00.
+- Déjeuner → section `aprem`, Goûter → `aprem`, Dîner → `soir`.
+- **Dé-duplication** : si le nom du resto apparaît déjà dans un item de la section (cas des 4 réservés : DAWN, Gion Tanto, Kichi Kichi, Kittan Hibiki), on skip — pas de doublon.
+- Items triés par heure après injection pour un ordre cohérent.
+- Utilisé à la fois dans `TimelineView` et la vue cartes normales.
+- `MealSection` reste en bas de chaque jour pour le détail complet (plat, attente, plan B, Maps, "Mangé").
+
+---
+
 ## Session 9 — 2026-04-24 (Restaurants — audit & améliorations)
 
 - Audit du composant `MealSection` / `MealCard` ajouté en session précédente (oubliée au CHANGELOG).
