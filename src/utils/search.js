@@ -33,6 +33,19 @@ export function matchesQuery(day, query) {
   if (day.date && day.date.toLowerCase().includes(q)) return true;
   if (day.day && day.day.toLowerCase().includes(q)) return true;
   if (day.tips && day.tips.some(tip => tip && tip.toLowerCase().includes(q))) return true;
+  if (day.meals) {
+    for (const k of Object.keys(day.meals)) {
+      const m = day.meals[k];
+      if (!m) continue;
+      if (
+        (m.nom && m.nom.toLowerCase().includes(q)) ||
+        (m.nomJp && m.nomJp.toLowerCase().includes(q)) ||
+        (m.plat && m.plat.toLowerCase().includes(q)) ||
+        (m.planB && m.planB.toLowerCase().includes(q)) ||
+        (m.adresse && m.adresse.toLowerCase().includes(q))
+      ) return true;
+    }
+  }
   if (!day.sections) return false;
   return day.sections.some(sec =>
     sec.items && sec.items.some(item =>
@@ -51,15 +64,30 @@ export function matchesQuery(day, query) {
  * @returns {number} Number of matching items (0 if no query).
  */
 export function countItemMatches(day, query) {
-  if (!query || !day?.sections) return 0;
+  if (!query || !day) return 0;
   const q = query.toLowerCase();
   let n = 0;
-  for (const sec of day.sections) {
-    if (!sec.items) continue;
-    for (const item of sec.items) {
+  if (day.sections) {
+    for (const sec of day.sections) {
+      if (!sec.items) continue;
+      for (const item of sec.items) {
+        if (
+          (item.t && item.t.toLowerCase().includes(q)) ||
+          (item.sub && item.sub.toLowerCase().includes(q))
+        ) n++;
+      }
+    }
+  }
+  if (day.meals) {
+    for (const k of Object.keys(day.meals)) {
+      const m = day.meals[k];
+      if (!m) continue;
       if (
-        (item.t && item.t.toLowerCase().includes(q)) ||
-        (item.sub && item.sub.toLowerCase().includes(q))
+        (m.nom && m.nom.toLowerCase().includes(q)) ||
+        (m.nomJp && m.nomJp.toLowerCase().includes(q)) ||
+        (m.plat && m.plat.toLowerCase().includes(q)) ||
+        (m.planB && m.planB.toLowerCase().includes(q)) ||
+        (m.adresse && m.adresse.toLowerCase().includes(q))
       ) n++;
     }
   }

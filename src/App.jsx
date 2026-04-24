@@ -2033,7 +2033,7 @@ const DayCard = forwardRef(function DayCard({ day, isOpen, onToggle, query, matc
           ) : (
           <>{day.sections.filter(s=>s.items.length>0).map((section, si)=><SectionBlock key={section.id} section={section} query={query} dayN={day.n} dayCity={day.city} idx={si} />)}</>
           )}
-          {day.meals && <MealSection meals={day.meals} city={day.city} />}
+          {day.meals && <MealSection meals={day.meals} city={day.city} dayN={day.n} />}
           {day.tips?.length>0 && (
             <div style={{
               marginTop:"0.85rem", padding:"0.8rem 0.95rem",
@@ -2582,44 +2582,72 @@ const MEAL_SLOTS = [
   { key:"diner",    label:"🍜 Dîner",    time:"~19h" },
 ];
 
-function MealCard({ slot, meal, city }) {
+const COMMANDE_META = {
+  green:  { icon:"🟢", label:"Commande facile (menu photo / anglais)" },
+  yellow: { icon:"🟡", label:"Commande moyenne (carte en japonais)" },
+  red:    { icon:"🔴", label:"Commande difficile (JP uniquement, prévoir phrasebook)" },
+};
+
+function MealCard({ slot, meal, city, mealKey }) {
   const [open, setOpen] = useState(false);
   const [addrOpen, setAddrOpen] = useState(false);
+  const { done, toggle } = useDoneItems();
+  const panelId = `meal-panel-${mealKey}`;
+  const addrId = `meal-addr-${mealKey}`;
   const cc = CITY[city] || CITY.transit;
   const st = ST[meal.s] || ST.free;
-  const commandeIcon = meal.commande === "green" ? "🟢" : meal.commande === "yellow" ? "🟡" : meal.commande === "red" ? "🔴" : (meal.commande || "");
+  const cm = COMMANDE_META[meal.commande] || null;
+  const isDone = done.has(mealKey);
+  const mapsQuery = encodeURIComponent([meal.nom, meal.nomJp, meal.adresse].filter(Boolean).join(" "));
+  const mapsHref = mapsQuery ? `https://www.google.com/maps/search/?api=1&query=${mapsQuery}` : null;
   return (
-    <div style={{ border:"1px solid var(--border-light)", borderLeft:`3px solid ${cc.color}`, background:"var(--bg-card-2)", marginBottom:"0.5rem", overflow:"hidden" }}>
+    <div style={{ border:"1px solid var(--border-light)", borderLeft:`3px solid ${cc.color}`, background:"var(--bg-card-2)", marginBottom:"0.5rem", overflow:"hidden", opacity:isDone?0.55:1 }}>
       <button
         onClick={() => setOpen(o => !o)}
-        style={{ width:"100%", display:"flex", alignItems:"center", gap:"0.4rem", padding:"0.55rem 0.75rem", background:"transparent", border:"none", cursor:"pointer", textAlign:"left", fontFamily:"inherit", color:"inherit", flexWrap:"wrap" }}
+        aria-expanded={open}
+        aria-controls={panelId}
+        style={{ width:"100%", display:"grid", gridTemplateColumns:"auto 1fr auto", columnGap:"0.5rem", rowGap:"0.2rem", alignItems:"center", padding:"0.55rem 0.75rem", background:"transparent", border:"none", cursor:"pointer", textAlign:"left", fontFamily:"inherit", color:"inherit" }}
       >
-        <span style={{ fontSize:"0.6rem", fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--text-muted)", whiteSpace:"nowrap", minWidth:"4.2rem", flexShrink:0 }}>{slot.label}</span>
-        <span style={{ flex:1, fontFamily:"var(--font-display)", fontSize:"0.9rem", fontWeight:700, color:"var(--text-primary)", lineHeight:1.2, minWidth:"8rem" }}>
+        <span style={{ fontSize:"0.6rem", fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--text-muted)", whiteSpace:"nowrap" }}>{slot.label}</span>
+        <span style={{ fontFamily:"var(--font-display)", fontSize:"0.9rem", fontWeight:700, color:"var(--text-primary)", lineHeight:1.2, textDecoration:isDone?"line-through":"none", overflow:"hidden" }}>
           {meal.nom}
           {meal.nomJp && <span style={{ fontFamily:"var(--font-kanji)", fontSize:"0.75rem", fontWeight:400, color:"var(--text-muted)", marginLeft:"0.35rem" }}>{meal.nomJp}</span>}
         </span>
-        <span style={{ fontFamily:"var(--font-mono)", fontSize:"0.67rem", fontWeight:600, color:"var(--text-sec)", whiteSpace:"nowrap", flexShrink:0 }}>{meal.prix}</span>
-        <span style={{ fontSize:"0.54rem", fontWeight:700, letterSpacing:"0.13em", textTransform:"uppercase", padding:"0.13rem 0.36rem", background:st.bg.light, color:st.color.light, border:`1px solid ${st.bdr.light}`, whiteSpace:"nowrap", flexShrink:0 }}>{st.label}</span>
-        <span title="Niveau de commande" style={{ fontSize:"0.78rem", flexShrink:0 }}>{commandeIcon}</span>
-        <span aria-hidden="true" style={{ fontSize:"0.65rem", color:"var(--text-muted)", flexShrink:0, display:"inline-block", transform:open?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▾</span>
+        <span style={{ display:"flex", alignItems:"center", gap:"0.35rem", justifySelf:"end", flexShrink:0 }}>
+          <span style={{ fontFamily:"var(--font-mono)", fontSize:"0.67rem", fontWeight:600, color:"var(--text-sec)", whiteSpace:"nowrap" }}>{meal.prix}</span>
+          <span style={{ fontSize:"0.54rem", fontWeight:700, letterSpacing:"0.13em", textTransform:"uppercase", padding:"0.13rem 0.36rem", background:st.bg.light, color:st.color.light, border:`1px solid ${st.bdr.light}`, whiteSpace:"nowrap" }}>{st.label}</span>
+          {cm && <span role="img" aria-label={cm.label} title={cm.label} style={{ fontSize:"0.78rem" }}>{cm.icon}</span>}
+          <span aria-hidden="true" style={{ fontSize:"0.65rem", color:"var(--text-muted)", display:"inline-block", transform:open?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▾</span>
+        </span>
       </button>
       {open && (
-        <div style={{ padding:"0.1rem 0.75rem 0.65rem", borderTop:"1px solid var(--border-light)" }}>
+        <div id={panelId} style={{ padding:"0.1rem 0.75rem 0.65rem", borderTop:"1px solid var(--border-light)" }}>
           {meal.plat    && <p style={{ fontFamily:"var(--font-body)", fontSize:"0.8rem", color:"var(--text-sec)",   margin:"0.42rem 0 0", lineHeight:1.5 }}><strong>Plat :</strong> {meal.plat}</p>}
           {meal.attente && <p style={{ fontFamily:"var(--font-body)", fontSize:"0.8rem", color:"var(--text-sec)",   margin:"0.26rem 0 0", lineHeight:1.5 }}>⏳ <strong>Attente :</strong> {meal.attente}</p>}
           {meal.planB   && <p style={{ fontFamily:"var(--font-body)", fontSize:"0.75rem", color:"var(--text-muted)", margin:"0.26rem 0 0", lineHeight:1.5 }}>🔄 <strong>Plan B :</strong> {meal.planB}</p>}
-          {(meal.adresse || meal.transport) && (
-            <div style={{ marginTop:"0.42rem" }}>
-              <button onClick={e=>{e.stopPropagation();setAddrOpen(o=>!o);}} style={{ fontSize:"0.69rem", fontWeight:600, color:"var(--text-muted)", background:"none", border:"none", cursor:"pointer", padding:0, fontFamily:"inherit" }}>
-                📍 Adresse & transport {addrOpen ? "▴" : "▾"}
+          <div style={{ marginTop:"0.5rem", display:"flex", flexWrap:"wrap", gap:"0.5rem", alignItems:"center" }}>
+            {mapsHref && (
+              <a href={mapsHref} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{ fontSize:"0.69rem", fontWeight:600, color:cc.color, textDecoration:"none", padding:"0.22rem 0.5rem", border:`1px solid ${cc.color}`, borderRadius:"2px" }}>
+                🗺 Google Maps
+              </a>
+            )}
+            {(meal.adresse || meal.transport) && (
+              <button onClick={e=>{e.stopPropagation();setAddrOpen(o=>!o);}} aria-expanded={addrOpen} aria-controls={addrId} style={{ fontSize:"0.69rem", fontWeight:600, color:"var(--text-muted)", background:"none", border:"none", cursor:"pointer", padding:0, fontFamily:"inherit" }}>
+                📍 Adresse {addrOpen ? "▴" : "▾"}
               </button>
-              {addrOpen && (
-                <div style={{ marginTop:"0.26rem", paddingLeft:"0.5rem", borderLeft:"2px solid var(--border-light)" }}>
-                  {meal.adresse   && <p style={{ fontFamily:"var(--font-body)", fontSize:"0.75rem", color:"var(--text-sec)",   margin:0, lineHeight:1.5 }}>{meal.adresse}</p>}
-                  {meal.transport && <p style={{ fontFamily:"var(--font-body)", fontSize:"0.75rem", color:"var(--text-muted)", margin:"0.16rem 0 0", lineHeight:1.5 }}>🚶 {meal.transport}</p>}
-                </div>
-              )}
+            )}
+            <button
+              onClick={e=>{e.stopPropagation();toggle(mealKey);}}
+              aria-pressed={isDone}
+              style={{ marginLeft:"auto", fontSize:"0.69rem", fontWeight:600, color:isDone?"var(--text-sec)":"var(--text-muted)", background:isDone?"var(--bg-card-2)":"none", border:"1px solid var(--border-light)", borderRadius:"2px", cursor:"pointer", padding:"0.22rem 0.5rem", fontFamily:"inherit" }}
+            >
+              {isDone ? "✓ Mangé" : "Marquer mangé"}
+            </button>
+          </div>
+          {addrOpen && (meal.adresse || meal.transport) && (
+            <div id={addrId} style={{ marginTop:"0.4rem", paddingLeft:"0.5rem", borderLeft:"2px solid var(--border-light)" }}>
+              {meal.adresse   && <p style={{ fontFamily:"var(--font-body)", fontSize:"0.75rem", color:"var(--text-sec)",   margin:0, lineHeight:1.5 }}>{meal.adresse}</p>}
+              {meal.transport && <p style={{ fontFamily:"var(--font-body)", fontSize:"0.75rem", color:"var(--text-muted)", margin:"0.16rem 0 0", lineHeight:1.5 }}>🚶 {meal.transport}</p>}
             </div>
           )}
         </div>
@@ -2628,13 +2656,13 @@ function MealCard({ slot, meal, city }) {
   );
 }
 
-function MealSection({ meals, city }) {
+function MealSection({ meals, city, dayN }) {
   const hasAny = MEAL_SLOTS.some(sl => meals[sl.key]);
   if (!hasAny) return null;
   return (
     <div style={{ marginTop:"1rem", borderTop:"2px dashed var(--border-mid)", paddingTop:"0.8rem" }}>
       <p style={{ fontFamily:"var(--font-body)", fontSize:"0.63rem", fontWeight:700, letterSpacing:"0.2em", textTransform:"uppercase", color:"var(--text-muted)", marginBottom:"0.55rem" }}>🍽 Repas du jour</p>
-      {MEAL_SLOTS.map(sl => meals[sl.key] ? <MealCard key={sl.key} slot={sl} meal={meals[sl.key]} city={city} /> : null)}
+      {MEAL_SLOTS.map(sl => meals[sl.key] ? <MealCard key={sl.key} slot={sl} meal={meals[sl.key]} city={city} mealKey={`meal-${dayN}-${sl.key}`} /> : null)}
     </div>
   );
 }

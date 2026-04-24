@@ -4,6 +4,24 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ---
 
+## Session 9 — 2026-04-24 (Restaurants — audit & améliorations)
+
+- Audit du composant `MealSection` / `MealCard` ajouté en session précédente (oubliée au CHANGELOG).
+- **Recherche étendue** (`utils/search.js`) : `matchesQuery` et `countItemMatches` incluent maintenant `day.meals` (nom, nom JP, plat, plan B, adresse). Taper "ramen" ou "Kichi Kichi" match les repas.
+- **MealCard — accessibilité** : `aria-expanded` / `aria-controls` sur les boutons repliables, `role="img"` + `aria-label` descriptif sur l'icône niveau de commande 🟢🟡🔴 (lecteurs d'écran).
+- **MealCard — lien Google Maps** : bouton dédié ouvrant `maps.google.com/?q=nom+adresse` dans un nouvel onglet (utile sur mobile pendant le voyage).
+- **MealCard — toggle "Mangé"** : bouton `Marquer mangé` / `✓ Mangé`, état persistant via `useDoneItems` (même localStorage que les activités, clé `meal-{n}-{slot}`). Opacité réduite + barré quand marqué.
+- **MealCard — layout mobile** : passage de `flex + flexWrap` (wrap hasardeux) à `display:grid` `auto 1fr auto` → nom peut tronquer proprement, badges restent alignés à droite sur tous les écrans.
+- **MealSection** : nouvelle prop `dayN` pour générer des clés stables (`meal-{n}-{slot}`).
+
+---
+
+## Session 8b — 2026-04-23 (intégration restaurants — non consignée)
+
+Rattrapage rétroactif : intégration en 4 batches des suggestions restaurants (déjeuner / goûter / dîner sur 14 jours) via les composants `MealSlots`, `MealCard`, `MealSection` (App.jsx ~2578). Préservation des 4 restaurants déjà réservés (DAWN J5, Gion Tanto J8, Kichi Kichi J9, Kittan Hibiki J13). Détails par repas : nom + nom JP, plat, prix, attente, statut (✅/⚠️/🔓), niveau de commande (🟢/🟡/🔴), plan B, adresse, transport.
+
+---
+
 ## Session 8 — 2026-04-21 (J13 — Kittan Hibiki réservation confirmée)
 
 - J13 (9 mai) : Kittan Hibiki déplacé de 19h (soir) à **13h00 (déjeuner)** — réservation confirmée.
