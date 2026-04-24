@@ -2638,18 +2638,20 @@ function MealCard({ slot, meal, city, mealKey }) {
         onClick={() => setOpen(o => !o)}
         aria-expanded={open}
         aria-controls={panelId}
-        style={{ width:"100%", display:"grid", gridTemplateColumns:"auto 1fr auto", columnGap:"0.5rem", rowGap:"0.2rem", alignItems:"center", padding:"0.55rem 0.75rem", background:"transparent", border:"none", cursor:"pointer", textAlign:"left", fontFamily:"inherit", color:"inherit" }}
+        style={{ width:"100%", display:"flex", flexDirection:"column", gap:"0.3rem", padding:"0.55rem 0.75rem", background:"transparent", border:"none", cursor:"pointer", textAlign:"left", fontFamily:"inherit", color:"inherit" }}
       >
-        <span style={{ fontSize:"0.6rem", fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--text-muted)", whiteSpace:"nowrap" }}>{slot.label}</span>
-        <span style={{ fontFamily:"var(--font-display)", fontSize:"0.9rem", fontWeight:700, color:"var(--text-primary)", lineHeight:1.2, textDecoration:isDone?"line-through":"none", overflow:"hidden" }}>
-          {meal.nom}
-          {meal.nomJp && <span style={{ fontFamily:"var(--font-kanji)", fontSize:"0.75rem", fontWeight:400, color:"var(--text-muted)", marginLeft:"0.35rem" }}>{meal.nomJp}</span>}
+        <span style={{ display:"flex", alignItems:"center", gap:"0.5rem", width:"100%" }}>
+          <span style={{ fontSize:"0.6rem", fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"var(--text-muted)", whiteSpace:"nowrap", flexShrink:0 }}>{slot.label}</span>
+          <span style={{ flex:1, minWidth:0, fontFamily:"var(--font-display)", fontSize:"0.9rem", fontWeight:700, color:"var(--text-primary)", lineHeight:1.25, textDecoration:isDone?"line-through":"none", overflowWrap:"anywhere" }}>
+            {meal.nom}
+            {meal.nomJp && <span style={{ fontFamily:"var(--font-kanji)", fontSize:"0.75rem", fontWeight:400, color:"var(--text-muted)", marginLeft:"0.35rem" }}>{meal.nomJp}</span>}
+          </span>
+          <span aria-hidden="true" style={{ fontSize:"0.65rem", color:"var(--text-muted)", flexShrink:0, display:"inline-block", transform:open?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▾</span>
         </span>
-        <span style={{ display:"flex", alignItems:"center", gap:"0.35rem", justifySelf:"end", flexShrink:0 }}>
+        <span style={{ display:"flex", alignItems:"center", gap:"0.4rem", flexWrap:"wrap", paddingLeft:"0.1rem" }}>
           <span style={{ fontFamily:"var(--font-mono)", fontSize:"0.67rem", fontWeight:600, color:"var(--text-sec)", whiteSpace:"nowrap" }}>{meal.prix}</span>
           <span style={{ fontSize:"0.54rem", fontWeight:700, letterSpacing:"0.13em", textTransform:"uppercase", padding:"0.13rem 0.36rem", background:st.bg.light, color:st.color.light, border:`1px solid ${st.bdr.light}`, whiteSpace:"nowrap" }}>{st.label}</span>
           {cm && <span role="img" aria-label={cm.label} title={cm.label} style={{ fontSize:"0.78rem" }}>{cm.icon}</span>}
-          <span aria-hidden="true" style={{ fontSize:"0.65rem", color:"var(--text-muted)", display:"inline-block", transform:open?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▾</span>
         </span>
       </button>
       {open && (

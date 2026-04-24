@@ -4,6 +4,14 @@ Journal des modifications apportées par session Claude Code. À donner en débu
 
 ---
 
+## Session 11 — 2026-04-24 (MealCard — fix affichage mobile)
+
+- Les noms longs ("Kuro tamago Owakudani", "Ekiben à Odawara Station") étaient écrasés par les badges à droite → rendu vertical lettre par lettre.
+- Refonte du header en 2 lignes : ligne 1 = slot + nom (pleine largeur, `overflowWrap:anywhere`) + chevron ; ligne 2 = prix + statut + niveau commande.
+- Le nom a maintenant tout l'espace nécessaire, les badges ne le compriment plus.
+
+---
+
 ## Session 10 — 2026-04-24 (Repas injectés dans timeline + cartes)
 
 - Nouveau helper `enrichSectionsWithMeals(sections, meals)` dans App.jsx : clone les sections et insère les repas comme items légers (nom + nom JP + plat/prix/adresse) à 12h00 / 16h00 / 19h00.
